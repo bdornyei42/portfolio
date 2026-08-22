@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bendegúz Dörnyei</title>
-<meta name="description" content="Bendegúz Dörnyei — Global Affairs & Statistics and Data Science, Yale. Closing loops in food systems, education, and public policy.">
+<meta name="description" content="Bendegúz (“Ben”) Dörnyei — quantitative policy researcher. Statistics, data science, and AI applied to global affairs, from democratic backsliding in Hungary to the World Bank's household surveys.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -13,6 +13,7 @@
     --ink:#1B2420;
     --paper:#E7EAE1;
     --paper-2:#DCE0D3;
+    --card:#F3F5EF;
     --paprika:#C1440E;
     --gold:#B98A1F;
     --forest:#2F4A3D;
@@ -71,6 +72,7 @@
   nav.top-nav{display:flex; gap:26px; font-size:14px;}
   nav.top-nav a{text-decoration:none; color:var(--slate);}
   nav.top-nav a:hover, nav.top-nav a:focus-visible{color:var(--paprika);}
+  @media (max-width:640px){ nav.top-nav{gap:18px; font-size:13px;} nav.top-nav .hide-sm{display:none;} }
 
   /* ===== Hero ===== */
   .hero{
@@ -85,7 +87,7 @@
   }
   .hero h1 em{font-style:italic; font-weight:400; color:var(--forest);}
   .hero .lede{
-    max-width:560px;
+    max-width:588px;
     margin-top:22px;
     font-size:19px;
     color:var(--ink);
@@ -99,7 +101,7 @@
   }
   .hero .meta-row span{white-space:nowrap;}
 
-  /* signature: the thread */
+  /* signature flourish */
   .thread-svg{
     position:absolute;
     right:6%;
@@ -136,6 +138,32 @@
   .reveal{opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease;}
   .reveal.in{opacity:1; transform:none;}
 
+  /* ===== Tools / demos ===== */
+  .demos-intro{max-width:640px; color:var(--ink); font-size:17px; margin-bottom:12px;}
+  .demos-note{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--slate);
+    margin-bottom:40px; display:flex; align-items:center; gap:8px;
+  }
+  .demos-note .dot{width:7px; height:7px; border-radius:50%; background:var(--paprika); flex:none;}
+  .demo-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  @media (max-width:820px){ .demo-grid{grid-template-columns:1fr;} }
+  .demo-card{
+    background:var(--card); padding:28px 26px 24px;
+    display:flex; flex-direction:column; min-height:230px;
+    text-decoration:none; color:var(--ink);
+    transition:background .25s ease, transform .25s ease;
+  }
+  .demo-card:hover, .demo-card:focus-visible{ background:#EDEFE7; }
+  .demo-card .eyebrow{color:var(--forest); margin-bottom:12px;}
+  .demo-card h3{font-size:22px; margin-bottom:10px;}
+  .demo-card p{color:var(--slate); font-size:14.5px; margin:0 0 20px;}
+  .demo-card .open{
+    margin-top:auto; font-family:'IBM Plex Mono',monospace; font-size:12.5px;
+    letter-spacing:.04em; color:var(--paprika); display:inline-flex; align-items:center; gap:7px;
+  }
+  .demo-card:hover .open .arrow{ transform:translateX(4px); }
+  .demo-card .open .arrow{ transition:transform .25s ease; }
+
   /* ===== Journey / timeline ===== */
   .timeline{position:relative; padding-left:34px;}
   .timeline::before{
@@ -150,31 +178,14 @@
     width:12px; height:12px; border-radius:50%;
     background:var(--paper); border:2px solid var(--forest);
   }
-  .t-item.loop .t-dot{
-    width:22px; height:22px; left:-39px; top:-3px;
-    border:none; background:none;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .t-item.loop .t-dot svg{width:22px; height:22px;}
+  .t-item.now .t-dot{ background:var(--paprika); border-color:var(--paprika); box-shadow:0 0 0 4px rgba(193,68,14,0.16); }
   .t-date{
     font-family:'IBM Plex Mono', monospace; font-size:12.5px;
     color:var(--paprika); margin-bottom:6px; display:block;
   }
-  .t-item h3{font-size:20px; font-weight:500; margin-bottom:6px;}
-  .t-item p{margin:0; color:var(--slate); font-size:15.5px; max-width:600px;}
-  .loop-tag{
-    display:inline-flex; align-items:center; gap:5px;
-    font-family:'IBM Plex Mono', monospace; font-size:11px;
-    color:var(--forest); margin-top:8px; letter-spacing:0.03em;
-  }
-
-  /* ===== Projects ===== */
-  .proj-grid{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line);}
-  .proj{background:var(--paper); padding:30px 28px;}
-  .proj .eyebrow{color:var(--forest); margin-bottom:10px;}
-  .proj h3{font-size:21px; margin-bottom:10px;}
-  .proj p{color:var(--slate); font-size:15px; margin:0;}
-  @media (max-width:640px){ .proj-grid{grid-template-columns:1fr;} }
+  .t-item h3{font-size:20px; font-weight:500; margin-bottom:4px;}
+  .t-item .org{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--slate); letter-spacing:.03em; margin-bottom:8px;}
+  .t-item p{margin:0; color:var(--slate); font-size:15.5px; max-width:620px;}
 
   /* ===== Education / Honors ===== */
   .ed-item{padding:22px 0; border-bottom:1px solid var(--line);}
@@ -220,153 +231,107 @@
   <div class="wrap">
     <div class="mark">B. DÖRNYEI</div>
     <nav class="top-nav">
-      <a href="#journey">Journey</a>
-      <a href="#projects">Projects</a>
-      <a href="#education">Education</a>
+      <a href="#experience">Experience</a>
+      <a href="#tools">Tools</a>
+      <a href="#education" class="hide-sm">Education</a>
       <a href="#contact">Contact</a>
     </nav>
   </div>
 </header>
 
 <div class="hero">
-  <div class="eyebrow">Global Affairs &amp; Statistics / Data Science — Yale</div>
+  <div class="eyebrow">Global Affairs · Statistics &amp; Data Science — Yale</div>
   <h1>Bendegúz<br><em>Dörnyei</em></h1>
-  <p class="lede">I close loops — in food systems, in education, in the nonprofits I build. Currently studying how data and policy can make that closing systematic instead of one-off.</p>
+  <p class="lede">I use statistics, data science, and a bit of AI to understand how institutions actually behave — from democratic backsliding in Hungary to the World Bank's household surveys. Currently an LSMS Survey Innovation Fellow at the World Bank and an M.P.P. candidate at Yale's Jackson School.</p>
   <div class="meta-row">
     <span>NEW HAVEN, CT</span>
-    <span>BUDAPEST, HU</span>
-    <span>YALE COLLEGE ’26 · MPP ’27</span>
+    <span>WASHINGTON, D.C.</span>
+    <span>YALE MPP ’27 · GEORGIA TECH MS ’28</span>
   </div>
   <svg class="thread-svg" viewBox="0 0 150 150" aria-hidden="true">
     <path d="M10,110 C40,110 30,60 60,60 C85,60 75,20 100,20 C115,20 118,35 132,32" />
   </svg>
 </div>
 
-<section id="journey">
+<section id="experience">
   <div class="section-head reveal">
-    <h2>The <span class="serif-italic">journey</span></h2>
-    <span class="count">2016 — 2027</span>
+    <h2>Where I've <span class="serif-italic">worked</span></h2>
+    <span class="count">2022 — now</span>
   </div>
-  <p class="lead-p reveal">A rough chronology. The loop icon marks the points where the throughline — closing a circular system instead of running a linear one — is most literal.</p>
+  <p class="lead-p reveal">Research and analyst roles across development, environment, and governance — the common thread is turning messy real-world data into something a decision-maker can act on.</p>
 
   <div class="timeline" style="margin-top:48px;">
 
-    <div class="t-item loop reveal">
-      <div class="t-dot">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 9 9" stroke="#2F4A3D" stroke-width="2" stroke-linecap="round"/><path d="M12 3l4 0M12 3l0 4" stroke="#2F4A3D" stroke-width="2" stroke-linecap="round"/></svg>
-      </div>
-      <span class="t-date">c. 2016</span>
-      <h3>National canoe conference, age 16</h3>
-      <p>Organized Hungary's first national canoe conference — the first time Bende ran an event from scratch.</p>
-    </div>
-
-    <div class="t-item loop reveal">
-      <div class="t-dot">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 9 9" stroke="#2F4A3D" stroke-width="2" stroke-linecap="round"/><path d="M12 3l4 0M12 3l0 4" stroke="#2F4A3D" stroke-width="2" stroke-linecap="round"/></svg>
-      </div>
-      <span class="t-date">age 15</span>
-      <h3>Co-founded a household food-waste initiative</h3>
-      <p>Worked to cut household food waste — commonly $150+/month per US household — partnering with major European wholesalers including Tesco and Metro.</p>
-      <span class="loop-tag">⟲ closing a physical supply loop</span>
+    <div class="t-item now reveal">
+      <div class="t-dot"></div>
+      <span class="t-date">Jun 2026 — present</span>
+      <h3>LSMS Survey Innovation Fellow</h3>
+      <div class="org">The World Bank Group · Development Data Group, Survey Unit · Washington, D.C.</div>
+      <p>Built an automated Python pipeline tracking the research impact of LSMS household surveys across publications, books, and articles; supported the launch of an internal Community of Practice for Data; produced analysis and visualizations on survey outcomes, including the Nigerian Household Business Indicators.</p>
     </div>
 
     <div class="t-item reveal">
-      <span class="t-date">2016</span>
-      <h3>Selected, Templeton Program</h3>
-      <p>Chosen from roughly 20,000 applicants to a program nurturing exceptional cognitive talent.</p>
+      <div class="t-dot"></div>
+      <span class="t-date">Jun — Aug 2025</span>
+      <h3>Public Administration Intern</h3>
+      <div class="org">United Nations · Dept. of Economic and Social Affairs (UN DESA) · New York, NY</div>
+      <p>Analyzed the UN e-government survey and quantified digital-capacity gaps across 193 countries with an R pipeline; produced reports and policy dashboards used by ministers during the UN High-Level Political Forum; attended General Assembly and Security Council sessions and prepared briefs for senior leadership.</p>
     </div>
 
     <div class="t-item reveal">
-      <span class="t-date">2018–2020</span>
-      <h3>Built Skeebdo</h3>
-      <p>A platform teaching English vocabulary at any level using clips from 200,000+ movies and TV shows, compatible with Netflix, HBO Max, Disney+, Hulu, and more.</p>
+      <div class="t-dot"></div>
+      <span class="t-date">Aug 2024 — Oct 2025</span>
+      <h3>Research Assistant</h3>
+      <div class="org">Yale Institution for Social and Policy Studies · New Haven, CT</div>
+      <p>Built an interim U.S. Senate position-tracker tool to support federal-oversight and policy research; ran quantitative field research on Hungary's electoral incentives and EU integration.</p>
     </div>
 
     <div class="t-item reveal">
-      <span class="t-date">2019–2021</span>
-      <h3>Founded Startup Maffia</h3>
-      <p>Built Hungary's leading business-support nonprofit for early founders — 43 free educational events, 165,000+ participants during his presidency. Graduated secondary school with the highest national distinction, then handed the association to a new board and stayed on as a supervisory board member so it would outlast him.</p>
+      <div class="t-dot"></div>
+      <span class="t-date">Aug 2024 — Jun 2025</span>
+      <h3>Research Assistant</h3>
+      <div class="org">Yale Center for Environmental Law &amp; Policy · New Haven, CT</div>
+      <p>Contributed to the 2026 Environmental Performance Index — a report used by the UN and governments worldwide — using R, Python, and SQL to analyze climate and trade data informing sustainability and economic policy.</p>
     </div>
 
     <div class="t-item reveal">
-      <span class="t-date">2021</span>
-      <h3>Co-director, "Cápák között"</h3>
-      <p>Preselection and mentoring board for Hungary's Shark Tank — evaluating projects and preparing founders to pitch in front of roughly 1M TV viewers.</p>
-    </div>
-
-    <div class="t-item reveal">
-      <span class="t-date">2022</span>
-      <h3>Matriculated at Yale College</h3>
-      <p>Began a double degree in Global Affairs and Statistics &amp; Data Science. Elected a full member of Mensa the same year.</p>
-    </div>
-
-    <div class="t-item loop reveal">
-      <div class="t-dot">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 9 9" stroke="#2F4A3D" stroke-width="2" stroke-linecap="round"/><path d="M12 3l4 0M12 3l0 4" stroke="#2F4A3D" stroke-width="2" stroke-linecap="round"/></svg>
-      </div>
-      <span class="t-date">2023–2024</span>
-      <h3>Coordinator, Planetary Innovator Speaker Series</h3>
-      <p>Yale Center for Business and the Environment (CBEY), focused on circularity, environmental innovation, and nature-based solutions. Also served as a student representative at Morse College.</p>
-      <span class="loop-tag">⟲ circular economy, at institutional scale</span>
-    </div>
-
-    <div class="t-item reveal">
-      <span class="t-date">Summer 2024</span>
-      <h3>Internship, UNICEF</h3>
-      <p>Contributed to work aimed at data-driven social change and non-profit leadership.</p>
-    </div>
-
-    <div class="t-item reveal">
-      <span class="t-date">2025</span>
-      <h3>Policy intern, UN DESA · Research assistant, Yale</h3>
-      <p>Public Administration and Policy Intern at the UN Department of Economic and Social Affairs; Research Assistant at the Yale Center for Environmental Law &amp; Policy.</p>
-    </div>
-
-    <div class="t-item reveal">
-      <span class="t-date">2025–2027</span>
-      <h3>Joint B.A./M.P.P., Jackson School of Global Affairs</h3>
-      <p>Accepted into Yale's selective five-year joint degree program, pairing the ongoing B.A. with an accelerated Master in Public Policy.</p>
+      <div class="t-dot"></div>
+      <span class="t-date">May — Aug 2024</span>
+      <h3>Service Quality Management Analyst</h3>
+      <div class="org">UNICEF · Global Shared Services Centre · Budapest, Hungary</div>
+      <p>Developed and validated an R-based financial risk model that recovered over $100,000 and improved oversight of an $8.9B fund; briefed senior officials, who adopted it long-term; built a Power BI dashboard for real-time performance tracking.</p>
     </div>
 
   </div>
 </section>
 
-<section id="projects">
+<section id="tools">
   <div class="section-head reveal">
-    <h2>Selected <span class="serif-italic">work</span></h2>
-    <span class="count">06</span>
+    <h2>Things I've <span class="serif-italic">built</span></h2>
+    <span class="count">03 · live demos</span>
   </div>
-  <div class="proj-grid reveal">
-    <div class="proj">
-      <div class="eyebrow">Circularity</div>
-      <h3>Fridge &amp; Pantry Management</h3>
-      <p>Household food-waste reduction, built with European wholesalers Tesco and Metro. Co-founded at 15.</p>
-    </div>
-    <div class="proj">
-      <div class="eyebrow">EdTech</div>
-      <h3>Skeebdo</h3>
-      <p>Learn English from 200,000+ movies and shows, across every major streaming platform.</p>
-    </div>
-    <div class="proj">
-      <div class="eyebrow">Nonprofit</div>
-      <h3>Startup Maffia</h3>
-      <p>43 free events, 165,000+ participants — built to run without its founder.</p>
-    </div>
-    <div class="proj">
-      <div class="eyebrow">Media &amp; Mentorship</div>
-      <h3>Cápák között</h3>
-      <p>Preselection &amp; mentoring for Hungary's Shark Tank, pitching to ~1M viewers.</p>
-    </div>
-    <div class="proj">
-      <div class="eyebrow">Environment</div>
-      <h3>Planetary Innovator Speaker Series</h3>
-      <p>Coordinated CBEY's series spanning circularity, clean energy, and nature-based solutions.</p>
-    </div>
-    <div class="proj">
-      <div class="eyebrow">Public Policy</div>
-      <h3>UN DESA</h3>
-      <p>Public Administration &amp; Policy internship focused on data-driven, systemic approaches.</p>
-    </div>
+  <p class="demos-intro reveal">Small single-page apps I built to run my own life and to keep my front-end sharp. Try them — each one is fully interactive.</p>
+  <p class="demos-note reveal"><span class="dot"></span> Public demos: seeded with sample data and running entirely in your browser. Nothing you enter is saved or sent anywhere.</p>
+
+  <div class="demo-grid reveal">
+    <a class="demo-card" href="planner-demo.html">
+      <div class="eyebrow">Planning</div>
+      <h3>Year Planner</h3>
+      <p>A whole year at a glance. Drop events onto a twelve-month grid, tag them by category, and track goals across the calendar — a single-page app with no page reloads.</p>
+      <span class="open">Open demo <span class="arrow">→</span></span>
+    </a>
+    <a class="demo-card" href="dashboard.html">
+      <div class="eyebrow">Personal finance</div>
+      <h3>Budget Dashboard</h3>
+      <p>Log transactions, sort them into categories, and watch the summary tiles recompute live. A compact take on the spreadsheet I used to keep by hand.</p>
+      <span class="open">Open demo <span class="arrow">→</span></span>
+    </a>
+    <a class="demo-card" href="connections.html">
+      <div class="eyebrow">Network</div>
+      <h3>Connection Tracker</h3>
+      <p>An interactive map of people and how they connect — nodes for contacts, links for relationships, searchable and filterable. Useful when your network outgrows your memory.</p>
+      <span class="open">Open demo <span class="arrow">→</span></span>
+    </a>
   </div>
 </section>
 
@@ -378,50 +343,56 @@
   <div class="reveal">
     <div class="ed-item">
       <div class="row">
+        <h3>Georgia Institute of Technology — College of Computing</h3>
+        <span class="yrs">2026–2028</span>
+      </div>
+      <p>M.S. in Computer Science, specialization in Artificial Intelligence.</p>
+    </div>
+    <div class="ed-item">
+      <div class="row">
         <h3>Yale University — Jackson School of Global Affairs</h3>
         <span class="yrs">2025–2027</span>
       </div>
-      <p>Master in Public Policy (M.P.P.), accelerated joint-degree track.</p>
+      <p>M.P.P. in Global Affairs (accelerated joint-degree track).</p>
     </div>
     <div class="ed-item">
       <div class="row">
         <h3>Yale College</h3>
         <span class="yrs">2022–2026</span>
       </div>
-      <p>B.A./B.S., double degree — Global Affairs, and Statistics &amp; Data Science.</p>
+      <p>B.A. in Global Affairs and Statistics &amp; Data Science. Elected Senator on the Yale College Council (academic and financial policy for 6,600+ students) and a member of the Yale Executive Committee.</p>
     </div>
     <div class="ed-item">
       <div class="row">
-        <h3>University of Cambridge — Summer Study Abroad</h3>
+        <h3>University of Cambridge — Pembroke College</h3>
         <span class="yrs">2023</span>
       </div>
-      <p>Industrial Organization; Economics of Growth &amp; Development; Moral Philosophy.</p>
+      <p>Yale study-abroad program in Development Economics, on full scholarship.</p>
     </div>
   </div>
 
   <ul class="honors-list reveal" style="margin-top:48px;">
-    <li>Templeton Fellow — selected from ~20,000 applicants (2016)</li>
-    <li>Full member, Mensa (2022)</li>
-    <li>Winner, Entrepreneur Leadership Academy (2019)</li>
-    <li>Highest national distinction, secondary school graduation</li>
-    <li>Media interviews on his projects have reached 2,000,000+ people in Hungary</li>
+    <li>Dwight Hall Fellow (2025); Leitner Fellow (2024, 2025); Blue Center Research Fellow (2025); Yale Richardson Scholar (2024)</li>
+    <li>Member, American Statistical Association (2024–) &amp; Mensa HungarIQa (2022–)</li>
+    <li>10 Young Talents of Hungary (2022); National Innovation Award (2021)</li>
+    <li>Templeton Fellow — selected from 20,000+ applicants (2017)</li>
+    <li>Featured on the Friderikusz Podcast (1.5M+ plays) and at the VIBE, DeepDive, and BrainBar festivals</li>
   </ul>
 </section>
 
 <footer id="contact">
-  <h2>Let's close<br><span class="serif-italic">a loop together.</span></h2>
+  <h2>Let's <span class="serif-italic">talk.</span></h2>
   <div class="footer-links">
-    <a href="mailto:bende.dornyei@yale.edu">bende.dornyei@yale.edu</a>
-    <a href="https://www.linkedin.com/in/dornyeibende/" target="_blank" rel="noopener">LinkedIn ↗</a>
-    <a href="https://www.instagram.com/ben_the_guz/" target="_blank" rel="noopener">Instagram ↗</a>
+    <a href="mailto:ben.dornyei@gmail.com">ben.dornyei@gmail.com</a>
+    <a href="https://www.linkedin.com/in/ben-dornyei/" target="_blank" rel="noopener">LinkedIn ↗</a>
   </div>
 </footer>
 <div class="fine">
   <span>© 2026 Bendegúz Dörnyei</span>
   <span style="display:flex; gap:18px; flex-wrap:wrap;">
-    <a href="planner-demo.html">Year planner (demo)</a>
-    <a href="dashboard.html">Budget dashboard (demo)</a>
-    <a href="connections.html">Connection tracker (demo)</a>
+    <a href="planner-demo.html">Year planner</a>
+    <a href="dashboard.html">Budget dashboard</a>
+    <a href="connections.html">Connection tracker</a>
   </span>
 </div>
 

@@ -26,9 +26,19 @@
   // (GET/PUT) behind the same Basic Auth gate, so the network map lives in
   // Cloudflare, not just one browser. Created with:
   //   npx wrangler kv namespace create CONNECTIONS_KV
+  //
+  // BUDGET_KV does the same for the PRIVATE budget dashboard
+  // (/admin/budget.html): the worker exposes /admin/api/budget (GET/PUT)
+  // behind the same Basic Auth gate. The local SimpleFin sync script
+  // (private/sync.js) PUSHES the categorized accounts + transactions here,
+  // and the budget page READS them back — so the raw credentials/transaction
+  // files never get served, but the numbers still show up in admin mode.
+  // Created with:
+  //   npx wrangler kv namespace create BUDGET_KV
   "kv_namespaces": [
     { "binding": "PLANNER_KV", "id": "5888c98ee99947a5a06f29ee25778437" },
-    { "binding": "CONNECTIONS_KV", "id": "73d6dc3d5bca4c668df82f56edfdb7c0" }
+    { "binding": "CONNECTIONS_KV", "id": "73d6dc3d5bca4c668df82f56edfdb7c0" },
+    { "binding": "BUDGET_KV", "id": "96dfdfacb8cb4fa98eaa0b4bd267108e" }
   ],
 
   "assets": {

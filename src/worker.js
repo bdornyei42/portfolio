@@ -69,6 +69,31 @@ async function handleConnections(request, env) {
   return json({ error: "method not allowed" }, 405);
 }
 
+// Same shape again, for the private budget dashboard. The local SimpleFin sync
+// script (private/sync.js) PUTs the categorized {accounts, transactions} blob
+// here; /admin/budget.html GETs it back. Raw credentials never touch the site.
+const BUDGET_KEY = "budget:state";
+const BUDGET_MAX_BYTES = 3 * 1024 * 1024; // 3 MB guard
+
+async function handleBudget(request, env) {
+  if (!env.BUDGET_KV) {
+    return json({ error: "KV not configured" }, 500);
+  }
+  if (request.method === "GET") {
+    const raw = await env.BUDGET_KV.get(BUDGET_KEY);
+    if (!raw) return json({ __empty: true });
+    return new Response(raw, { headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+  }
+  if (request.method === "PUT" || request.method === "POST") {
+    const body = await request.text();
+    if (body.length > BUDGET_MAX_BYTES) return json({ error: "too large" }, 413);
+    try { JSON.parse(body); } catch { return json({ error: "invalid JSON" }, 400); }
+    await env.BUDGET_KV.put(BUDGET_KEY, body);
+    return json({ ok: true, savedAt: Date.now() });
+  }
+  return json({ error: "method not allowed" }, 405);
+}
+
 function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
     status,
@@ -89,6 +114,8 @@ export default {
       if (url.pathname === "/admin/api/planner") return handlePlanner(request, env);
       // Connection tracker API (GET/PUT the JSON network state), same gate.
       if (url.pathname === "/admin/api/connections") return handleConnections(request, env);
+      // Budget API (GET the synced accounts/transactions, PUT from sync.js), same gate.
+      if (url.pathname === "/admin/api/budget") return handleBudget(request, env);
     }
 
     return env.ASSETS.fetch(request);

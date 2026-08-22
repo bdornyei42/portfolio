@@ -23,6 +23,11 @@ copy /y public\planner-demo.html site\ >nul
 REM Whole admin/ folder (hub + budget + rejections + planner) goes
 REM behind Basic Auth. Only .html is copied, so no stray files leak.
 copy /y private\admin\*.html   site\admin\ >nul
+REM Shared, public, no-auth static libs (served from /vendor). Currently just
+REM pdf.js, lazy-loaded by the planner's syllabus PDF importer. Same-origin so
+REM both the admin planner and the public demo use it without any CDN.
+mkdir site\vendor
+copy /y public\vendor\*.js     site\vendor\ >nul
 
 echo Staged for deploy:
 dir /s /b site
