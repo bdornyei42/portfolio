@@ -1,0 +1,16 @@
+{
+  "name": "personal-website",
+  "version": "1.0.0",
+  "description": "Personal portfolio site (Cloudflare Worker) plus a local SimpleFin sync script for the private budget dashboard.",
+  "type": "module",
+  "scripts": {
+    "claim": "node private/claim.js",
+    "sync": "node private/sync.js",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "license": "MIT"
+}

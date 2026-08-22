@@ -1,0 +1,43 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Cloudflare Worker that serves your personal website as static assets.
+  // The worker name below is what shows up in your Cloudflare dashboard and in
+  // the *.workers.dev URL (bdornyei42.<your-subdomain>.workers.dev).
+  "name": "bdornyei42",
+  "compatibility_date": "2025-08-22",
+
+  // src/worker.js runs on every request: it Basic-Auth-gates /admin/* using
+  // the ADMIN_USER / ADMIN_PASSWORD secrets, then hands everything else to
+  // the static assets below. deploy.bat rebuilds ./site from scratch each
+  // run, assembling it from public/ (fully public) and private/admin/
+  // (password-protected) — so nothing in private/ that ISN'T meant to be
+  // served (credentials.json, categorized-transactions.json, sync scripts)
+  // ever ends up in the deployed bundle.
+  "main": "src/worker.js",
+
+  // Workers KV: server-side store for the PRIVATE year planner (/admin/planner).
+  // The worker exposes /admin/api/planner (GET/PUT) behind the same Basic Auth
+  // gate; the planner page reads/writes its JSON state here so real data lives
+  // in Cloudflare, not just one browser. Created with:
+  //   npx wrangler kv namespace create PLANNER_KV
+  //
+  // CONNECTIONS_KV does the same for the PRIVATE connection tracker
+  // (/admin/connections.html): the worker exposes /admin/api/connections
+  // (GET/PUT) behind the same Basic Auth gate, so the network map lives in
+  // Cloudflare, not just one browser. Created with:
+  //   npx wrangler kv namespace create CONNECTIONS_KV
+  "kv_namespaces": [
+    { "binding": "PLANNER_KV", "id": "5888c98ee99947a5a06f29ee25778437" },
+    { "binding": "CONNECTIONS_KV", "id": "73d6dc3d5bca4c668df82f56edfdb7c0" }
+  ],
+
+  "assets": {
+    "directory": "./site",
+    "binding": "ASSETS",
+    // Without this, Cloudflare serves matching static files directly and
+    // only falls back to the Worker for paths with no asset match — which
+    // would let /admin/* bypass the Basic Auth check entirely. Routing
+    // these paths through the Worker first is what makes the gate real.
+    "run_worker_first": ["/admin", "/admin/*"]
+  }
+}

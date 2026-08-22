@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connection Tracker (Demo) — B. Dörnyei</title>
+<meta name="description" content="Portfolio demo of a personal network tracker — an interactive map of people, groups, and how they connect. Seeded with fake sample data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2420; --paper:#E7EAE1; --paper-2:#DCE0D3; --paprika:#C1440E;
+    --gold:#B98A1F; --forest:#2F4A3D; --slate:#55625C;
+    --line:rgba(27,36,32,0.16); --card:#F3F5EF;
+    --shadow:0 6px 22px rgba(27,36,32,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Public Sans',system-ui,sans-serif; overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Newsreader',Georgia,serif; font-weight:500; margin:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  button{font-family:inherit;}
+  a{color:inherit;}
+
+  /* ===== Top bar ===== */
+  header.bar{
+    position:fixed; top:0; left:0; right:0; height:58px; z-index:40;
+    display:flex; align-items:center; gap:14px; padding:0 18px;
+    background:rgba(231,234,225,0.9); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  header.bar h1{font-size:20px; white-space:nowrap;}
+  .badge{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+    letter-spacing:.06em; text-transform:uppercase; color:#fff; background:var(--paprika);
+    padding:3px 7px; border-radius:3px; vertical-align:middle; margin-left:2px;
+  }
+  .bar .spacer{flex:1;}
+  .bar a.back{color:var(--slate); font-size:13px; text-decoration:none; white-space:nowrap;}
+  .bar a.back:hover{color:var(--paprika);}
+  .syncdot{font-size:12px; line-height:1; color:var(--slate); user-select:none; cursor:default;
+    transition:color .2s;}
+  .syncdot[data-state="pending"], .syncdot[data-state="saving"], .syncdot[data-state="loading"]{animation:pulse 1s ease-in-out infinite;}
+  @keyframes pulse{50%{opacity:.35;}}
+
+  .btn{
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    padding:7px 12px; border-radius:5px; font-size:13px; cursor:pointer; white-space:nowrap;
+    display:inline-flex; align-items:center; gap:6px; transition:border-color .15s, background .15s;
+  }
+  .btn:hover{border-color:var(--paprika); color:var(--paprika);}
+  .btn.primary{background:var(--paprika); color:#fff; border-color:var(--paprika);}
+  .btn.primary:hover{background:#a5390b; color:#fff;}
+  .btn.active{background:var(--forest); color:#fff; border-color:var(--forest);}
+  .btn.ghost{background:none;}
+  .btn.sm{padding:5px 9px; font-size:12px;}
+  .icon-only{padding:7px 9px;}
+
+  .search{
+    display:flex; align-items:center; gap:6px; border:1px solid var(--line);
+    background:#fff; border-radius:5px; padding:5px 9px;
+  }
+  .search input{border:none; outline:none; background:none; font-size:13px; width:150px; font-family:inherit;}
+  .search svg{opacity:.5;}
+
+  /* ===== Canvas ===== */
+  #stage{position:fixed; inset:58px 0 0 0; overflow:hidden; cursor:grab;
+    background-color:var(--paper);
+    background-image:radial-gradient(rgba(27,36,32,0.10) 1.1px, transparent 1.1px);
+    background-size:26px 26px;}
+  #stage.panning{cursor:grabbing;}
+  #stage.linking{cursor:crosshair;}
+  #world{position:absolute; top:0; left:0; width:4800px; height:3400px; transform-origin:0 0;}
+  #wires{position:absolute; top:0; left:0; width:4800px; height:3400px; pointer-events:none; overflow:visible;}
+
+  /* group hubs */
+  .hub{
+    position:absolute; transform:translate(-50%,-50%); z-index:2;
+    display:flex; flex-direction:column; align-items:center; gap:5px; cursor:grab; user-select:none;
+  }
+  .hub .disc{
+    min-width:118px; padding:12px 18px; border-radius:16px; text-align:center;
+    background:var(--card); border:1.5px dashed var(--gcol,var(--slate));
+    box-shadow:var(--shadow); color:var(--gcol,var(--slate));
+  }
+  .hub .disc .gname{font-family:'Newsreader',serif; font-size:18px; color:var(--ink); line-height:1.15;}
+  .hub .disc .gmeta{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.05em; text-transform:uppercase; margin-top:3px; opacity:.85;}
+  .hub.dragging{cursor:grabbing; z-index:30;}
+
+  /* person / institution nodes */
+  .node{
+    position:absolute; transform:translate(-50%,-50%); z-index:5;
+    display:flex; flex-direction:column; align-items:center; gap:6px; cursor:grab; user-select:none; width:96px;
+  }
+  .node.dragging{z-index:30; cursor:grabbing;}
+  .node .av{
+    width:54px; height:54px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'Newsreader',serif; font-size:20px; color:#fff; position:relative;
+    box-shadow:var(--shadow); border:3px solid #fff;
+    background:var(--ncol,var(--forest));
+  }
+  .node.inst .av{border-radius:14px;}
+  .node .ring{
+    position:absolute; inset:-6px; border-radius:50%; border:2px solid var(--gcol,transparent);
+  }
+  .node.inst .ring{border-radius:18px;}
+  .node .nm{
+    font-size:12.5px; line-height:1.2; text-align:center; max-width:96px;
+    background:rgba(231,234,225,0.72); padding:1px 5px; border-radius:4px;
+  }
+  .node .role{font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--slate); text-align:center; margin-top:-2px;}
+  .node .cake{position:absolute; top:-6px; right:-6px; font-size:14px; filter:drop-shadow(0 1px 1px rgba(0,0,0,.3));}
+  .node.selected .av{outline:3px solid var(--paprika); outline-offset:2px;}
+  .node.match .av{box-shadow:0 0 0 4px rgba(185,138,31,.55), var(--shadow);}
+  .node.dim{opacity:.28; filter:grayscale(0.4);}
+  .hub.dim{opacity:.3;}
+  .node.linksrc .av{outline:3px dashed var(--forest); outline-offset:2px;}
+
+  /* wires */
+  .wire{stroke:var(--slate); stroke-width:1.6; fill:none;}
+  .wire.tether{stroke:var(--gcol,var(--slate)); stroke-width:1.4; stroke-dasharray:3 5; opacity:.55;}
+  .wire-label{font-family:'IBM Plex Mono',monospace; font-size:10px; fill:var(--forest);}
+  .wire-label-bg{fill:var(--paper); opacity:.85;}
+
+  /* ===== side panel ===== */
+  #panel{
+    position:fixed; top:58px; right:0; bottom:0; width:360px; max-width:92vw; z-index:35;
+    background:var(--card); border-left:1px solid var(--line); box-shadow:-8px 0 30px rgba(27,36,32,.10);
+    transform:translateX(100%); transition:transform .22s ease; display:flex; flex-direction:column;
+  }
+  #panel.open{transform:none;}
+  #panel .phead{padding:16px 18px; border-bottom:1px solid var(--line); display:flex; align-items:flex-start; gap:10px;}
+  #panel .phead .close{margin-left:auto; background:none; border:none; font-size:20px; color:var(--slate); cursor:pointer; line-height:1;}
+  #panel .phead .close:hover{color:var(--paprika);}
+  #panel .pbody{padding:16px 18px; overflow-y:auto; flex:1;}
+  .chip{display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; margin:2px 3px 2px 0; background:var(--paper-2); color:var(--ink);}
+  .chip.g{background:var(--gcol,var(--slate)); color:#fff;}
+  .chip.help{background:var(--gold); color:#fff;}
+  .fieldrow{margin-bottom:14px;}
+  .fieldrow .lab{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--slate); margin-bottom:4px;}
+  .fieldrow .val{font-size:14px;}
+  .fieldrow .val.empty{color:var(--slate); font-style:italic; opacity:.7;}
+  .bcount{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--paprika);}
+  .rel-item{display:flex; align-items:center; gap:8px; font-size:13px; padding:5px 0; border-bottom:1px dashed var(--line);}
+  .rel-item .x{margin-left:auto; background:none; border:none; color:var(--slate); cursor:pointer; font-size:12px;}
+  .rel-item .x:hover{color:var(--paprika);}
+
+  /* editor form */
+  form.editor label{display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--slate); margin:12px 0 4px;}
+  form.editor input, form.editor select, form.editor textarea{
+    width:100%; padding:8px 9px; font-size:13.5px; border:1px solid var(--line); border-radius:5px; background:#fff; font-family:inherit; color:var(--ink);
+  }
+  form.editor textarea{resize:vertical; min-height:52px;}
+  form.editor .hint{font-size:11px; color:var(--slate); margin-top:3px;}
+  form.editor .two{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .panel-actions{display:flex; gap:8px; padding:14px 18px; border-top:1px solid var(--line);}
+  .panel-actions .del{margin-left:auto; color:var(--paprika); border-color:rgba(193,68,14,.4);}
+
+  /* legend / help filter */
+  #legend{
+    position:fixed; left:14px; bottom:14px; z-index:30; background:var(--card);
+    border:1px solid var(--line); border-radius:8px; box-shadow:var(--shadow);
+    padding:12px 14px; max-width:240px; font-size:12.5px;
+  }
+  #legend h3{font-size:14px; margin-bottom:8px;}
+  #legend .lg-row{display:flex; align-items:center; gap:8px; padding:3px 0; cursor:pointer;}
+  #legend .sw{width:12px; height:12px; border-radius:3px; flex:none;}
+  #legend .lg-row.off{opacity:.4;}
+  #legend .lg-count{margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--slate);}
+  #legend .lg-sec{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--slate); margin:10px 0 4px;}
+  #legend select{width:100%; padding:5px 7px; font-size:12px; border:1px solid var(--line); border-radius:5px; background:#fff; font-family:inherit;}
+
+  .zoomctl{position:fixed; right:14px; bottom:14px; z-index:30; display:flex; flex-direction:column; gap:6px;}
+  .zoomctl .btn{justify-content:center; width:38px; height:34px; padding:0; font-size:16px; box-shadow:var(--shadow);}
+
+  /* intro notice */
+  #notice{
+    position:fixed; left:50%; top:74px; transform:translateX(-50%); z-index:30;
+    background:var(--card); border:1px solid var(--line); border-left:3px solid var(--forest);
+    padding:12px 16px; font-size:13px; max-width:560px; border-radius:0 5px 5px 0; box-shadow:var(--shadow);
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  #notice b{color:var(--forest);}
+  #notice .x{background:none; border:none; color:var(--slate); cursor:pointer; font-size:16px; line-height:1;}
+  #notice .x:hover{color:var(--paprika);}
+
+  .toast{
+    position:fixed; left:50%; bottom:64px; transform:translateX(-50%) translateY(20px);
+    background:var(--forest); color:#fff; padding:9px 16px; border-radius:6px; font-size:13px;
+    z-index:60; opacity:0; transition:opacity .2s, transform .2s; pointer-events:none;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:640px){
+    .bar .lbl{display:none;}
+    #legend{max-width:180px;}
+    .search input{width:100px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <h1>Connections<span class="badge" id="mode-badge">Demo</span></h1>
+  <div class="search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <input id="search" type="search" placeholder="Search people…" autocomplete="off">
+  </div>
+  <button class="btn" onclick="startAddPerson()"><span>＋</span><span class="lbl">Person</span></button>
+  <button class="btn" onclick="startAddGroup()"><span>＋</span><span class="lbl">Group</span></button>
+  <button class="btn" id="linkbtn" onclick="toggleLinkMode()"><span>↔</span><span class="lbl">Link</span></button>
+  <div class="spacer"></div>
+  <button class="btn ghost sm" onclick="exportData()">Export</button>
+  <button class="btn ghost sm" onclick="document.getElementById('importfile').click()">Import</button>
+  <input type="file" id="importfile" accept="application/json" style="display:none" onchange="importData(event)">
+  <button class="btn ghost sm" id="resetbtn" onclick="resetDemo()">↺ Reset demo</button>
+  <span id="syncdot" class="syncdot" title="Local only">●</span>
+  <a class="back" href="index.html">← Site</a>
+</header>
+
+<div id="stage">
+  <div id="world">
+    <svg id="wires"></svg>
+    <!-- nodes injected here -->
+  </div>
+</div>
+
+<div id="notice">
+  <div>
+    <b>This is a portfolio demo.</b> Everyone on this map is fictional sample data, seeded fresh on load — drag people around, open a card, add a link. It mirrors a private tool I use to keep track of my real network: who they are, what they're into, birthdays, and <b>where each person can help</b>. The real version saves to my own machine only.
+  </div>
+  <button class="x" onclick="document.getElementById('notice').remove()">×</button>
+</div>
+
+<div id="legend">
+  <h3>Groups</h3>
+  <div id="legend-groups"></div>
+  <div class="lg-sec">Who can help with…</div>
+  <select id="help-filter" onchange="applyFilters()"><option value="">— anything —</option></select>
+</div>
+
+<div class="zoomctl">
+  <button class="btn" onclick="zoomBy(1.2)" title="Zoom in">＋</button>
+  <button class="btn" onclick="zoomBy(1/1.2)" title="Zoom out">－</button>
+  <button class="btn" onclick="fitView()" title="Fit to view">⊡</button>
+</div>
+
+<aside id="panel">
+  <div class="phead" id="phead"></div>
+  <div class="pbody" id="pbody"></div>
+  <div class="panel-actions" id="pactions"></div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   CONFIG — this is what differs between the public demo and the
+   private (localStorage-backed) version at /admin/connections.html
+   ============================================================ */
+const CONFIG = {
+  demo: true,
+  storageKey: 'dornyei-connections-demo',
+  store: window.sessionStorage,   // demo: session-only, resets when tab closes
+  api: null,                      // demo has NO backend — everything is fake & local
+};
+
+/* group colors, assigned round-robin */
+const PALETTE = ['#2F4A3D','#C1440E','#B98A1F','#55625C','#3E6B7A','#7A4A6B','#6B7A3E'];
+
+/* ---- fake, clearly-fictional seed data for the demo ---- */
+function seedData(){
+  const G = (id,name,color,x,y)=>({id,name,color,x,y});
+  const groups = [
+    G('g_fam','Family','#C1440E', 900, 700),
+    G('g_yale','Yale','#2F4A3D', 1900, 620),
+    G('g_startup','Startup World','#B98A1F', 1500, 1500),
+    G('g_policy','UN / Policy','#3E6B7A', 2650, 1350),
+    G('g_mentor','Mentors','#7A4A6B', 2500, 500),
+  ];
+  const P = (o)=>Object.assign({kind:'person', hobbies:[], likes:[], funFacts:[], helpAreas:[]}, o);
+  const people = [
+    P({id:'p1', name:'Anna Kovács', role:'Sister', group:'g_fam', birthday:'1999-08-27', location:'Budapest, HU',
+       hobbies:['pottery','trail running'], likes:['matcha','vinyl records'], funFacts:['Speaks 4 languages','Once biked across Croatia'],
+       help:'Native German speaker — proofreads anything I write in German and knows the Berlin startup scene.', helpAreas:['German','Intros'],
+       contact:'anna@example.com', lastContact:'2026-08-10', notes:'Call more often.', x:760, y:820}),
+    P({id:'p2', name:'Levente Kovács', role:'Father', group:'g_fam', birthday:'1968-03-12', location:'Budapest, HU',
+       hobbies:['woodworking','chess'], likes:['espresso','history podcasts'], funFacts:['Built the family cabin by hand'],
+       help:'30 years in manufacturing — great sounding board for anything operations or supply-chain.', helpAreas:['Operations','Advice'],
+       contact:'', lastContact:'2026-08-18', notes:'', x:1040, y:840}),
+    P({id:'p3', name:'Dr. Priya Menon', role:'Thesis advisor', group:'g_yale', birthday:'1979-11-04', location:'New Haven, CT',
+       hobbies:['birdwatching'], likes:['strong tea','field data'], funFacts:['Has a lake named after a beetle she catalogued'],
+       help:'Statistics & causal inference. Will read drafts and connect me to the environmental-data lab.', helpAreas:['Statistics','Research','Intros'],
+       contact:'p.menon@example.edu', lastContact:'2026-07-30', notes:'Office hours Thu 2pm.', x:1780, y:760}),
+    P({id:'p4', name:'Marcus Lee', role:'Roommate / SDS major', group:'g_yale', birthday:'2003-05-19', location:'New Haven, CT',
+       hobbies:['climbing','lo-fi beats'], likes:['ramen','mechanical keyboards'], funFacts:['Ranked top-100 in a chess app'],
+       help:'Ridiculously good at Python & data viz — my go-to for debugging D3 and pandas.', helpAreas:['Coding','Data viz'],
+       contact:'marcus@example.edu', lastContact:'2026-08-19', notes:'', x:2050, y:800}),
+    P({id:'p5', name:'Sofia Almeida', role:'Co-founder, Startup Maffia', group:'g_startup', birthday:'1997-02-02', location:'Lisbon, PT',
+       hobbies:['surfing','sketching'], likes:['flat whites','risk decks'], funFacts:['Pitched on live TV at 22'],
+       help:'Fundraising & pitch coaching. Warm intros to a dozen EU angels.', helpAreas:['Fundraising','Intros','Pitching'],
+       contact:'sofia@example.com', lastContact:'2026-06-15', notes:'Owes me a coffee.', x:1360, y:1600}),
+    P({id:'p6', name:'Tomás Reyes', role:'Product designer', group:'g_startup', birthday:'1995-09-30', location:'Remote',
+       hobbies:['film photography','cooking'], likes:['negronis','Figma'], funFacts:['Shot a documentary in Patagonia'],
+       help:'Designs clean product UIs fast — helped mock the food-waste app in a weekend.', helpAreas:['Design','Product'],
+       contact:'', lastContact:'2026-05-20', notes:'', x:1660, y:1640}),
+    P({id:'p7', name:'Amina Diallo', role:'Program officer', group:'g_policy', birthday:'1988-12-08', location:'New York, NY',
+       hobbies:['jazz','marathons'], likes:['bookstores','policy briefs'], funFacts:['Ran the NYC marathon 3x'],
+       help:'Knows the UN DESA hiring cycle inside-out and how to get a memo read.', helpAreas:['Policy','Careers','Intros'],
+       contact:'amina@example.org', lastContact:'2026-07-01', notes:'', x:2540, y:1250}),
+    P({id:'p8', name:'James Okoro', role:'Data-for-good lead', group:'g_policy', birthday:'1985-06-21', location:'Geneva, CH',
+       hobbies:['cycling','open data'], likes:['maps','GIS'], funFacts:['Maintains a popular open-data package'],
+       help:'Geospatial & humanitarian data. Great for anything mapping-related.', helpAreas:['Data','Mapping','Research'],
+       contact:'', lastContact:'2026-04-11', notes:'', x:2800, y:1450}),
+    P({id:'p9', name:'Eszter Nagy', role:'Former mentor', group:'g_mentor', birthday:'1972-01-15', location:'Vienna, AT',
+       hobbies:['opera','gardening'], likes:['long lunches','frank feedback'], funFacts:['Founded 3 nonprofits'],
+       help:'Nonprofit governance & board building — helped me hand off Startup Maffia cleanly.', helpAreas:['Nonprofit','Advice','Fundraising'],
+       contact:'eszter@example.com', lastContact:'2026-03-02', notes:'Send her the annual update.', x:2380, y:560}),
+    P({id:'p10', name:'David Fischer', role:'Angel investor', group:'g_mentor', birthday:'1965-10-10', location:'Zurich, CH',
+       hobbies:['sailing','wine'], likes:['clear one-pagers'], funFacts:['Exited two companies'],
+       help:'Early-stage checks and brutally honest deck feedback.', helpAreas:['Fundraising','Advice'],
+       contact:'', lastContact:'2026-02-14', notes:'', x:2640, y:640}),
+  ];
+  const links = [
+    {id:'l1', a:'p1', b:'p2', label:'father'},
+    {id:'l2', a:'p3', b:'p4', label:'advises'},
+    {id:'l3', a:'p5', b:'p6', label:'co-founders'},
+    {id:'l4', a:'p9', b:'p5', label:'mentored'},
+    {id:'l5', a:'p7', b:'p8', label:'colleagues'},
+    {id:'l6', a:'p10', b:'p5', label:'invested in'},
+  ];
+  return {groups, people, links, view:{tx:-560, ty:-260, scale:0.85}};
+}
+
+/* ============================================================
+   State + persistence
+   ============================================================ */
+let state = loadState();
+
+function loadState(){
+  try{
+    const raw = CONFIG.store.getItem(CONFIG.storageKey);
+    if(raw) return migrate(JSON.parse(raw));
+  }catch(e){}
+  if(CONFIG.demo) return seedData();
+  // private first-run: start empty, but drop in any suggested starter groups
+  const starters = (CONFIG.starterGroups||[]).map((s,i)=>({
+    id:uid(), name:s.name, color:s.color||PALETTE[i%PALETTE.length],
+    x:900+(i%3)*520, y:700+Math.floor(i/3)*520
+  }));
+  return {groups:starters, people:[], links:[], view:{tx:-560,ty:-260,scale:0.85}};
+}
+function migrate(s){
+  s.groups = s.groups||[]; s.people = s.people||[]; s.links = s.links||[];
+  s.view = s.view||{tx:0,ty:0,scale:1};
+  s.people.forEach(p=>{ p.hobbies=p.hobbies||[]; p.likes=p.likes||[]; p.funFacts=p.funFacts||[]; p.helpAreas=p.helpAreas||[]; p.kind=p.kind||'person'; });
+  return s;
+}
+function save(){
+  try{ CONFIG.store.setItem(CONFIG.storageKey, JSON.stringify(state)); }catch(e){}
+  scheduleRemoteSave();   // no-op unless CONFIG.api is set (private version)
+}
+function resetDemo(){
+  if(!CONFIG.demo){
+    if(!confirm('Clear the whole map? This cannot be undone.')) return;
+    state = {groups:[], people:[], links:[], view:{tx:-560,ty:-260,scale:0.85}};
+  } else {
+    state = seedData();
+  }
+  save(); closePanel(); renderAll(); fitView(); toast(CONFIG.demo?'Demo reset':'Map cleared');
+}
+
+/* ============================================================
+   Helpers
+   ============================================================ */
+const $ = (id)=>document.getElementById(id);
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function person(id){return state.people.find(p=>p.id===id);}
+function group(id){return state.groups.find(g=>g.id===id);}
+function initials(name){return (name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase();}
+function parseList(s){return (s||'').split(',').map(x=>x.trim()).filter(Boolean);}
+function allHelpAreas(){
+  const set = new Set();
+  state.people.forEach(p=>(p.helpAreas||[]).forEach(h=>set.add(h)));
+  return [...set].sort((a,b)=>a.localeCompare(b));
+}
+function daysUntilBirthday(bday){
+  if(!bday) return null;
+  const [_, mm, dd] = bday.split('-').map(Number);
+  if(!mm||!dd) return null;
+  const now = new Date(); const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  let next = new Date(now.getFullYear(), mm-1, dd);
+  if(next < today) next = new Date(now.getFullYear()+1, mm-1, dd);
+  return Math.round((next - today)/86400000);
+}
+function ageFrom(bday){
+  if(!bday) return null;
+  const [y,m,d] = bday.split('-').map(Number);
+  if(!y) return null;
+  const now = new Date(); let age = now.getFullYear()-y;
+  if(now.getMonth()+1 < m || (now.getMonth()+1===m && now.getDate()<d)) age--;
+  return age>0&&age<130 ? age : null;
+}
+function toast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+/* ============================================================
+   View transform (pan / zoom)
+   ============================================================ */
+function applyTransform(){
+  $('world').style.transform = `translate(${state.view.tx}px,${state.view.ty}px) scale(${state.view.scale})`;
+}
+function zoomBy(f, cx, cy){
+  const stage = $('stage').getBoundingClientRect();
+  if(cx==null){cx=stage.width/2; cy=stage.height/2;}
+  const v = state.view;
+  const ns = Math.min(2.2, Math.max(0.25, v.scale*f));
+  const wx = (cx - v.tx)/v.scale, wy = (cy - v.ty)/v.scale;
+  v.tx = cx - wx*ns; v.ty = cy - wy*ns; v.scale = ns;
+  applyTransform(); save();
+}
+function fitView(){
+  const items = [...state.people, ...state.groups];
+  const stage = $('stage').getBoundingClientRect();
+  if(!items.length){ state.view={tx:stage.width/2-400, ty:stage.height/2-300, scale:0.9}; applyTransform(); save(); return; }
+  let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  items.forEach(n=>{minX=Math.min(minX,n.x); minY=Math.min(minY,n.y); maxX=Math.max(maxX,n.x); maxY=Math.max(maxY,n.y);});
+  const pad=140; minX-=pad; minY-=pad; maxX+=pad; maxY+=pad;
+  const w=maxX-minX, h=maxY-minY;
+  const scale = Math.min(2, Math.max(0.3, Math.min(stage.width/w, stage.height/h)));
+  state.view.scale = scale;
+  state.view.tx = (stage.width - w*scale)/2 - minX*scale;
+  state.view.ty = (stage.height - h*scale)/2 - minY*scale;
+  applyTransform(); save();
+}
+
+/* ============================================================
+   Rendering
+   ============================================================ */
+let selectedId = null;
+
+function renderAll(){
+  renderNodes();
+  renderWires();
+  renderLegend();
+  refreshHelpFilter();
+  applyTransform();
+  applyFilters();
+}
+
+function renderNodes(){
+  const world = $('world');
+  // remove existing node/hub elements (keep the <svg id=wires>)
+  [...world.querySelectorAll('.node,.hub')].forEach(el=>el.remove());
+
+  state.groups.forEach(g=>{
+    const el = document.createElement('div');
+    el.className = 'hub'; el.dataset.gid = g.id;
+    el.style.left = g.x+'px'; el.style.top = g.y+'px'; el.style.setProperty('--gcol', g.color);
+    const count = state.people.filter(p=>p.group===g.id).length;
+    el.innerHTML = `<div class="disc"><div class="gname">${esc(g.name)}</div><div class="gmeta">${count} ${count===1?'person':'people'}</div></div>`;
+    el.addEventListener('pointerdown', e=>startDragHub(e, g));
+    el.addEventListener('click', e=>{ if(!dragMoved) openGroup(g.id); });
+    world.appendChild(el);
+  });
+
+  state.people.forEach(p=>{
+    const g = group(p.group);
+    const el = document.createElement('div');
+    el.className = 'node' + (p.kind==='institution'?' inst':'');
+    el.dataset.pid = p.id;
+    el.style.left = p.x+'px'; el.style.top = p.y+'px';
+    el.style.setProperty('--ncol', g?g.color:'#55625C');
+    el.style.setProperty('--gcol', g?g.color:'transparent');
+    const du = daysUntilBirthday(p.birthday);
+    const cake = (du!=null && du<=30) ? `<span class="cake" title="Birthday in ${du} day${du===1?'':'s'}">🎂</span>` : '';
+    el.innerHTML = `
+      <div class="av"><span class="ring"></span>${esc(initials(p.name))}${cake}</div>
+      <div class="nm">${esc(p.name)}</div>
+      ${p.role?`<div class="role">${esc(p.role)}</div>`:''}`;
+    el.addEventListener('pointerdown', e=>startDragNode(e, p));
+    el.addEventListener('click', e=>onNodeClick(e, p));
+    world.appendChild(el);
+  });
+}
+
+function nodeCenter(p){return {x:p.x, y:p.y};}
+
+function renderWires(){
+  const svg = $('wires');
+  svg.innerHTML = '';
+  const NS='http://www.w3.org/2000/svg';
+  // group tethers
+  state.people.forEach(p=>{
+    const g = group(p.group); if(!g) return;
+    const line = document.createElementNS(NS,'line');
+    line.setAttribute('x1',p.x); line.setAttribute('y1',p.y);
+    line.setAttribute('x2',g.x); line.setAttribute('y2',g.y);
+    line.setAttribute('class','wire tether');
+    line.style.setProperty('--gcol', g.color);
+    line.dataset.tether = p.id;
+    svg.appendChild(line);
+  });
+  // relationship links
+  state.links.forEach(l=>{
+    const a=person(l.a), b=person(l.b); if(!a||!b) return;
+    const line = document.createElementNS(NS,'line');
+    line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
+    line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
+    line.setAttribute('class','wire'); line.dataset.link = l.id;
+    svg.appendChild(line);
+    if(l.label){
+      const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      const bg = document.createElementNS(NS,'rect');
+      const w = l.label.length*6+8;
+      bg.setAttribute('x',mx-w/2); bg.setAttribute('y',my-9); bg.setAttribute('width',w); bg.setAttribute('height',15);
+      bg.setAttribute('rx',4); bg.setAttribute('class','wire-label-bg'); bg.dataset.link=l.id;
+      svg.appendChild(bg);
+      const t = document.createElementNS(NS,'text');
+      t.setAttribute('x',mx); t.setAttribute('y',my+2); t.setAttribute('text-anchor','middle');
+      t.setAttribute('class','wire-label'); t.dataset.link=l.id; t.textContent=l.label;
+      svg.appendChild(t);
+    }
+  });
+}
+
+/* update only the wires touching a moved node — cheap during drag */
+function updateWiresFor(kind, id){
+  const svg=$('wires');
+  if(kind==='person'){
+    const p=person(id); const g=group(p.group);
+    svg.querySelectorAll(`[data-tether="${id}"]`).forEach(l=>{l.setAttribute('x1',p.x); l.setAttribute('y1',p.y); if(g){l.setAttribute('x2',g.x); l.setAttribute('y2',g.y);}});
+    state.links.filter(l=>l.a===id||l.b===id).forEach(l=>refreshLinkGeom(l));
+  } else {
+    const g=group(id);
+    state.people.filter(p=>p.group===id).forEach(p=>{
+      svg.querySelectorAll(`[data-tether="${p.id}"]`).forEach(l=>{l.setAttribute('x2',g.x); l.setAttribute('y2',g.y);});
+    });
+  }
+}
+function refreshLinkGeom(l){
+  const a=person(l.a), b=person(l.b); if(!a||!b) return;
+  const svg=$('wires');
+  svg.querySelectorAll(`line[data-link="${l.id}"]`).forEach(el=>{el.setAttribute('x1',a.x);el.setAttribute('y1',a.y);el.setAttribute('x2',b.x);el.setAttribute('y2',b.y);});
+  const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+  svg.querySelectorAll(`rect[data-link="${l.id}"]`).forEach(el=>{const w=(l.label||'').length*6+8; el.setAttribute('x',mx-w/2); el.setAttribute('y',my-9);});
+  svg.querySelectorAll(`text[data-link="${l.id}"]`).forEach(el=>{el.setAttribute('x',mx); el.setAttribute('y',my+2);});
+}
+
+function renderLegend(){
+  const box=$('legend-groups'); box.innerHTML='';
+  if(!state.groups.length){ box.innerHTML='<div class="val empty" style="font-size:12px;">No groups yet.</div>'; return; }
+  state.groups.forEach(g=>{
+    const count = state.people.filter(p=>p.group===g.id).length;
+    const row=document.createElement('div');
+    row.className='lg-row'+(hiddenGroups.has(g.id)?' off':'');
+    row.innerHTML=`<span class="sw" style="background:${g.color}"></span><span>${esc(g.name)}</span><span class="lg-count">${count}</span>`;
+    row.title='Click to show/hide';
+    row.addEventListener('click',()=>{ if(hiddenGroups.has(g.id))hiddenGroups.delete(g.id); else hiddenGroups.add(g.id); renderLegend(); applyFilters(); });
+    box.appendChild(row);
+  });
+}
+function refreshHelpFilter(){
+  const sel=$('help-filter'); const cur=sel.value;
+  sel.innerHTML='<option value="">— anything —</option>'+allHelpAreas().map(h=>`<option>${esc(h)}</option>`).join('');
+  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+}
+
+/* ============================================================
+   Filtering / search / help-highlight
+   ============================================================ */
+let hiddenGroups = new Set();
+function applyFilters(){
+  const q = ($('search').value||'').trim().toLowerCase();
+  const help = $('help-filter').value;
+  document.querySelectorAll('.node').forEach(el=>{
+    const p = person(el.dataset.pid); if(!p) return;
+    let visible = true, match = false;
+    if(hiddenGroups.has(p.group)) visible=false;
+    if(q){
+      const hay = [p.name,p.role,p.location,p.notes,p.help,(p.hobbies||[]).join(' '),(p.likes||[]).join(' '),(p.funFacts||[]).join(' '),(p.helpAreas||[]).join(' ')].join(' ').toLowerCase();
+      if(!hay.includes(q)) visible=false;
+    }
+    if(help && (p.helpAreas||[]).includes(help)) match=true;
+    el.classList.toggle('dim', !visible || (help && !match));
+    el.classList.toggle('match', visible && match);
+  });
+  document.querySelectorAll('.hub').forEach(el=>{
+    el.classList.toggle('dim', hiddenGroups.has(el.dataset.gid));
+  });
+}
+
+/* ============================================================
+   Dragging nodes / hubs + panning
+   ============================================================ */
+let dragMoved=false;
+function screenToWorld(clientX, clientY){
+  const s=$('stage').getBoundingClientRect(); const v=state.view;
+  return {x:(clientX-s.left-v.tx)/v.scale, y:(clientY-s.top-v.ty)/v.scale};
+}
+function startDragNode(e, p){
+  if(linkMode){ e.stopPropagation(); return; } // handled by click
+  e.stopPropagation(); e.preventDefault();
+  const el = e.currentTarget; el.setPointerCapture(e.pointerId);
+  const start = screenToWorld(e.clientX,e.clientY);
+  const ox=p.x-start.x, oy=p.y-start.y; dragMoved=false;
+  const move=(ev)=>{
+    const w=screenToWorld(ev.clientX,ev.clientY);
+    p.x=Math.round(w.x+ox); p.y=Math.round(w.y+oy);
+    el.style.left=p.x+'px'; el.style.top=p.y+'px';
+    dragMoved=true; el.classList.add('dragging'); updateWiresFor('person',p.id);
+  };
+  const up=(ev)=>{
+    el.releasePointerCapture(e.pointerId);
+    el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up);
+    el.classList.remove('dragging'); if(dragMoved) save();
+  };
+  el.addEventListener('pointermove',move); el.addEventListener('pointerup',up);
+}
+function startDragHub(e, g){
+  e.stopPropagation(); e.preventDefault();
+  const el=e.currentTarget; el.setPointerCapture(e.pointerId);
+  const start=screenToWorld(e.clientX,e.clientY);
+  const ox=g.x-start.x, oy=g.y-start.y; dragMoved=false;
+  const move=(ev)=>{
+    const w=screenToWorld(ev.clientX,ev.clientY);
+    g.x=Math.round(w.x+ox); g.y=Math.round(w.y+oy);
+    el.style.left=g.x+'px'; el.style.top=g.y+'px';
+    dragMoved=true; el.classList.add('dragging'); updateWiresFor('group',g.id);
+  };
+  const up=()=>{
+    el.releasePointerCapture(e.pointerId);
+    el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up);
+    el.classList.remove('dragging'); if(dragMoved) save();
+  };
+  el.addEventListener('pointermove',move); el.addEventListener('pointerup',up);
+}
+
+/* stage panning */
+(function(){
+  const stage=$('stage');
+  stage.addEventListener('pointerdown', e=>{
+    if(e.target.closest('.node')||e.target.closest('.hub')) return;
+    if(linkMode){ return; }
+    stage.setPointerCapture(e.pointerId); stage.classList.add('panning');
+    const sx=e.clientX, sy=e.clientY, tx0=state.view.tx, ty0=state.view.ty;
+    const move=(ev)=>{ state.view.tx=tx0+(ev.clientX-sx); state.view.ty=ty0+(ev.clientY-sy); applyTransform(); };
+    const up=()=>{ stage.releasePointerCapture(e.pointerId); stage.classList.remove('panning'); stage.removeEventListener('pointermove',move); stage.removeEventListener('pointerup',up); save(); };
+    stage.addEventListener('pointermove',move); stage.addEventListener('pointerup',up);
+  });
+  stage.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const r=stage.getBoundingClientRect();
+    zoomBy(e.deltaY<0?1.1:1/1.1, e.clientX-r.left, e.clientY-r.top);
+  }, {passive:false});
+})();
+
+/* ============================================================
+   Link mode
+   ============================================================ */
+let linkMode=false, linkSource=null;
+function toggleLinkMode(){
+  linkMode=!linkMode; linkSource=null;
+  $('linkbtn').classList.toggle('active', linkMode);
+  $('stage').classList.toggle('linking', linkMode);
+  document.querySelectorAll('.node').forEach(n=>n.classList.remove('linksrc'));
+  toast(linkMode?'Link mode: click two people':'Link mode off');
+}
+function onNodeClick(e, p){
+  if(dragMoved){ dragMoved=false; return; }
+  if(linkMode){
+    e.stopPropagation();
+    if(!linkSource){
+      linkSource=p.id;
+      document.querySelector(`.node[data-pid="${p.id}"]`).classList.add('linksrc');
+    } else if(linkSource===p.id){
+      linkSource=null; document.querySelectorAll('.node').forEach(n=>n.classList.remove('linksrc'));
+    } else {
+      const label = prompt('How are they connected? (e.g. "sister", "mentor", "colleague")','');
+      if(label!==null){
+        state.links.push({id:uid(), a:linkSource, b:p.id, label:label.trim()});
+        save(); renderWires(); toast('Connection added');
+      }
+      linkSource=null; document.querySelectorAll('.node').forEach(n=>n.classList.remove('linksrc'));
+    }
+    return;
+  }
+  openPerson(p.id);
+}
+
+/* ============================================================
+   Side panel — view + edit
+   ============================================================ */
+function closePanel(){ $('panel').classList.remove('open'); selectedId=null; document.querySelectorAll('.node.selected').forEach(n=>n.classList.remove('selected')); }
+function selectNode(id){
+  document.querySelectorAll('.node.selected').forEach(n=>n.classList.remove('selected'));
+  const el=document.querySelector(`.node[data-pid="${id}"]`); if(el) el.classList.add('selected');
+  selectedId=id;
+}
+
+function openPerson(id){
+  const p=person(id); if(!p) return;
+  selectNode(id);
+  const g=group(p.group);
+  const du=daysUntilBirthday(p.birthday), age=ageFrom(p.birthday);
+  const bdayTxt = p.birthday ? (fmtDate(p.birthday) + (age?` · turns ${age+ (du===0?0:1)}`:'') + (du!=null?` · ${du===0?'today! 🎂':'in '+du+' day'+(du===1?'':'s')}`:'')) : '';
+  const rels = state.links.filter(l=>l.a===id||l.b===id);
+
+  $('phead').innerHTML = `
+    <div class="av" style="width:44px;height:44px;border-radius:${p.kind==='institution'?'12px':'50%'};background:${g?g.color:'#55625C'};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Newsreader',serif;font-size:17px;flex:none;">${esc(initials(p.name))}</div>
+    <div style="min-width:0;">
+      <h2 style="font-size:20px;line-height:1.1;">${esc(p.name)}</h2>
+      <div style="font-size:12.5px;color:var(--slate);">${esc(p.role||'')}${g?` · <span style="color:${g.color}">${esc(g.name)}</span>`:''}</div>
+    </div>
+    <button class="close" onclick="closePanel()">×</button>`;
+
+  const chip = (t,cls='')=>`<span class="chip ${cls}">${esc(t)}</span>`;
+  $('pbody').innerHTML = `
+    ${p.help?`<div class="fieldrow"><div class="lab">How they can help</div><div class="val">${esc(p.help)}</div>${(p.helpAreas||[]).length?`<div style="margin-top:6px;">${p.helpAreas.map(h=>chip(h,'help')).join('')}</div>`:''}</div>`:''}
+    ${bdayTxt?`<div class="fieldrow"><div class="lab">Birthday</div><div class="val">${esc(bdayTxt)}</div></div>`:''}
+    ${p.location?`<div class="fieldrow"><div class="lab">Location</div><div class="val">${esc(p.location)}</div></div>`:''}
+    ${(p.hobbies||[]).length?`<div class="fieldrow"><div class="lab">Hobbies</div><div>${p.hobbies.map(h=>chip(h)).join('')}</div></div>`:''}
+    ${(p.likes||[]).length?`<div class="fieldrow"><div class="lab">Likes</div><div>${p.likes.map(h=>chip(h)).join('')}</div></div>`:''}
+    ${(p.funFacts||[]).length?`<div class="fieldrow"><div class="lab">Fun facts</div><div class="val"><ul style="margin:4px 0 0;padding-left:18px;">${p.funFacts.map(f=>`<li>${esc(f)}</li>`).join('')}</ul></div></div>`:''}
+    <div class="fieldrow"><div class="lab">Connections <span class="bcount">${rels.length}</span></div>
+      <div>${rels.length?rels.map(l=>{const other=person(l.a===id?l.b:l.a); return `<div class="rel-item"><span>${esc(l.label||'connected')} — <b>${esc(other?other.name:'?')}</b></span><button class="x" onclick="removeLink('${l.id}')">unlink</button></div>`;}).join(''):'<div class="val empty">No connections yet — use Link mode.</div>'}</div>
+    </div>
+    ${p.contact?`<div class="fieldrow"><div class="lab">Contact</div><div class="val">${esc(p.contact)}</div></div>`:''}
+    ${p.lastContact?`<div class="fieldrow"><div class="lab">Last in touch</div><div class="val">${esc(fmtDate(p.lastContact))}</div></div>`:''}
+    ${p.notes?`<div class="fieldrow"><div class="lab">Notes</div><div class="val">${esc(p.notes)}</div></div>`:''}
+  `;
+  $('pactions').innerHTML = `
+    <button class="btn primary" onclick="editPerson('${id}')">Edit</button>
+    <button class="btn" onclick="startLinkFrom('${id}')">＋ Connection</button>
+    <button class="btn del" onclick="deletePerson('${id}')">Delete</button>`;
+  $('panel').classList.add('open');
+}
+
+function fmtDate(d){
+  if(!d) return '';
+  const [y,m,day]=d.split('-').map(Number);
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if(!m) return d;
+  return `${months[m-1]} ${day}${y?', '+y:''}`;
+}
+
+function editPerson(id){
+  const p = id?person(id):null;
+  const isNew = !p;
+  const d = p||{kind:'person', hobbies:[],likes:[],funFacts:[],helpAreas:[]};
+  const groupOpts = state.groups.map(g=>`<option value="${g.id}"${d.group===g.id?' selected':''}>${esc(g.name)}</option>`).join('');
+  $('phead').innerHTML = `<h2 style="font-size:19px;">${isNew?'New connection':'Edit'}</h2><button class="close" onclick="${isNew?'closePanel()':`openPerson('${id}')`}">×</button>`;
+  $('pbody').innerHTML = `
+    <form class="editor" id="pform" onsubmit="return false;">
+      <label>Name</label><input id="e-name" value="${esc(d.name||'')}" required>
+      <div class="two">
+        <div><label>Role / title</label><input id="e-role" value="${esc(d.role||'')}"></div>
+        <div><label>Type</label><select id="e-kind"><option value="person"${d.kind!=='institution'?' selected':''}>Person</option><option value="institution"${d.kind==='institution'?' selected':''}>Institution</option></select></div>
+      </div>
+      <div class="two">
+        <div><label>Group</label><select id="e-group"><option value="">— none —</option>${groupOpts}</select></div>
+        <div><label>Birthday</label><input type="date" id="e-birthday" value="${esc(d.birthday||'')}"></div>
+      </div>
+      <label>Location</label><input id="e-location" value="${esc(d.location||'')}">
+      <label>How they can help you</label><textarea id="e-help" placeholder="What can you turn to this person for?">${esc(d.help||'')}</textarea>
+      <label>Help areas <span class="hint" style="text-transform:none;">comma-separated — powers the “who can help with…” filter</span></label>
+      <input id="e-helpAreas" value="${esc((d.helpAreas||[]).join(', '))}" placeholder="Fundraising, Intros, Coding">
+      <label>Hobbies</label><input id="e-hobbies" value="${esc((d.hobbies||[]).join(', '))}" placeholder="climbing, jazz">
+      <label>Likes</label><input id="e-likes" value="${esc((d.likes||[]).join(', '))}" placeholder="matcha, maps">
+      <label>Fun facts <span class="hint" style="text-transform:none;">one per line</span></label>
+      <textarea id="e-funFacts" placeholder="Speaks 4 languages">${esc((d.funFacts||[]).join('\n'))}</textarea>
+      <div class="two">
+        <div><label>Contact</label><input id="e-contact" value="${esc(d.contact||'')}" placeholder="email / phone"></div>
+        <div><label>Last in touch</label><input type="date" id="e-lastContact" value="${esc(d.lastContact||'')}"></div>
+      </div>
+      <label>Notes</label><textarea id="e-notes">${esc(d.notes||'')}</textarea>
+    </form>`;
+  $('pactions').innerHTML = `
+    <button class="btn primary" onclick="savePerson('${id||''}')">Save</button>
+    <button class="btn" onclick="${isNew?'closePanel()':`openPerson('${id}')`}">Cancel</button>`;
+  $('panel').classList.add('open');
+  setTimeout(()=>$('e-name').focus(),50);
+}
+
+function savePerson(id){
+  const name=$('e-name').value.trim();
+  if(!name){ toast('Name is required'); $('e-name').focus(); return; }
+  let p = id?person(id):null;
+  if(!p){
+    // place new person near the centre of the current view
+    const s=$('stage').getBoundingClientRect(); const v=state.view;
+    p={id:uid(), x:Math.round((s.width/2-v.tx)/v.scale), y:Math.round((s.height/2-v.ty)/v.scale)};
+    state.people.push(p);
+  }
+  p.name=name;
+  p.role=$('e-role').value.trim();
+  p.kind=$('e-kind').value;
+  p.group=$('e-group').value||undefined;
+  p.birthday=$('e-birthday').value||'';
+  p.location=$('e-location').value.trim();
+  p.help=$('e-help').value.trim();
+  p.helpAreas=parseList($('e-helpAreas').value);
+  p.hobbies=parseList($('e-hobbies').value);
+  p.likes=parseList($('e-likes').value);
+  p.funFacts=$('e-funFacts').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  p.contact=$('e-contact').value.trim();
+  p.lastContact=$('e-lastContact').value||'';
+  p.notes=$('e-notes').value.trim();
+  save(); renderAll(); openPerson(p.id); toast('Saved');
+}
+
+function deletePerson(id){
+  const p=person(id); if(!p) return;
+  if(!confirm(`Delete ${p.name}? This also removes their connections.`)) return;
+  state.people=state.people.filter(x=>x.id!==id);
+  state.links=state.links.filter(l=>l.a!==id&&l.b!==id);
+  save(); closePanel(); renderAll(); toast('Deleted');
+}
+function removeLink(lid){
+  state.links=state.links.filter(l=>l.id!==lid);
+  save(); renderWires(); if(selectedId) openPerson(selectedId);
+}
+function startLinkFrom(id){
+  if(!linkMode) toggleLinkMode();
+  linkSource=id;
+  document.querySelectorAll('.node').forEach(n=>n.classList.remove('linksrc'));
+  const el=document.querySelector(`.node[data-pid="${id}"]`); if(el) el.classList.add('linksrc');
+  toast('Now click who they connect to');
+}
+
+/* ---- groups ---- */
+function openGroup(id){
+  const g=group(id); if(!g) return;
+  const members=state.people.filter(p=>p.group===id);
+  $('phead').innerHTML=`
+    <div class="av" style="width:44px;height:44px;border-radius:12px;background:${g.color};color:#fff;display:flex;align-items:center;justify-content:center;flex:none;">◇</div>
+    <div><h2 style="font-size:20px;">${esc(g.name)}</h2><div style="font-size:12.5px;color:var(--slate);">${members.length} ${members.length===1?'person':'people'}</div></div>
+    <button class="close" onclick="closePanel()">×</button>`;
+  $('pbody').innerHTML=`
+    <div class="fieldrow"><div class="lab">Members</div>
+      <div>${members.length?members.map(m=>`<div class="rel-item"><span onclick="openPerson('${m.id}')" style="cursor:pointer;">${esc(m.name)} <span style="color:var(--slate)">${esc(m.role||'')}</span></span></div>`).join(''):'<div class="val empty">No one in this group yet.</div>'}</div>
+    </div>
+    <div class="fieldrow"><div class="lab">Colour</div>
+      <div>${PALETTE.map(c=>`<button onclick="setGroupColor('${id}','${c}')" style="width:22px;height:22px;border-radius:5px;border:2px solid ${g.color===c?'#1B2420':'transparent'};background:${c};margin:2px;cursor:pointer;"></button>`).join('')}</div>
+    </div>`;
+  $('pactions').innerHTML=`
+    <button class="btn primary" onclick="renameGroup('${id}')">Rename</button>
+    <button class="btn" onclick="gatherGroup('${id}')" title="Arrange members around this hub">✦ Gather</button>
+    <button class="btn del" onclick="deleteGroup('${id}')">Delete</button>`;
+  $('panel').classList.add('open');
+}
+function setGroupColor(id,c){ const g=group(id); if(!g)return; g.color=c; save(); renderAll(); openGroup(id); }
+function renameGroup(id){ const g=group(id); const n=prompt('Group name:',g.name); if(n&&n.trim()){g.name=n.trim(); save(); renderAll(); openGroup(id);} }
+function deleteGroup(id){
+  const g=group(id); if(!confirm(`Delete group “${g.name}”? People stay on the map, just ungrouped.`))return;
+  state.people.forEach(p=>{ if(p.group===id) p.group=undefined; });
+  state.groups=state.groups.filter(x=>x.id!==id);
+  save(); closePanel(); renderAll(); toast('Group deleted');
+}
+function gatherGroup(id){
+  const g=group(id); const members=state.people.filter(p=>p.group===id);
+  const R=200;
+  members.forEach((p,i)=>{ const a=(i/members.length)*Math.PI*2 - Math.PI/2; p.x=Math.round(g.x+Math.cos(a)*R); p.y=Math.round(g.y+Math.sin(a)*R); });
+  save(); renderAll(); toast('Gathered around hub');
+}
+
+function startAddPerson(){ selectedId=null; document.querySelectorAll('.node.selected').forEach(n=>n.classList.remove('selected')); editPerson(null); }
+function startAddGroup(){
+  const name=prompt('New group name (e.g. “Family”, “Yale”, “Investors”):','');
+  if(!name||!name.trim())return;
+  const s=$('stage').getBoundingClientRect(); const v=state.view;
+  const g={id:uid(), name:name.trim(), color:PALETTE[state.groups.length%PALETTE.length],
+    x:Math.round((s.width/2-v.tx)/v.scale), y:Math.round((s.height/2-v.ty)/v.scale)};
+  state.groups.push(g); save(); renderAll(); openGroup(g.id);
+}
+
+/* double-click empty canvas → add a person there */
+$('stage').addEventListener('dblclick', e=>{
+  if(e.target.closest('.node')||e.target.closest('.hub'))return;
+  const w=screenToWorld(e.clientX,e.clientY);
+  pendingPos=w; editPerson(null);
+});
+let pendingPos=null;
+const _savePerson=savePerson;
+savePerson=function(id){
+  if(!id && pendingPos){
+    const name=$('e-name').value.trim(); if(!name){toast('Name is required'); return;}
+    const p={id:uid(), x:Math.round(pendingPos.x), y:Math.round(pendingPos.y)};
+    state.people.push(p);
+    p.name=name; p.role=$('e-role').value.trim(); p.kind=$('e-kind').value; p.group=$('e-group').value||undefined;
+    p.birthday=$('e-birthday').value||''; p.location=$('e-location').value.trim(); p.help=$('e-help').value.trim();
+    p.helpAreas=parseList($('e-helpAreas').value); p.hobbies=parseList($('e-hobbies').value); p.likes=parseList($('e-likes').value);
+    p.funFacts=$('e-funFacts').value.split('\n').map(x=>x.trim()).filter(Boolean);
+    p.contact=$('e-contact').value.trim(); p.lastContact=$('e-lastContact').value||''; p.notes=$('e-notes').value.trim();
+    pendingPos=null; save(); renderAll(); openPerson(p.id); toast('Added'); return;
+  }
+  pendingPos=null; _savePerson(id);
+};
+
+/* ============================================================
+   Cloudflare sync  (active only when CONFIG.api is set — the
+   private /admin version). localStorage stays as an instant-paint
+   + offline cache; the KV-backed API is the cross-device source
+   of truth. Demo version leaves all of this inert.
+   ============================================================ */
+let remoteReady = false;   // becomes true after the first load resolves
+let syncTimer = null;
+
+function setSyncStatus(s){
+  const el = $('syncdot'); if(!el) return;
+  const map = {
+    loading:['#B98A1F','Loading from cloud…'],
+    pending:['#B98A1F','Changes pending…'],
+    saving :['#B98A1F','Saving to cloud…'],
+    saved  :['#2F4A3D','Saved to Cloudflare'],
+    error  :['#C1440E','Offline — saved on this device, will retry'],
+    local  :['#55625C','Local only'],
+  };
+  const [c,t] = map[s] || map.local;
+  el.style.color = c; el.title = t; el.dataset.state = s;
+}
+function scheduleRemoteSave(){
+  if(!CONFIG.api || !remoteReady) return;
+  clearTimeout(syncTimer);
+  setSyncStatus('pending');
+  syncTimer = setTimeout(remoteSave, 700);   // debounce bursts of edits
+}
+async function remoteSave(){
+  if(!CONFIG.api) return;
+  clearTimeout(syncTimer);
+  try{
+    setSyncStatus('saving');
+    const res = await fetch(CONFIG.api, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(state)});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    setSyncStatus('saved');
+  }catch(e){ setSyncStatus('error'); }
+}
+async function remoteLoad(){
+  if(!CONFIG.api){ remoteReady = true; return; }
+  setSyncStatus('loading');
+  try{
+    const res = await fetch(CONFIG.api, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if(data && !data.__empty && data.people){
+      // adopt the cloud copy as the source of truth (remoteReady still false,
+      // so the save() below only writes the local cache — no echo push)
+      state = migrate(data);
+      try{ CONFIG.store.setItem(CONFIG.storageKey, JSON.stringify(state)); }catch(e){}
+      closePanel(); renderAll();
+      remoteReady = true; setSyncStatus('saved');
+    } else {
+      // nothing stored yet — seed the cloud with whatever we have locally
+      remoteReady = true; await remoteSave();
+    }
+  }catch(e){
+    // API unreachable (offline, or not deployed yet) — keep working locally
+    remoteReady = true; setSyncStatus('error');
+  }
+}
+// best-effort flush if the tab is closing mid-edit
+window.addEventListener('pagehide', ()=>{
+  if(CONFIG.api && remoteReady && navigator.sendBeacon){
+    try{ navigator.sendBeacon(CONFIG.api, new Blob([JSON.stringify(state)], {type:'application/json'})); }catch(e){}
+  }
+});
+
+/* ============================================================
+   Export / import
+   ============================================================ */
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='connections-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+  toast('Exported JSON');
+}
+function importData(ev){
+  const file=ev.target.files[0]; if(!file)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const data=JSON.parse(rd.result);
+      if(!data.people) throw new Error('bad file');
+      state=migrate(data); save(); closePanel(); renderAll(); fitView(); toast('Imported');
+    }catch(e){ alert('Could not read that file — is it a connections export?'); }
+  };
+  rd.readAsText(file); ev.target.value='';
+}
+
+/* ============================================================
+   Boot
+   ============================================================ */
+$('search').addEventListener('input', applyFilters);
+$('stage').addEventListener('click', e=>{ if(e.target.id==='stage'||e.target.id==='world'||e.target.id==='wires'){ if(!linkMode) closePanel(); } });
+window.addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(linkMode){toggleLinkMode();} else closePanel(); } });
+
+if(!CONFIG.demo){
+  $('mode-badge').remove();
+  document.title='Connection Tracker — B. Dörnyei';
+  $('resetbtn').textContent='↺ Clear';
+  const n=$('notice'); if(n) n.remove();
+}
+if(!CONFIG.api){ const sd=$('syncdot'); if(sd) sd.remove(); }
+
+// persist the initial state once so seed / starter-group ids stay stable across reloads
+try{ if(!CONFIG.store.getItem(CONFIG.storageKey)) save(); }catch(e){}
+renderAll();
+applyTransform();
+
+// pull the authoritative copy from Cloudflare (private version only);
+// no-op for the demo, which has CONFIG.api = null
+remoteLoad();
+</script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Dashboard (Demo) — B. Dörnyei</title>
+<meta name="description" content="Portfolio demo of a personal budget dashboard — seeded with fake sample data.">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2420; --paper:#E7EAE1; --paprika:#C1440E; --forest:#2F4A3D;
+    --slate:#55625C; --line:rgba(27,36,32,0.16); --card:#F3F5EF;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'Public Sans',system-ui,sans-serif;}
+  .wrap{max-width:880px; margin:0 auto; padding:48px 28px 80px;}
+  h1,h2{font-family:'Newsreader',serif; font-weight:500; margin:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  .top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; flex-wrap:wrap; gap:10px;}
+  .top a{color:var(--slate); font-size:13px; text-decoration:none;}
+  .top a:hover{color:var(--paprika);}
+
+  .demo-badge{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em;
+    text-transform:uppercase; color:#fff; background:var(--paprika); padding:3px 8px; border-radius:3px;
+    vertical-align:middle; margin-left:10px;
+  }
+
+  .notice{
+    background:var(--card); border:1px solid var(--line); border-left:3px solid var(--forest);
+    padding:16px 18px; font-size:14px; color:var(--ink); margin:24px 0 36px; border-radius:0 3px 3px 0;
+  }
+  .notice b{color:var(--forest);}
+
+  .grid-summary{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:36px;}
+  .sum-card{background:var(--card); padding:18px 16px;}
+  .sum-card .cat{font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--slate);}
+  .sum-card .amt{font-family:'IBM Plex Mono',monospace; font-size:20px; margin-top:6px;}
+
+  form#entry{
+    display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:10px; margin-bottom:28px; align-items:end;
+  }
+  form#entry label{font-size:11px; color:var(--slate); display:block; margin-bottom:4px;}
+  form#entry input, form#entry select{
+    width:100%; padding:8px 9px; font-size:14px; border:1px solid var(--line); border-radius:3px; background:#fff;
+  }
+  form#entry button{
+    padding:9px 16px; background:var(--paprika); color:#fff; border:none; border-radius:3px; font-size:14px; cursor:pointer;
+  }
+  form#entry button:hover{background:#a5390b;}
+  @media (max-width:720px){ form#entry{grid-template-columns:1fr 1fr;} }
+
+  table{width:100%; border-collapse:collapse; font-size:14px;}
+  th,td{text-align:left; padding:10px 8px; border-bottom:1px solid var(--line);}
+  th{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; color:var(--slate); font-weight:500;}
+  td.amt{font-family:'IBM Plex Mono',monospace; text-align:right;}
+  td.del{text-align:right;}
+  td.del button{background:none; border:none; color:var(--slate); cursor:pointer; font-size:13px;}
+  td.del button:hover{color:var(--paprika);}
+  .empty{color:var(--slate); font-size:14px; padding:24px 0;}
+  .reset-row{margin-top:18px;}
+  .reset-row button{
+    background:none; border:1px solid var(--line); color:var(--slate); padding:7px 12px;
+    border-radius:3px; font-size:13px; cursor:pointer; font-family:'IBM Plex Mono',monospace;
+  }
+  .reset-row button:hover{border-color:var(--paprika); color:var(--paprika);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <h1 style="font-size:26px;">Budget<span class="demo-badge">Demo</span></h1>
+    <a href="index.html">← Back to site</a>
+  </div>
+
+  <div class="notice">
+    <b>This is a portfolio demo.</b> All transactions below are fake sample data, seeded on page load — nothing here touches a real bank account. It's showing the same interface I use privately with a script that pulls real transactions from SimpleFin Bridge and auto-categorizes them; that version runs locally on my own machine, never in a browser or on a public server.
+  </div>
+
+  <div class="grid-summary" id="summary"></div>
+
+  <form id="entry" onsubmit="addTx(event)">
+    <div><label>Date</label><input type="date" id="f-date" required></div>
+    <div><label>Merchant</label><input type="text" id="f-merchant" placeholder="Blue Bottle" required></div>
+    <div><label>Amount ($)</label><input type="number" step="0.01" id="f-amount" placeholder="6.50" required></div>
+    <div>
+      <label>Category</label>
+      <select id="f-category">
+        <option>Coffee</option>
+        <option>Food</option>
+        <option>Transport</option>
+        <option>Subscriptions</option>
+        <option>Rent/Housing</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <button type="submit">Add</button>
+  </form>
+
+  <table>
+    <thead><tr><th>Date</th><th>Merchant</th><th>Category</th><th style="text-align:right;">Amount</th><th></th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div class="empty" id="empty-msg" style="display:none;">No transactions yet — add one above.</div>
+
+  <div class="reset-row">
+    <button onclick="resetDemo()">↺ Reset demo data</button>
+  </div>
+</div>
+
+<script>
+  // Fake, illustrative-only sample data — regenerated fresh each page load
+  // (session-only, via sessionStorage) so edits made by a visitor never persist.
+  const SEED = [
+    { id: 1, date: '2026-08-18', merchant: 'Blue Bottle Coffee', amount: 6.25,   category: 'Coffee' },
+    { id: 2, date: '2026-08-17', merchant: 'Trader Joe\'s',      amount: 54.10,  category: 'Food' },
+    { id: 3, date: '2026-08-16', merchant: 'MTA Transit',        amount: 33.00,  category: 'Transport' },
+    { id: 4, date: '2026-08-15', merchant: 'Spotify',            amount: 11.99,  category: 'Subscriptions' },
+    { id: 5, date: '2026-08-01', merchant: 'Landlord LLC',       amount: 1450.00,category: 'Rent/Housing' },
+    { id: 6, date: '2026-07-29', merchant: 'Shell Gas Station',  amount: 41.72,  category: 'Transport' },
+    { id: 7, date: '2026-07-27', merchant: 'Whole Foods Market', amount: 78.35,  category: 'Food' },
+    { id: 8, date: '2026-07-22', merchant: 'Peet\'s Coffee',     amount: 5.50,   category: 'Coffee' },
+    { id: 9, date: '2026-07-20', merchant: 'Netflix',            amount: 15.49,  category: 'Subscriptions' },
+    { id:10, date: '2026-07-14', merchant: 'Corner Bodega',      amount: 12.80,  category: 'Other' },
+  ];
+
+  let tx = [];
+  const STORAGE_KEY = 'dornyei-budget-demo-transactions';
+
+  function loadTx(){
+    try{
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      tx = raw ? JSON.parse(raw) : structuredClone(SEED);
+    } catch(e){ tx = structuredClone(SEED); }
+    render();
+  }
+  function saveTx(){
+    try{ sessionStorage.setItem(STORAGE_KEY, JSON.stringify(tx)); }
+    catch(e){ /* demo-only; ignore */ }
+  }
+  function resetDemo(){
+    tx = structuredClone(SEED);
+    saveTx();
+    render();
+  }
+
+  function addTx(e){
+    e.preventDefault();
+    const date = document.getElementById('f-date').value;
+    const merchant = document.getElementById('f-merchant').value;
+    const amount = parseFloat(document.getElementById('f-amount').value);
+    const category = document.getElementById('f-category').value;
+    tx.unshift({ id: Date.now(), date, merchant, amount, category });
+    document.getElementById('entry').reset();
+    saveTx();
+    render();
+  }
+  function removeTx(id){
+    tx = tx.filter(t=>t.id!==id);
+    saveTx();
+    render();
+  }
+
+  function render(){
+    const rows = document.getElementById('rows');
+    const emptyMsg = document.getElementById('empty-msg');
+    rows.innerHTML = '';
+    emptyMsg.style.display = tx.length ? 'none' : 'block';
+    tx.forEach(t=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${t.date}</td><td>${t.merchant}</td><td>${t.category}</td>
+        <td class="amt">$${t.amount.toFixed(2)}</td>
+        <td class="del"><button onclick="removeTx(${t.id})">remove</button></td>`;
+      rows.appendChild(tr);
+    });
+
+    const totals = {};
+    tx.forEach(t=>{ totals[t.category] = (totals[t.category]||0) + t.amount; });
+    const summary = document.getElementById('summary');
+    summary.innerHTML = '';
+    const cats = Object.keys(totals);
+    if(!cats.length){
+      summary.innerHTML = '<div class="sum-card"><div class="cat">Total</div><div class="amt">$0.00</div></div>';
+    } else {
+      cats.forEach(c=>{
+        summary.innerHTML += `<div class="sum-card"><div class="cat">${c}</div><div class="amt">$${totals[c].toFixed(2)}</div></div>`;
+      });
+    }
+  }
+
+  loadTx();
+</script>
+
+</body>
+</html>
