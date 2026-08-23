@@ -1034,6 +1034,97 @@
     overrides=out;
   }
 
+  /* ---------- demo sample data (fake, generated in-browser) ----------
+     Mirrors the shape the real Worker returns from SimpleFin: bank + credit +
+     investment accounts (with holdings), plus ~10 months of categorized
+     transactions so every chart, the investments tab, and recurring-detection
+     all have something to show. Nothing here is real. */
+  function DEMO_DATA(){
+    const today = new Date();
+    const iso = d => d.toISOString().slice(0,10);
+    const addDays = (base,n)=>{ const d=new Date(base); d.setDate(d.getDate()+n); return d; };
+    let s = 20260822;                          // fixed seed → stable-looking demo
+    const rnd = ()=>{ s = (s*1103515245 + 12345) & 0x7fffffff; return s/0x7fffffff; };
+    const pick = arr => arr[Math.floor(rnd()*arr.length)];
+    const amt = (lo,hi)=> -(Math.round((lo + rnd()*(hi-lo))*100)/100);  // negative = spend
+
+    const CARD='Chase Sapphire', CARD2='Quicksilver Card', CHK='Chase Total Checking', CHK2='360 Checking';
+    const M = {
+      Coffee:['SQ *BLUE BOTTLE',"Peet's Coffee",'Starbucks','Gregorys Coffee'],
+      'Food & Dining':['TST* SWEETGREEN','Chipotle','Shake Shack',"Joe's Pizza",'Thai Villa','Dig Inn'],
+      Groceries:["Trader Joe's",'Whole Foods Market','Fairway Market'],
+      Transport:['MTA*METROCARD','Uber','Lyft','Shell Oil'],
+      Shopping:['Amazon.com','Uniqlo','MUJI','Apple Store'],
+      Health:['CVS Pharmacy','Rite Aid'],
+      Travel:['Amtrak','Delta Air Lines','Airbnb'],
+    };
+
+    const tx=[]; let id=1;
+    const push=(date,account,merchant,amount,category)=> tx.push({id:id++, date:iso(date), account, description:merchant, amount, category});
+
+    const start = addDays(today,-315);
+    for (let d=new Date(start); d<=today; d=addDays(d,1)){
+      const dow=d.getDay(), dom=d.getDate();
+      if (dow>=1&&dow<=5 && rnd()<0.7) push(d,CARD,pick(M.Coffee),amt(3.5,6.75),'Coffee');
+      if (rnd()<0.55) push(d,CARD,pick(M['Food & Dining']),amt(9,34),'Food & Dining');
+      if (dow>=1&&dow<=5 && rnd()<0.4) push(d,CARD2,pick(M.Transport),amt(2.9,28),'Transport');
+      if ((dow===0||dow===6) && rnd()<0.6) push(d,CARD2,pick(M.Groceries),amt(28,96),'Groceries');
+      if (rnd()<0.10) push(d,CARD,pick(M.Shopping),amt(14,160),'Shopping');
+      if (rnd()<0.04) push(d,CARD2,pick(M.Health),amt(8,60),'Health');
+      if (rnd()<0.02) push(d,CARD,pick(M.Travel),amt(80,420),'Travel');
+      // monthly fixed costs
+      if (dom===1)  push(d,CHK,'Landlord LLC RENT',-1450,'Rent/Housing');
+      if (dom===4)  push(d,CARD,'Spotify USA',-11.99,'Subscriptions');
+      if (dom===9)  push(d,CARD,'Netflix.com',-15.49,'Subscriptions');
+      if (dom===12) push(d,CARD,'OpenAI ChatGPT',-20.00,'Subscriptions');
+      if (dom===15) push(d,CHK,'Con Edison',amt(58,92),'Bills/Utilities');
+      if (dom===18) push(d,CHK,'Verizon Wireless',-45.00,'Bills/Utilities');
+      if (dom===6)  push(d,CARD2,'Blink Fitness',-34.00,'Health');
+      // income
+      if (dow===5)  push(d,CHK,'YALE JACKSON STIPEND',425,'Income');
+      if (dom===2||dom===17) push(d,CHK2,'WORLD BANK PAYROLL',1850,'Income');
+      // transfers (card payments / savings) — excluded from spend math
+      if (dom===22){ push(d,CHK,'CHASE CREDIT CRD AUTOPAY',-650,'Transfer'); push(d,CARD,'Payment Thank You',650,'Transfer'); }
+      if (dom===25) push(d,CHK2,'Transfer to Performance Savings',-400,'Transfer');
+    }
+
+    const accounts = [
+      { org:'Chase', name:CHK, balance:4215.62, type:'depository' },
+      { org:'Chase', name:CARD, balance:-1863.40, type:'credit' },
+      { org:'Capital One', name:CHK2, balance:2648.19, type:'depository' },
+      { org:'Capital One', name:CARD2, balance:-742.11, type:'credit' },
+      { org:'Capital One', name:'Performance Savings', balance:15400.00, type:'depository' },
+      { org:'Charles Schwab', name:'Roth IRA', type:'investment', balance:16680, holdings:[
+        { symbol:'VTI',  description:'Vanguard Total Stock Market ETF',       shares:40, marketValue:10800, costBasis:8200 },
+        { symbol:'VXUS', description:'Vanguard Total International Stock ETF', shares:60, marketValue:3720,  costBasis:3400 },
+        { symbol:'BND',  description:'Vanguard Total Bond Market ETF',        shares:30, marketValue:2160,  costBasis:2250 },
+      ]},
+      { org:'Charles Schwab', name:'Individual Brokerage', type:'investment', balance:20685, holdings:[
+        { symbol:'VOO',  description:'Vanguard S&P 500 ETF', shares:15, marketValue:7500, costBasis:6300 },
+        { symbol:'AAPL', description:'Apple Inc.',           shares:25, marketValue:5625, costBasis:4100 },
+        { symbol:'MSFT', description:'Microsoft Corp.',      shares:12, marketValue:5160, costBasis:3800 },
+        { symbol:'NVDA', description:'NVIDIA Corp.',         shares:20, marketValue:2400, costBasis:1500 },
+      ]},
+      { org:'Charles Schwab', name:'Traditional IRA (Rollover)', type:'investment', balance:8800, holdings:[
+        { symbol:'SCHB', description:'Schwab U.S. Broad Market ETF',    shares:80,  marketValue:4800, costBasis:4200 },
+        { symbol:'SCHF', description:'Schwab International Equity ETF',  shares:100, marketValue:4000, costBasis:3900 },
+      ]},
+    ];
+
+    const goals = { categories:{ 'Food & Dining':350, 'Coffee':80, 'Groceries':400, 'Shopping':200, 'Subscriptions':60 } };
+    const overrides = {};   // start clean so visitors can try re-filing a category tag
+    const recurring = [
+      { id:'r-rent',    name:'Landlord LLC RENT',   amount:1450,  flow:'out', cadence:'monthly',  category:'Rent/Housing' },
+      { id:'r-spotify', name:'Spotify USA',         amount:11.99, flow:'out', cadence:'monthly',  category:'Subscriptions' },
+      { id:'r-netflix', name:'Netflix.com',         amount:15.49, flow:'out', cadence:'monthly',  category:'Subscriptions' },
+      { id:'r-gym',     name:'Blink Fitness',       amount:34,    flow:'out', cadence:'monthly',  category:'Health' },
+      { id:'r-stipend', name:'Yale Jackson Stipend',amount:425,   flow:'in',  cadence:'weekly',   category:'Income' },
+      { id:'r-payroll', name:'World Bank Payroll',  amount:1850,  flow:'in',  cadence:'biweekly', category:'Income' },
+    ];
+
+    return { accounts, transactions:tx, goals, overrides, recurring };
+  }
+
   /* ---------- boot ---------- */
   function initSelects(){
     document.getElementById('f-category').innerHTML = CATEGORIES.filter(c=>c!=='Transfer').map(c=>`<option>${c}</option>`).join('');
@@ -1051,34 +1142,23 @@
     });
   }
 
-  async function boot(){
+  function boot(){
     loadManual(); initSelects();
-    try{ goals = JSON.parse(localStorage.getItem(GOALS_CACHE)) || {categories:{}}; }catch(e){ goals={categories:{}}; }
-    if(!goals.categories) goals.categories={};
-    try{ overrides = (JSON.parse(localStorage.getItem(OVERRIDES_CACHE))||{}).overrides || {}; }catch(e){ overrides={}; }
-    try{ recurring = (JSON.parse(localStorage.getItem(RECUR_CACHE))||{}).items || []; }catch(e){ recurring=[]; }
+    // Restore any edits made earlier this session; otherwise fall back to the seed.
+    let sg=null, so=null, sr=null;
+    try{ sg = JSON.parse(STORE.getItem(GOALS_CACHE)); }catch(e){}
+    try{ so = JSON.parse(STORE.getItem(OVERRIDES_CACHE)); }catch(e){}
+    try{ sr = JSON.parse(STORE.getItem(RECUR_CACHE)); }catch(e){}
+
+    const seed = DEMO_DATA();
+    synced = { accounts:seed.accounts, transactions:seed.transactions, syncedAt:new Date().toISOString() };
+    goals     = (sg && sg.categories) ? sg : seed.goals;
+    overrides = (so && so.overrides)  ? so.overrides : seed.overrides;
+    recurring = (sr && Array.isArray(sr.items)) ? sr.items : seed.recurring;
     migrateOverrides();
-    renderAll();
 
-    try{
-      const res = await fetch(API,{headers:{'Accept':'application/json'}});
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      const data = await res.json();
-      if(data && data.__empty){ document.getElementById('synced-empty').style.display='block'; setStatus('No bank data synced yet', true); }
-      else{
-        synced = { accounts:data.accounts||[], transactions:data.transactions||[], syncedAt:data.syncedAt||null };
-        const when = synced.syncedAt ? new Date(synced.syncedAt).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'}) : 'unknown time';
-        const nInv = investAccounts().length;
-        setStatus(`<b>${synced.accounts.length}</b> account${synced.accounts.length===1?'':'s'} synced${nInv?` · ${nInv} investment`:''} · last updated ${when}`, false);
-      }
-    }catch(e){ setStatus('Could not reach the budget API — showing manual entries only', true); }
-
-    // server-authoritative state
-    await Promise.all([
-      fetch(GOALS_API,{headers:{'Accept':'application/json'}}).then(r=>r.ok?r.json():null).then(g=>{ if(g && !g.__empty && g.categories) goals=g; }).catch(()=>{}),
-      fetch(OVERRIDES_API,{headers:{'Accept':'application/json'}}).then(r=>r.ok?r.json():null).then(o=>{ if(o && !o.__empty && o.overrides){ overrides=o.overrides; migrateOverrides(); } }).catch(()=>{}),
-      fetch(RECUR_API,{headers:{'Accept':'application/json'}}).then(r=>r.ok?r.json():null).then(x=>{ if(x && !x.__empty && Array.isArray(x.items)) recurring=x.items; }).catch(()=>{}),
-    ]);
+    const nInv = investAccounts().length;
+    setStatus(`<b>${synced.accounts.length}</b> sample accounts · ${nInv} investment · <span class="mono">demo data — nothing real</span>`, false);
     renderAll();
   }
   boot();
