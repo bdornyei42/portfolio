@@ -164,6 +164,35 @@
   .demo-card:hover .open .arrow{ transform:translateX(4px); }
   .demo-card .open .arrow{ transition:transform .25s ease; }
 
+  /* featured project (external venture) */
+  .feature-card{
+    display:flex; gap:24px; align-items:center; flex-wrap:wrap;
+    background:var(--card); border:1px solid var(--line); border-left:3px solid var(--paprika);
+    padding:26px 28px; margin-bottom:28px; text-decoration:none; color:var(--ink);
+    transition:background .2s ease;
+  }
+  .feature-card:hover, .feature-card:focus-visible{ background:#EDEFE7; }
+  .feature-card .fc-main{flex:1; min-width:260px;}
+  .feature-card .eyebrow{color:var(--paprika); margin-bottom:10px;}
+  .feature-card h3{font-size:24px; margin-bottom:8px;}
+  .feature-card p{color:var(--slate); font-size:15px; margin:0; max-width:660px;}
+  .feature-card .visit{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:.04em; color:var(--paprika);
+    white-space:nowrap; display:inline-flex; align-items:center; gap:7px;
+  }
+  .feature-card .visit .arrow{ transition:transform .25s ease; }
+  .feature-card:hover .visit .arrow{ transform:translate(2px,-2px); }
+
+  /* inline sample-project link inside a timeline entry */
+  .t-item .proj-link{
+    display:inline-flex; align-items:center; gap:7px; margin-top:12px;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.03em;
+    color:var(--paprika); text-decoration:none;
+  }
+  .t-item .proj-link:hover, .t-item .proj-link:focus-visible{ text-decoration:underline; }
+  .t-item .proj-link .arrow{ transition:transform .2s ease; }
+  .t-item .proj-link:hover .arrow{ transform:translate(2px,-2px); }
+
   /* ===== Journey / timeline ===== */
   .timeline{position:relative; padding-left:34px;}
   .timeline::before{
@@ -264,10 +293,20 @@
 
     <div class="t-item now reveal">
       <div class="t-dot"></div>
+      <span class="t-date">Aug 2026 — present</span>
+      <h3>Founder</h3>
+      <div class="org">Sterling Admissions · sterlingadmissions.com</div>
+      <p>Founded a mentoring company that pairs students applying to top US universities with recent admits for weekly 1:1 guidance — application strategy, essays, activity lists, and school selection. Built from my own experience getting into Yale from Hungary without a college counselor.</p>
+      <a class="proj-link" href="https://sterlingadmissions.com" target="_blank" rel="noopener">Visit sterlingadmissions.com <span class="arrow">↗</span></a>
+    </div>
+
+    <div class="t-item now reveal">
+      <div class="t-dot"></div>
       <span class="t-date">Jun 2026 — present</span>
       <h3>LSMS Survey Innovation Fellow</h3>
       <div class="org">The World Bank Group · Development Data Group, Survey Unit · Washington, D.C.</div>
       <p>Built an automated Python pipeline tracking the research impact of LSMS household surveys across publications, books, and articles; supported the launch of an internal Community of Practice for Data; produced analysis and visualizations on survey outcomes, including the Nigerian Household Business Indicators.</p>
+      <a class="proj-link" href="https://bdornyei42.github.io/WBG_LSMS_Impact/" target="_blank" rel="noopener">See the live LSMS impact dashboard <span class="arrow">↗</span></a>
     </div>
 
     <div class="t-item reveal">
@@ -308,10 +347,20 @@
 <section id="tools">
   <div class="section-head reveal">
     <h2>Things I've <span class="serif-italic">built</span></h2>
-    <span class="count">03 · live demos</span>
+    <span class="count">01 venture · 03 tools</span>
   </div>
-  <p class="demos-intro reveal">Small single-page apps I built to run my own life and to keep my front-end sharp. Try them — each one is fully interactive.</p>
-  <p class="demos-note reveal"><span class="dot"></span> Public demos: seeded with sample data and running entirely in your browser. Nothing you enter is saved or sent anywhere.</p>
+  <p class="demos-intro reveal">A company I founded, plus small single-page apps I built to run my own life. Everything here is real and clickable.</p>
+
+  <a class="feature-card reveal" href="https://sterlingadmissions.com" target="_blank" rel="noopener">
+    <div class="fc-main">
+      <div class="eyebrow">Company · Education</div>
+      <h3>Sterling Admissions</h3>
+      <p>1:1 mentoring for students applying to elite US universities, from anywhere. I pair applicants with recent admits from top-15 schools for weekly guidance on strategy, essays, and school lists — the counseling I wish I'd had applying from Hungary.</p>
+    </div>
+    <span class="visit">sterlingadmissions.com <span class="arrow">↗</span></span>
+  </a>
+
+  <p class="demos-note reveal"><span class="dot"></span> The three below are public demos: seeded with sample data and running entirely in your browser. Nothing you enter is saved or sent anywhere.</p>
 
   <div class="demo-grid reveal">
     <a class="demo-card" href="planner-demo.html">

@@ -75,12 +75,27 @@ async function handleConnections(request, env) {
 const BUDGET_KEY = "budget:state";
 const BUDGET_MAX_BYTES = 3 * 1024 * 1024; // 3 MB guard
 
-async function handleBudget(request, env) {
+// Budget spending goals live in the same KV under their own key. Written by the
+// budget page (not by sync.js, so a sync never clobbers your goals), read back
+// on load. Same GET/PUT contract as everything else.
+const BUDGET_GOALS_KEY = "budget:goals";
+
+// Manual category overrides, keyed by merchant description. The budget page
+// writes these when you click a transaction's tag and pick a new category; they
+// survive every sync (sync re-categorizes from scratch, but never touches this
+// key), so "BENDE INC. → Food" sticks for past and future rows alike.
+const BUDGET_OVERRIDES_KEY = "budget:overrides";
+
+// Recurring income/expense rules (rent, subscriptions, the weekly stipend, …),
+// written by the budget page's "Recurring" tab, used to build the forecast.
+const BUDGET_RECURRING_KEY = "budget:recurring";
+
+async function handleBudget(request, env, key = BUDGET_KEY) {
   if (!env.BUDGET_KV) {
     return json({ error: "KV not configured" }, 500);
   }
   if (request.method === "GET") {
-    const raw = await env.BUDGET_KV.get(BUDGET_KEY);
+    const raw = await env.BUDGET_KV.get(key);
     if (!raw) return json({ __empty: true });
     return new Response(raw, { headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
   }
@@ -88,7 +103,7 @@ async function handleBudget(request, env) {
     const body = await request.text();
     if (body.length > BUDGET_MAX_BYTES) return json({ error: "too large" }, 413);
     try { JSON.parse(body); } catch { return json({ error: "invalid JSON" }, 400); }
-    await env.BUDGET_KV.put(BUDGET_KEY, body);
+    await env.BUDGET_KV.put(key, body);
     return json({ ok: true, savedAt: Date.now() });
   }
   return json({ error: "method not allowed" }, 405);
@@ -116,6 +131,12 @@ export default {
       if (url.pathname === "/admin/api/connections") return handleConnections(request, env);
       // Budget API (GET the synced accounts/transactions, PUT from sync.js), same gate.
       if (url.pathname === "/admin/api/budget") return handleBudget(request, env);
+      // Budget goals (GET/PUT from the budget page), stored under a separate key.
+      if (url.pathname === "/admin/api/budget/goals") return handleBudget(request, env, BUDGET_GOALS_KEY);
+      // Manual category overrides (GET/PUT from the budget page), own key.
+      if (url.pathname === "/admin/api/budget/overrides") return handleBudget(request, env, BUDGET_OVERRIDES_KEY);
+      // Recurring income/expense rules (GET/PUT from the budget page), own key.
+      if (url.pathname === "/admin/api/budget/recurring") return handleBudget(request, env, BUDGET_RECURRING_KEY);
     }
 
     return env.ASSETS.fetch(request);

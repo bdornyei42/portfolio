@@ -196,10 +196,137 @@
   }
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
+  /* ===== segmented view switch ===== */
+  .seg{display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--card);}
+  .seg button{border:none; background:none; padding:7px 13px; font-size:13px; cursor:pointer; color:var(--slate);
+    display:inline-flex; align-items:center; gap:6px; border-right:1px solid var(--line); transition:background .12s,color .12s;}
+  .seg button:last-child{border-right:none;}
+  .seg button:hover{color:var(--ink);}
+  .seg button.on{background:var(--forest); color:#fff;}
+  .seg svg{width:15px; height:15px;}
+
+  /* map-only chrome hides itself outside map view */
+  body:not(.view-map) #legend, body:not(.view-map) .zoomctl, body:not(.view-map) #notice{display:none;}
+  body:not(.view-map) .map-tool{display:none;}
+
+  /* ===== List + Radar shared surface ===== */
+  .sheet{position:fixed; inset:58px 0 0 0; overflow-y:auto; background:var(--paper); display:none; padding:26px 26px 80px;}
+  body.view-list #listview{display:block;}
+  body.view-radar #radarview{display:block;}
+  .sheet-inner{max-width:1040px; margin:0 auto;}
+  .sheet h2.section{font-size:22px; margin:26px 0 12px; display:flex; align-items:baseline; gap:10px;}
+  .sheet h2.section:first-child{margin-top:0;}
+  .sheet h2.section .n{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--slate); font-weight:400;}
+  .muted{color:var(--slate);}
+
+  /* ===== List view ===== */
+  .list-controls{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:18px;}
+  .list-controls select{padding:7px 9px; font-size:13px; border:1px solid var(--line); border-radius:5px; background:#fff; font-family:inherit; color:var(--ink);}
+  table.people{width:100%; border-collapse:collapse; font-size:13.5px; background:var(--card); border:1px solid var(--line); border-radius:8px; overflow:hidden;}
+  table.people th{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--slate);
+    text-align:left; padding:11px 12px; border-bottom:1px solid var(--line); cursor:pointer; white-space:nowrap; user-select:none; background:var(--paper-2);}
+  table.people th:hover{color:var(--paprika);}
+  table.people th .arr{opacity:.55; font-size:9px; margin-left:3px;}
+  table.people td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:middle;}
+  table.people tr:last-child td{border-bottom:none;}
+  table.people tbody tr{cursor:pointer; transition:background .1s;}
+  table.people tbody tr:hover{background:var(--paper-2);}
+  .cellname{display:flex; align-items:center; gap:9px; min-width:0;}
+  .cellname .mini{width:30px; height:30px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+    font-family:'Newsreader',serif; font-size:13px; color:#fff; background:var(--ncol,var(--forest));}
+  .cellname.inst .mini{border-radius:8px;}
+  .cellname .who{min-width:0;}
+  .cellname .who .n2{font-weight:500; line-height:1.15;}
+  .cellname .who .r2{font-size:11px; color:var(--slate); line-height:1.2;}
+  .gdot{display:inline-flex; align-items:center; gap:6px;}
+  .gdot .sw{width:9px; height:9px; border-radius:50%; flex:none;}
+  .stale{font-family:'IBM Plex Mono',monospace; font-size:12px;}
+  .stale .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle;}
+  .stale.fresh .dot{background:var(--forest);}
+  .stale.warn  .dot{background:var(--gold);}
+  .stale.over  .dot{background:var(--paprika);}
+  .stale.none  .dot{background:var(--line);}
+  .rowact{display:flex; gap:6px; justify-content:flex-end;}
+  .rowact button{border:1px solid var(--line); background:#fff; border-radius:5px; padding:4px 7px; font-size:11px; cursor:pointer; color:var(--slate); white-space:nowrap;}
+  .rowact button:hover{border-color:var(--paprika); color:var(--paprika);}
+  .list-empty{text-align:center; padding:60px 20px; color:var(--slate);}
+
+  /* ===== Radar view ===== */
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:28px;}
+  .tile{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:15px 16px; box-shadow:var(--shadow);}
+  .tile .big{font-family:'Newsreader',serif; font-size:32px; line-height:1;}
+  .tile .lbl2{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--slate); margin-top:6px;}
+  .tile.alert .big{color:var(--paprika);}
+  .cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px;}
+  .rcard{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:13px 14px; display:flex; gap:11px; align-items:flex-start;
+    transition:border-color .12s, box-shadow .12s;}
+  .rcard:hover{border-color:var(--slate); box-shadow:var(--shadow);}
+  .rcard .mini{width:38px; height:38px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+    font-family:'Newsreader',serif; font-size:15px; color:#fff; background:var(--ncol,var(--forest)); cursor:pointer;}
+  .rcard.inst .mini{border-radius:9px;}
+  .rcard .body2{flex:1; min-width:0;}
+  .rcard .body2 .nm2{font-weight:500; cursor:pointer;}
+  .rcard .body2 .nm2:hover{color:var(--paprika);}
+  .rcard .body2 .sub2{font-size:11.5px; color:var(--slate); margin-top:1px;}
+  .rcard .body2 .why{font-size:12px; margin-top:6px;}
+  .rcard .why.over{color:var(--paprika);}
+  .rcard .why.soon{color:var(--gold);}
+  .rcard .act2{margin-top:9px; display:flex; gap:6px; flex-wrap:wrap;}
+  .rcard .act2 button{border:1px solid var(--line); background:#fff; border-radius:5px; padding:4px 9px; font-size:11px; cursor:pointer; color:var(--slate);}
+  .rcard .act2 button:hover{border-color:var(--forest); color:var(--forest);}
+  .radar-empty{background:var(--card); border:1px dashed var(--line); border-radius:10px; padding:22px; color:var(--slate); font-size:13.5px;}
+
+  /* ===== timeline / memory in panel ===== */
+  .tl{margin-top:4px;}
+  .tl-item{display:flex; gap:9px; padding:7px 0; border-bottom:1px dashed var(--line);}
+  .tl-item:last-child{border-bottom:none;}
+  .tl-ic{flex:none; width:22px; height:22px; border-radius:50%; background:var(--paper-2); display:flex; align-items:center; justify-content:center; font-size:11px;}
+  .tl-body{flex:1; min-width:0;}
+  .tl-body .tl-date{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.04em; text-transform:uppercase; color:var(--slate);}
+  .tl-body .tl-text{font-size:13px; margin-top:1px; white-space:pre-wrap; word-break:break-word;}
+  .tl-body .tl-x{float:right; background:none; border:none; color:var(--slate); cursor:pointer; font-size:11px;}
+  .tl-body .tl-x:hover{color:var(--paprika);}
+  .addnote{display:flex; gap:6px; margin-top:8px;}
+  .addnote input{flex:1; padding:7px 9px; font-size:13px; border:1px solid var(--line); border-radius:5px; background:#fff; font-family:inherit;}
+  .quickacts{display:flex; gap:7px; flex-wrap:wrap; margin:2px 0 14px;}
+  .quickacts .btn.sm{font-size:12px;}
+  a.linky{color:var(--forest); text-decoration:none; border-bottom:1px solid rgba(47,74,61,.3);}
+  a.linky:hover{color:var(--paprika); border-color:var(--paprika);}
+
+  /* ===== modal (import from notes) ===== */
+  #scrim{position:fixed; inset:0; background:rgba(27,36,32,.4); z-index:70; display:none; align-items:center; justify-content:center; padding:20px;}
+  #scrim.open{display:flex;}
+  .modal{background:var(--card); border-radius:12px; box-shadow:0 20px 60px rgba(27,36,32,.35); width:640px; max-width:100%; max-height:90vh;
+    display:flex; flex-direction:column; overflow:hidden;}
+  .modal .mhead{padding:16px 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px;}
+  .modal .mhead h2{font-size:19px;}
+  .modal .mhead .sub{font-size:12px; color:var(--slate);}
+  .modal .mhead .close{margin-left:auto; background:none; border:none; font-size:22px; color:var(--slate); cursor:pointer; line-height:1;}
+  .modal .mhead .close:hover{color:var(--paprika);}
+  .modal .mbody{padding:18px 20px; overflow-y:auto; flex:1;}
+  .modal .mfoot{padding:14px 20px; border-top:1px solid var(--line); display:flex; gap:8px; align-items:center;}
+  .modal label{display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--slate); margin:0 0 5px;}
+  .modal textarea{width:100%; min-height:150px; padding:10px; font-size:13px; border:1px solid var(--line); border-radius:6px; background:#fff; font-family:inherit; resize:vertical;}
+  .modal select, .modal input[type=text]{width:100%; padding:8px 9px; font-size:13.5px; border:1px solid var(--line); border-radius:5px; background:#fff; font-family:inherit; color:var(--ink);}
+  .found{margin-top:6px;}
+  .found-row{display:grid; grid-template-columns:22px 118px 1fr; gap:9px; align-items:center; padding:7px 0; border-bottom:1px dashed var(--line);}
+  .found-row .fk{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--slate);}
+  .found-row input[type=text]{padding:6px 8px; font-size:13px;}
+  .found-row input[type=checkbox]{width:16px; height:16px; accent-color:var(--forest);}
+  .found-none{color:var(--slate); font-size:13px; font-style:italic; padding:8px 0;}
+  .privacy{font-size:11.5px; color:var(--slate); margin-right:auto; max-width:340px; line-height:1.35;}
+
+  @media (max-width:760px){
+    .sheet{padding:18px 14px 70px;}
+    .found-row{grid-template-columns:22px 90px 1fr;}
+  }
   @media (max-width:640px){
     .bar .lbl{display:none;}
     #legend{max-width:180px;}
     .search input{width:100px;}
+    .seg button{padding:7px 9px;}
+    .seg .slbl{display:none;}
+    table.people .col-hide{display:none;}
   }
 </style>
 </head>
@@ -207,13 +334,22 @@
 
 <header class="bar">
   <h1>Connections<span class="badge" id="mode-badge">Demo</span></h1>
+  <div class="seg" id="viewseg">
+    <button data-view="radar" onclick="setView('radar')" title="Radar — who to reach out to">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg><span class="slbl">Radar</span></button>
+    <button data-view="list" onclick="setView('list')" title="List of everyone">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" stroke-linecap="round"/></svg><span class="slbl">List</span></button>
+    <button data-view="map" onclick="setView('map')" title="Relationship map">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="13" cy="17" r="2.5"/><path d="M8 8l3.5 7M16 8l-3 7"/></svg><span class="slbl">Map</span></button>
+  </div>
   <div class="search">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     <input id="search" type="search" placeholder="Search people…" autocomplete="off">
   </div>
-  <button class="btn" onclick="startAddPerson()"><span>＋</span><span class="lbl">Person</span></button>
-  <button class="btn" onclick="startAddGroup()"><span>＋</span><span class="lbl">Group</span></button>
-  <button class="btn" id="linkbtn" onclick="toggleLinkMode()"><span>↔</span><span class="lbl">Link</span></button>
+  <button class="btn primary" onclick="openImport()" title="Paste a LinkedIn profile or meeting notes and let it fill in the details"><span>✦</span><span class="lbl">Add from notes</span></button>
+  <button class="btn map-tool" onclick="startAddPerson()"><span>＋</span><span class="lbl">Person</span></button>
+  <button class="btn map-tool" onclick="startAddGroup()"><span>＋</span><span class="lbl">Group</span></button>
+  <button class="btn map-tool" id="linkbtn" onclick="toggleLinkMode()"><span>↔</span><span class="lbl">Link</span></button>
   <div class="spacer"></div>
   <button class="btn ghost sm" onclick="exportData()">Export</button>
   <button class="btn ghost sm" onclick="document.getElementById('importfile').click()">Import</button>
@@ -230,9 +366,53 @@
   </div>
 </div>
 
+<section id="listview" class="sheet"><div class="sheet-inner" id="list-inner"></div></section>
+<section id="radarview" class="sheet"><div class="sheet-inner" id="radar-inner"></div></section>
+
+<div id="scrim">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="mhead">
+      <div>
+        <h2>Add from notes</h2>
+        <div class="sub">Paste a LinkedIn profile, meeting notes, an email signature — anything.</div>
+      </div>
+      <button class="close" onclick="closeImport()">×</button>
+    </div>
+    <div class="mbody">
+      <label>Paste text</label>
+      <textarea id="imp-text" placeholder="e.g.
+Jane Doe
+Head of Partnerships at Acme Corp
+San Francisco, CA
+jane@acme.com · +1 415 555 0134
+
+Met at the climate summit — interested in our data work, follow up re: pilot in Q4."></textarea>
+      <div style="margin-top:14px;">
+        <label>Who is this about?</label>
+        <select id="imp-target"></select>
+      </div>
+      <button class="btn" style="margin-top:12px;" onclick="scanImport()">Scan text</button>
+      <div id="imp-result" style="margin-top:14px; display:none;">
+        <label>What I found <span class="muted" style="text-transform:none;letter-spacing:0;">— untick anything you don't want applied</span></label>
+        <div class="found" id="imp-found"></div>
+        <label style="margin-top:14px;">Save the full text as a memory note?</label>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;">
+          <input type="checkbox" id="imp-note" checked style="width:16px;height:16px;accent-color:var(--forest);">
+          <span>Add it to this person's history, dated today.</span>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <div class="privacy">🔒 Read on this device only — nothing is sent anywhere, and nothing is saved until you hit Apply.</div>
+      <button class="btn" onclick="closeImport()">Cancel</button>
+      <button class="btn primary" id="imp-apply" onclick="applyImport()" disabled>Apply</button>
+    </div>
+  </div>
+</div>
+
 <div id="notice">
   <div>
-    <b>This is a portfolio demo.</b> Everyone on this map is fictional sample data, seeded fresh on load — drag people around, open a card, add a link. It mirrors a private tool I use to keep track of my real network: who they are, what they're into, birthdays, and <b>where each person can help</b>. The real version saves to my own machine only.
+    <b>This is a portfolio demo.</b> Everyone here is fictional sample data, seeded fresh on load. Try <b>Radar</b> for who to reconnect with, the <b>List</b> to sort everyone, or the <b>Map</b> to see how people connect. Hit <b>✦ Add from notes</b> and paste a LinkedIn profile or meeting notes — it fills in the details on-device. It mirrors a private tool I use for my real network; the real version syncs only to my own account.
   </div>
   <button class="x" onclick="document.getElementById('notice').remove()">×</button>
 </div>
@@ -245,6 +425,7 @@
 </div>
 
 <div class="zoomctl">
+  <button class="btn" onclick="tidyLayout()" title="Auto-arrange around groups">✦</button>
   <button class="btn" onclick="zoomBy(1.2)" title="Zoom in">＋</button>
   <button class="btn" onclick="zoomBy(1/1.2)" title="Zoom out">－</button>
   <button class="btn" onclick="fitView()" title="Fit to view">⊡</button>
@@ -283,12 +464,14 @@ function seedData(){
     G('g_policy','UN / Policy','#3E6B7A', 2650, 1350),
     G('g_mentor','Mentors','#7A4A6B', 2500, 500),
   ];
-  const P = (o)=>Object.assign({kind:'person', hobbies:[], likes:[], funFacts:[], helpAreas:[]}, o);
+  const P = (o)=>Object.assign({kind:'person', hobbies:[], likes:[], funFacts:[], helpAreas:[], tags:[], timeline:[], cadence:0}, o);
   const people = [
     P({id:'p1', name:'Anna Kovács', role:'Sister', group:'g_fam', birthday:'1999-08-27', location:'Budapest, HU',
        hobbies:['pottery','trail running'], likes:['matcha','vinyl records'], funFacts:['Speaks 4 languages','Once biked across Croatia'],
        help:'Native German speaker — proofreads anything I write in German and knows the Berlin startup scene.', helpAreas:['German','Intros'],
-       contact:'anna@example.com', lastContact:'2026-08-10', notes:'Call more often.', x:760, y:820}),
+       tags:['family','close'], cadence:30,
+       contact:'anna@example.com', lastContact:'2026-08-10', notes:'Call more often.',
+       timeline:[{date:'2026-08-10',type:'call',text:'Long call — she\'s moving flats next month.'}], x:760, y:820}),
     P({id:'p2', name:'Levente Kovács', role:'Father', group:'g_fam', birthday:'1968-03-12', location:'Budapest, HU',
        hobbies:['woodworking','chess'], likes:['espresso','history podcasts'], funFacts:['Built the family cabin by hand'],
        help:'30 years in manufacturing — great sounding board for anything operations or supply-chain.', helpAreas:['Operations','Advice'],
@@ -301,13 +484,14 @@ function seedData(){
        hobbies:['climbing','lo-fi beats'], likes:['ramen','mechanical keyboards'], funFacts:['Ranked top-100 in a chess app'],
        help:'Ridiculously good at Python & data viz — my go-to for debugging D3 and pandas.', helpAreas:['Coding','Data viz'],
        contact:'marcus@example.edu', lastContact:'2026-08-19', notes:'', x:2050, y:800}),
-    P({id:'p5', name:'Sofia Almeida', role:'Co-founder, Startup Maffia', group:'g_startup', birthday:'1997-02-02', location:'Lisbon, PT',
+    P({id:'p5', name:'Sofia Almeida', role:'Startup co-founder', group:'g_startup', birthday:'1997-02-02', location:'Lisbon, PT',
        hobbies:['surfing','sketching'], likes:['flat whites','risk decks'], funFacts:['Pitched on live TV at 22'],
        help:'Fundraising & pitch coaching. Warm intros to a dozen EU angels.', helpAreas:['Fundraising','Intros','Pitching'],
+       company:'Startup Maffia', tags:['work','founder'], cadence:30,
        contact:'sofia@example.com', lastContact:'2026-06-15', notes:'Owes me a coffee.', x:1360, y:1600}),
     P({id:'p6', name:'Tomás Reyes', role:'Product designer', group:'g_startup', birthday:'1995-09-30', location:'Remote',
        hobbies:['film photography','cooking'], likes:['negronis','Figma'], funFacts:['Shot a documentary in Patagonia'],
-       help:'Designs clean product UIs fast — helped mock the food-waste app in a weekend.', helpAreas:['Design','Product'],
+       help:'Designs clean product UIs fast — helped mock a side-project app in a weekend.', helpAreas:['Design','Product'],
        contact:'', lastContact:'2026-05-20', notes:'', x:1660, y:1640}),
     P({id:'p7', name:'Amina Diallo', role:'Program officer', group:'g_policy', birthday:'1988-12-08', location:'New York, NY',
        hobbies:['jazz','marathons'], likes:['bookstores','policy briefs'], funFacts:['Ran the NYC marathon 3x'],
@@ -316,14 +500,17 @@ function seedData(){
     P({id:'p8', name:'James Okoro', role:'Data-for-good lead', group:'g_policy', birthday:'1985-06-21', location:'Geneva, CH',
        hobbies:['cycling','open data'], likes:['maps','GIS'], funFacts:['Maintains a popular open-data package'],
        help:'Geospatial & humanitarian data. Great for anything mapping-related.', helpAreas:['Data','Mapping','Research'],
+       cadence:90, tags:['work'],
        contact:'', lastContact:'2026-04-11', notes:'', x:2800, y:1450}),
     P({id:'p9', name:'Eszter Nagy', role:'Former mentor', group:'g_mentor', birthday:'1972-01-15', location:'Vienna, AT',
        hobbies:['opera','gardening'], likes:['long lunches','frank feedback'], funFacts:['Founded 3 nonprofits'],
-       help:'Nonprofit governance & board building — helped me hand off Startup Maffia cleanly.', helpAreas:['Nonprofit','Advice','Fundraising'],
+       help:'Nonprofit governance & board building — helped me hand off a nonprofit board cleanly.', helpAreas:['Nonprofit','Advice','Fundraising'],
+       cadence:90, tags:['mentor'],
        contact:'eszter@example.com', lastContact:'2026-03-02', notes:'Send her the annual update.', x:2380, y:560}),
     P({id:'p10', name:'David Fischer', role:'Angel investor', group:'g_mentor', birthday:'1965-10-10', location:'Zurich, CH',
        hobbies:['sailing','wine'], likes:['clear one-pagers'], funFacts:['Exited two companies'],
        help:'Early-stage checks and brutally honest deck feedback.', helpAreas:['Fundraising','Advice'],
+       cadence:90, tags:['mentor','investor'],
        contact:'', lastContact:'2026-02-14', notes:'', x:2640, y:640}),
   ];
   const links = [
@@ -347,7 +534,7 @@ function loadState(){
     const raw = CONFIG.store.getItem(CONFIG.storageKey);
     if(raw) return migrate(JSON.parse(raw));
   }catch(e){}
-  if(CONFIG.demo) return seedData();
+  if(CONFIG.demo) return migrate(seedData());
   // private first-run: start empty, but drop in any suggested starter groups
   const starters = (CONFIG.starterGroups||[]).map((s,i)=>({
     id:uid(), name:s.name, color:s.color||PALETTE[i%PALETTE.length],
@@ -358,9 +545,23 @@ function loadState(){
 function migrate(s){
   s.groups = s.groups||[]; s.people = s.people||[]; s.links = s.links||[];
   s.view = s.view||{tx:0,ty:0,scale:1};
-  s.people.forEach(p=>{ p.hobbies=p.hobbies||[]; p.likes=p.likes||[]; p.funFacts=p.funFacts||[]; p.helpAreas=p.helpAreas||[]; p.kind=p.kind||'person'; });
+  s.people.forEach(p=>{
+    p.hobbies=p.hobbies||[]; p.likes=p.likes||[]; p.funFacts=p.funFacts||[];
+    p.helpAreas=p.helpAreas||[]; p.tags=p.tags||[]; p.timeline=p.timeline||[];
+    p.kind=p.kind||'person';
+    p.email=p.email||''; p.phone=p.phone||''; p.company=p.company||''; p.linkedin=p.linkedin||'';
+    p.cadence=(typeof p.cadence==='number')?p.cadence:0;   // days; 0 = don't remind
+    // fold a legacy free-text "contact" into email/phone if we can, keep the rest
+    if(p.contact){
+      if(!p.email && /@/.test(p.contact)) p.email=p.contact.trim();
+      else if(!p.phone && /^[+()\d][\d\s().-]{5,}$/.test(p.contact.trim())) p.phone=p.contact.trim();
+    }
+  });
   return s;
 }
+/* cadence presets (days) */
+const CADENCES = [[0,'No reminder'],[30,'Monthly'],[90,'Quarterly'],[182,'Twice a year'],[365,'Yearly']];
+function cadenceLabel(d){ const m=CADENCES.find(c=>c[0]===d); return m?m[1]:(d?`Every ${d} days`:'No reminder'); }
 function save(){
   try{ CONFIG.store.setItem(CONFIG.storageKey, JSON.stringify(state)); }catch(e){}
   scheduleRemoteSave();   // no-op unless CONFIG.api is set (private version)
@@ -370,7 +571,7 @@ function resetDemo(){
     if(!confirm('Clear the whole map? This cannot be undone.')) return;
     state = {groups:[], people:[], links:[], view:{tx:-560,ty:-260,scale:0.85}};
   } else {
-    state = seedData();
+    state = migrate(seedData());
   }
   save(); closePanel(); renderAll(); fitView(); toast(CONFIG.demo?'Demo reset':'Map cleared');
 }
@@ -410,6 +611,44 @@ function ageFrom(bday){
 function toast(msg){
   const t=$('toast'); t.textContent=msg; t.classList.add('show');
   clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),1800);
+}
+function todayISO(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+/* most recent time we were in touch: the max of lastContact + any dated timeline entry */
+function lastTouch(p){
+  let best = p.lastContact||'';
+  (p.timeline||[]).forEach(t=>{ if(t.date && t.date>best) best=t.date; });
+  return best||null;
+}
+function daysSince(iso){
+  if(!iso) return null;
+  const [y,m,d]=iso.split('-').map(Number); if(!y||!m||!d) return null;
+  const then=new Date(y,m-1,d), now=new Date();
+  const t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  return Math.max(0, Math.round((t0-then)/86400000));
+}
+/* how overdue a person is vs their cadence; null when no cadence set */
+function overdueBy(p){
+  if(!p.cadence) return null;
+  const lt=lastTouch(p);
+  const since = lt==null ? 100000 : daysSince(lt);
+  return since - p.cadence;   // >0 = overdue by N days
+}
+function relTime(iso){
+  const n=daysSince(iso); if(n==null) return '—';
+  if(n===0) return 'today'; if(n===1) return 'yesterday';
+  if(n<7) return n+' days ago'; if(n<14) return 'last week';
+  if(n<60) return Math.round(n/7)+' weeks ago';
+  if(n<365) return Math.round(n/30)+' months ago';
+  const y=Math.floor(n/365); return y+(y===1?' year ago':' years ago');
+}
+/* staleness bucket for the coloured dot */
+function staleClass(p){
+  const lt=lastTouch(p);
+  const ov=overdueBy(p);
+  if(ov!=null){ if(ov>0) return 'over'; if(ov> -Math.max(7,p.cadence*0.2)) return 'warn'; return 'fresh'; }
+  if(!lt) return 'none';
+  const n=daysSince(lt);
+  if(n>180) return 'over'; if(n>90) return 'warn'; return 'fresh';
 }
 
 /* ============================================================
@@ -454,6 +693,215 @@ function renderAll(){
   refreshHelpFilter();
   applyTransform();
   applyFilters();
+  renderSheets();
+}
+
+/* ============================================================
+   Views: Map / List / Radar
+   ============================================================ */
+let currentView = 'radar';
+function setView(v){
+  currentView = v;
+  document.body.classList.remove('view-map','view-list','view-radar');
+  document.body.classList.add('view-'+v);
+  document.querySelectorAll('#viewseg button').forEach(b=>b.classList.toggle('on', b.dataset.view===v));
+  if(linkMode && v!=='map') toggleLinkMode();
+  try{ localStorage.setItem('dornyei-connections-view', v); }catch(e){}
+  renderSheets();
+  if(v==='map') applyTransform();
+}
+function renderSheets(){
+  if(currentView==='list') renderList();
+  else if(currentView==='radar') renderRadar();
+}
+
+/* people passing the current search + hidden-group filters (shared across views) */
+function filteredPeople(){
+  const q=($('search').value||'').trim().toLowerCase();
+  return state.people.filter(p=>{
+    if(hiddenGroups.has(p.group)) return false;
+    if(!q) return true;
+    const hay=[p.name,p.role,p.company,p.location,p.notes,p.help,
+      (p.hobbies||[]).join(' '),(p.likes||[]).join(' '),(p.funFacts||[]).join(' '),
+      (p.helpAreas||[]).join(' '),(p.tags||[]).join(' '),
+      (p.timeline||[]).map(t=>t.text).join(' ')].join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+}
+function avatarMini(p, cls){
+  const g=group(p.group);
+  return `<div class="mini" style="--ncol:${g?g.color:'#55625C'}">${esc(initials(p.name))}</div>`;
+}
+
+/* ---------- Radar ---------- */
+function renderRadar(){
+  const box=$('radar-inner'); if(!box) return;
+  const people=filteredPeople();
+
+  // reconnect: overdue (cadence) first, then long-silent people with no cadence
+  const withCad = people.filter(p=>overdueBy(p)!=null && overdueBy(p)>0)
+                        .sort((a,b)=>overdueBy(b)-overdueBy(a));
+  const noCadStale = people.filter(p=>overdueBy(p)==null)
+                          .map(p=>({p, n:(lastTouch(p)?daysSince(lastTouch(p)):null)}))
+                          .filter(o=>o.n!=null && o.n>120)
+                          .sort((a,b)=>b.n-a.n).map(o=>o.p);
+  const reconnect=[...withCad, ...noCadStale];
+
+  // upcoming birthdays in the next 60 days
+  const bdays=people.map(p=>({p, d:daysUntilBirthday(p.birthday)}))
+                    .filter(o=>o.d!=null && o.d<=60)
+                    .sort((a,b)=>a.d-b.d);
+
+  const overdueCount=withCad.length;
+  const bdayMonth=people.filter(p=>{const d=daysUntilBirthday(p.birthday); return d!=null&&d<=31;}).length;
+  const tracked=people.filter(p=>p.cadence).length;
+
+  const tiles=`
+    <div class="tiles">
+      <div class="tile"><div class="big">${people.length}</div><div class="lbl2">People</div></div>
+      <div class="tile"><div class="big">${state.groups.length}</div><div class="lbl2">Groups</div></div>
+      <div class="tile ${overdueCount?'alert':''}"><div class="big">${overdueCount}</div><div class="lbl2">To reconnect</div></div>
+      <div class="tile"><div class="big">${bdayMonth}</div><div class="lbl2">Birthdays ≤ 31d</div></div>
+    </div>`;
+
+  const recon = reconnect.length ? `<div class="cards">${reconnect.slice(0,24).map(p=>{
+      const ov=overdueBy(p); const lt=lastTouch(p);
+      const why = ov!=null
+        ? `<div class="why over">Overdue by ${ov} day${ov===1?'':'s'} · ${cadenceLabel(p.cadence)}</div>`
+        : `<div class="why over">Last in touch ${relTime(lt)}</div>`;
+      const g=group(p.group);
+      return `<div class="rcard ${p.kind==='institution'?'inst':''}">
+        ${avatarMini(p)}
+        <div class="body2">
+          <div class="nm2" onclick="focusPerson('${p.id}')">${esc(p.name)}</div>
+          <div class="sub2">${esc(p.role||'')}${g?` · ${esc(g.name)}`:''}</div>
+          ${why}
+          <div class="act2">
+            <button onclick="markContacted('${p.id}')">✓ Contacted today</button>
+            ${p.email?`<button onclick="location.href='mailto:${esc(p.email)}'">✉ Email</button>`:''}
+            <button onclick="snooze('${p.id}')">Snooze</button>
+          </div>
+        </div></div>`;
+    }).join('')}</div>`
+    : `<div class="radar-empty">Nobody's overdue — nice. Set a “keep in touch” cadence on people you want to be nudged about, and they'll show up here when it's time.</div>`;
+
+  const bd = bdays.length ? `<div class="cards">${bdays.map(o=>{
+      const p=o.p, g=group(p.group);
+      const when = o.d===0?'Today! 🎂':(o.d===1?'Tomorrow':`in ${o.d} days`);
+      const age=ageFrom(p.birthday);
+      return `<div class="rcard ${p.kind==='institution'?'inst':''}">
+        ${avatarMini(p)}
+        <div class="body2">
+          <div class="nm2" onclick="focusPerson('${p.id}')">${esc(p.name)}</div>
+          <div class="sub2">${esc(fmtDate(p.birthday))}${age!=null?` · turns ${age+ (o.d===0?0:1)}`:''}</div>
+          <div class="why soon">🎂 ${when}</div>
+          <div class="act2">
+            ${p.email?`<button onclick="location.href='mailto:${esc(p.email)}'">✉ Send wishes</button>`:''}
+            <button onclick="markContacted('${p.id}')">✓ Reached out</button>
+          </div>
+        </div></div>`;
+    }).join('')}</div>`
+    : `<div class="radar-empty">No birthdays in the next 60 days.</div>`;
+
+  box.innerHTML = `
+    ${tiles}
+    <h2 class="section">Reconnect <span class="n">${reconnect.length}</span></h2>
+    ${recon}
+    <h2 class="section">Upcoming birthdays <span class="n">${bdays.length}</span></h2>
+    ${bd}`;
+}
+function focusPerson(id){ setView('map'); openPerson(id); centerOn(id); }
+function centerOn(id){
+  const p=person(id); if(!p) return;
+  const s=$('stage').getBoundingClientRect(); const v=state.view;
+  v.scale=Math.max(v.scale,0.9);
+  v.tx = s.width/2 - p.x*v.scale - 180;  // nudge left of the panel
+  v.ty = s.height/2 - p.y*v.scale;
+  applyTransform(); save();
+}
+function markContacted(id){
+  const p=person(id); if(!p) return;
+  p.lastContact=todayISO();
+  p.timeline=p.timeline||[];
+  p.timeline.push({date:todayISO(), type:'met', text:'Reached out.'});
+  save(); renderSheets(); if(selectedId===id) openPerson(id); toast('Marked as contacted today');
+}
+function snooze(id){
+  const p=person(id); if(!p) return;
+  // treat as "touched today" without a note, so it drops off the radar for a cadence cycle
+  p.lastContact=todayISO(); save(); renderSheets(); toast('Snoozed for one cycle');
+}
+
+/* ---------- List ---------- */
+let listSort={key:'stale', dir:1};
+function renderList(){
+  const box=$('list-inner'); if(!box) return;
+  let people=filteredPeople();
+  const groupSel = $('list-group') ? $('list-group').value : '';
+  if(groupSel) people=people.filter(p=>p.group===groupSel);
+
+  const sortVal=(p)=>{
+    switch(listSort.key){
+      case 'name': return (p.name||'').toLowerCase();
+      case 'group': return (group(p.group)?.name||'~').toLowerCase();
+      case 'bday': { const d=daysUntilBirthday(p.birthday); return d==null?99999:d; }
+      case 'stale': { // ascending shows who needs attention most, first
+        const ov=overdueBy(p);
+        const base = ov!=null ? ov : ((lastTouch(p)?daysSince(lastTouch(p)):9999) - 90);
+        return -base; }
+      default: return 0;
+    }
+  };
+  people.sort((a,b)=>{ const va=sortVal(a), vb=sortVal(b); return (va<vb?-1:va>vb?1:0)*listSort.dir; });
+
+  const groupOpts=`<option value="">All groups</option>`+state.groups.map(g=>`<option value="${g.id}"${groupSel===g.id?' selected':''}>${esc(g.name)}</option>`).join('');
+  const arr=(k)=> listSort.key===k?`<span class="arr">${listSort.dir>0?'▲':'▼'}</span>`:'';
+
+  const rows = people.map(p=>{
+    const g=group(p.group);
+    const sc=staleClass(p), lt=lastTouch(p);
+    const staleTxt = lt?relTime(lt):(p.cadence?'never':'—');
+    const du=daysUntilBirthday(p.birthday);
+    const bTxt = du==null?'<span class="muted">—</span>':(du===0?'🎂 today':(du<=60?`in ${du}d`:fmtDate(p.birthday)));
+    const tags=(p.tags||[]).slice(0,3).map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+    return `<tr onclick="focusPerson('${p.id}')">
+      <td><div class="cellname ${p.kind==='institution'?'inst':''}">
+        <div class="mini" style="--ncol:${g?g.color:'#55625C'}">${esc(initials(p.name))}</div>
+        <div class="who"><div class="n2">${esc(p.name)}</div><div class="r2">${esc(p.role||'')}${p.company?` · ${esc(p.company)}`:''}</div></div>
+      </div></td>
+      <td class="col-hide">${g?`<span class="gdot"><span class="sw" style="background:${g.color}"></span>${esc(g.name)}</span>`:'<span class="muted">—</span>'}</td>
+      <td><span class="stale ${sc}"><span class="dot"></span>${staleTxt}</span></td>
+      <td class="col-hide">${bTxt}</td>
+      <td class="col-hide">${tags||'<span class="muted">—</span>'}</td>
+      <td><div class="rowact" onclick="event.stopPropagation()">
+        <button onclick="markContacted('${p.id}')" title="Mark contacted today">✓</button>
+        ${p.email?`<button onclick="location.href='mailto:${esc(p.email)}'" title="Email">✉</button>`:''}
+        <button onclick="openImportFor('${p.id}')" title="Add notes">✦</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  box.innerHTML = `
+    <h2 class="section">Everyone <span class="n">${people.length}</span></h2>
+    <div class="list-controls">
+      <select id="list-group" onchange="renderList()">${groupOpts}</select>
+      <span class="muted" style="font-size:12.5px;">Tip: click a column to sort · click a row to open on the map</span>
+    </div>
+    ${people.length? `<table class="people">
+      <thead><tr>
+        <th onclick="sortList('name')">Name${arr('name')}</th>
+        <th class="col-hide" onclick="sortList('group')">Group${arr('group')}</th>
+        <th onclick="sortList('stale')">Last in touch${arr('stale')}</th>
+        <th class="col-hide" onclick="sortList('bday')">Birthday${arr('bday')}</th>
+        <th class="col-hide">Tags</th>
+        <th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>` : `<div class="list-empty">No one matches. Try clearing the search, or use <b>✦ Add from notes</b> to bring someone in.</div>`}`;
+}
+function sortList(key){
+  if(listSort.key===key) listSort.dir*=-1; else { listSort.key=key; listSort.dir=(key==='name'||key==='group')?1:1; }
+  renderList();
 }
 
 function renderNodes(){
@@ -564,7 +1012,7 @@ function renderLegend(){
     row.className='lg-row'+(hiddenGroups.has(g.id)?' off':'');
     row.innerHTML=`<span class="sw" style="background:${g.color}"></span><span>${esc(g.name)}</span><span class="lg-count">${count}</span>`;
     row.title='Click to show/hide';
-    row.addEventListener('click',()=>{ if(hiddenGroups.has(g.id))hiddenGroups.delete(g.id); else hiddenGroups.add(g.id); renderLegend(); applyFilters(); });
+    row.addEventListener('click',()=>{ if(hiddenGroups.has(g.id))hiddenGroups.delete(g.id); else hiddenGroups.add(g.id); renderLegend(); applyFilters(); renderSheets(); });
     box.appendChild(row);
   });
 }
@@ -723,25 +1171,71 @@ function openPerson(id){
     <button class="close" onclick="closePanel()">×</button>`;
 
   const chip = (t,cls='')=>`<span class="chip ${cls}">${esc(t)}</span>`;
+  const lt=lastTouch(p); const ov=overdueBy(p);
+  const touchTxt = lt
+    ? `${relTime(lt)}${p.cadence?` · ${cadenceLabel(p.cadence)}`:''}${ov!=null&&ov>0?` · <span style="color:var(--paprika)">overdue ${ov}d</span>`:''}`
+    : (p.cadence?`never · ${cadenceLabel(p.cadence)}`:'—');
+
+  // contact links
+  const links=[];
+  if(p.email) links.push(`<a class="linky" href="mailto:${esc(p.email)}">${esc(p.email)}</a>`);
+  if(p.phone) links.push(`<a class="linky" href="tel:${esc(p.phone.replace(/\s+/g,''))}">${esc(p.phone)}</a>`);
+  if(p.linkedin){ const u=/^https?:/.test(p.linkedin)?p.linkedin:('https://'+p.linkedin); links.push(`<a class="linky" href="${esc(u)}" target="_blank" rel="noopener">LinkedIn ↗</a>`); }
+
+  // memory timeline
+  const tl=(p.timeline||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const icon={met:'🤝',call:'📞',note:'✎',import:'✦'};
+  const tlHTML = tl.length ? `<div class="tl">${tl.map((t,i)=>{
+      const realIdx=(p.timeline||[]).indexOf(t);
+      return `<div class="tl-item"><div class="tl-ic">${icon[t.type]||'✎'}</div>
+        <div class="tl-body"><button class="tl-x" title="Remove" onclick="removeTimeline('${id}',${realIdx})">×</button>
+        <div class="tl-date">${esc(fmtDate(t.date))}</div><div class="tl-text">${esc(t.text||'')}</div></div></div>`;
+    }).join('')}</div>` : '<div class="val empty">No history yet — log a note below, or use ✦ Add from notes.</div>';
+
   $('pbody').innerHTML = `
+    <div class="quickacts">
+      <button class="btn sm primary" onclick="markContacted('${id}')">✓ Contacted today</button>
+      <button class="btn sm" onclick="openImportFor('${id}')">✦ Add from notes</button>
+      ${p.email?`<a class="btn sm" href="mailto:${esc(p.email)}">✉ Email</a>`:''}
+    </div>
+    <div class="fieldrow"><div class="lab">Last in touch</div><div class="val">${touchTxt}</div></div>
     ${p.help?`<div class="fieldrow"><div class="lab">How they can help</div><div class="val">${esc(p.help)}</div>${(p.helpAreas||[]).length?`<div style="margin-top:6px;">${p.helpAreas.map(h=>chip(h,'help')).join('')}</div>`:''}</div>`:''}
     ${bdayTxt?`<div class="fieldrow"><div class="lab">Birthday</div><div class="val">${esc(bdayTxt)}</div></div>`:''}
-    ${p.location?`<div class="fieldrow"><div class="lab">Location</div><div class="val">${esc(p.location)}</div></div>`:''}
+    ${(p.location||p.company)?`<div class="fieldrow"><div class="lab">${p.company&&p.location?'Company · Location':(p.company?'Company':'Location')}</div><div class="val">${esc([p.company,p.location].filter(Boolean).join(' · '))}</div></div>`:''}
+    ${links.length?`<div class="fieldrow"><div class="lab">Contact</div><div class="val">${links.join(' &nbsp;·&nbsp; ')}</div></div>`:''}
+    ${(p.tags||[]).length?`<div class="fieldrow"><div class="lab">Tags</div><div>${p.tags.map(t=>chip(t)).join('')}</div></div>`:''}
     ${(p.hobbies||[]).length?`<div class="fieldrow"><div class="lab">Hobbies</div><div>${p.hobbies.map(h=>chip(h)).join('')}</div></div>`:''}
     ${(p.likes||[]).length?`<div class="fieldrow"><div class="lab">Likes</div><div>${p.likes.map(h=>chip(h)).join('')}</div></div>`:''}
     ${(p.funFacts||[]).length?`<div class="fieldrow"><div class="lab">Fun facts</div><div class="val"><ul style="margin:4px 0 0;padding-left:18px;">${p.funFacts.map(f=>`<li>${esc(f)}</li>`).join('')}</ul></div></div>`:''}
     <div class="fieldrow"><div class="lab">Connections <span class="bcount">${rels.length}</span></div>
-      <div>${rels.length?rels.map(l=>{const other=person(l.a===id?l.b:l.a); return `<div class="rel-item"><span>${esc(l.label||'connected')} — <b>${esc(other?other.name:'?')}</b></span><button class="x" onclick="removeLink('${l.id}')">unlink</button></div>`;}).join(''):'<div class="val empty">No connections yet — use Link mode.</div>'}</div>
+      <div>${rels.length?rels.map(l=>{const other=person(l.a===id?l.b:l.a); return `<div class="rel-item"><span>${esc(l.label||'connected')} — <b onclick="openPerson('${other?other.id:''}')" style="cursor:pointer;">${esc(other?other.name:'?')}</b></span><button class="x" onclick="removeLink('${l.id}')">unlink</button></div>`;}).join(''):'<div class="val empty">No connections yet — use Link mode.</div>'}</div>
     </div>
-    ${p.contact?`<div class="fieldrow"><div class="lab">Contact</div><div class="val">${esc(p.contact)}</div></div>`:''}
-    ${p.lastContact?`<div class="fieldrow"><div class="lab">Last in touch</div><div class="val">${esc(fmtDate(p.lastContact))}</div></div>`:''}
     ${p.notes?`<div class="fieldrow"><div class="lab">Notes</div><div class="val">${esc(p.notes)}</div></div>`:''}
+    <div class="fieldrow"><div class="lab">Memory &amp; history</div>
+      ${tlHTML}
+      <div class="addnote">
+        <input id="quicknote" placeholder="Log a note… (Enter to save)" onkeydown="if(event.key==='Enter'){addNote('${id}');}">
+        <button class="btn sm" onclick="addNote('${id}')">Add</button>
+      </div>
+    </div>
   `;
   $('pactions').innerHTML = `
     <button class="btn primary" onclick="editPerson('${id}')">Edit</button>
     <button class="btn" onclick="startLinkFrom('${id}')">＋ Connection</button>
     <button class="btn del" onclick="deletePerson('${id}')">Delete</button>`;
   $('panel').classList.add('open');
+}
+function addNote(id){
+  const el=$('quicknote'); if(!el) return;
+  const text=el.value.trim(); if(!text) return;
+  const p=person(id); if(!p) return;
+  p.timeline=p.timeline||[]; p.timeline.push({date:todayISO(), type:'note', text});
+  p.lastContact=todayISO();
+  save(); openPerson(id); renderSheets(); toast('Note saved');
+}
+function removeTimeline(id, idx){
+  const p=person(id); if(!p||!p.timeline) return;
+  p.timeline.splice(idx,1); save(); openPerson(id); renderSheets();
 }
 
 function fmtDate(d){
@@ -755,32 +1249,42 @@ function fmtDate(d){
 function editPerson(id){
   const p = id?person(id):null;
   const isNew = !p;
-  const d = p||{kind:'person', hobbies:[],likes:[],funFacts:[],helpAreas:[]};
+  const d = p||{kind:'person', hobbies:[],likes:[],funFacts:[],helpAreas:[],tags:[]};
   const groupOpts = state.groups.map(g=>`<option value="${g.id}"${d.group===g.id?' selected':''}>${esc(g.name)}</option>`).join('');
+  const cadOpts = CADENCES.map(c=>`<option value="${c[0]}"${(d.cadence||0)===c[0]?' selected':''}>${c[1]}</option>`).join('');
   $('phead').innerHTML = `<h2 style="font-size:19px;">${isNew?'New connection':'Edit'}</h2><button class="close" onclick="${isNew?'closePanel()':`openPerson('${id}')`}">×</button>`;
   $('pbody').innerHTML = `
     <form class="editor" id="pform" onsubmit="return false;">
       <label>Name</label><input id="e-name" value="${esc(d.name||'')}" required>
       <div class="two">
         <div><label>Role / title</label><input id="e-role" value="${esc(d.role||'')}"></div>
-        <div><label>Type</label><select id="e-kind"><option value="person"${d.kind!=='institution'?' selected':''}>Person</option><option value="institution"${d.kind==='institution'?' selected':''}>Institution</option></select></div>
+        <div><label>Company / org</label><input id="e-company" value="${esc(d.company||'')}"></div>
       </div>
       <div class="two">
+        <div><label>Type</label><select id="e-kind"><option value="person"${d.kind!=='institution'?' selected':''}>Person</option><option value="institution"${d.kind==='institution'?' selected':''}>Institution</option></select></div>
         <div><label>Group</label><select id="e-group"><option value="">— none —</option>${groupOpts}</select></div>
-        <div><label>Birthday</label><input type="date" id="e-birthday" value="${esc(d.birthday||'')}"></div>
       </div>
-      <label>Location</label><input id="e-location" value="${esc(d.location||'')}">
+      <div class="two">
+        <div><label>Birthday</label><input type="date" id="e-birthday" value="${esc(d.birthday||'')}"></div>
+        <div><label>Location</label><input id="e-location" value="${esc(d.location||'')}"></div>
+      </div>
+      <div class="two">
+        <div><label>Keep in touch</label><select id="e-cadence">${cadOpts}</select></div>
+        <div><label>Last in touch</label><input type="date" id="e-lastContact" value="${esc(d.lastContact||'')}"></div>
+      </div>
       <label>How they can help you</label><textarea id="e-help" placeholder="What can you turn to this person for?">${esc(d.help||'')}</textarea>
       <label>Help areas <span class="hint" style="text-transform:none;">comma-separated — powers the “who can help with…” filter</span></label>
       <input id="e-helpAreas" value="${esc((d.helpAreas||[]).join(', '))}" placeholder="Fundraising, Intros, Coding">
+      <label>Tags</label><input id="e-tags" value="${esc((d.tags||[]).join(', '))}" placeholder="close friend, work, alumni">
       <label>Hobbies</label><input id="e-hobbies" value="${esc((d.hobbies||[]).join(', '))}" placeholder="climbing, jazz">
       <label>Likes</label><input id="e-likes" value="${esc((d.likes||[]).join(', '))}" placeholder="matcha, maps">
       <label>Fun facts <span class="hint" style="text-transform:none;">one per line</span></label>
       <textarea id="e-funFacts" placeholder="Speaks 4 languages">${esc((d.funFacts||[]).join('\n'))}</textarea>
       <div class="two">
-        <div><label>Contact</label><input id="e-contact" value="${esc(d.contact||'')}" placeholder="email / phone"></div>
-        <div><label>Last in touch</label><input type="date" id="e-lastContact" value="${esc(d.lastContact||'')}"></div>
+        <div><label>Email</label><input id="e-email" value="${esc(d.email||'')}" placeholder="name@example.com"></div>
+        <div><label>Phone</label><input id="e-phone" value="${esc(d.phone||'')}" placeholder="+1 …"></div>
       </div>
+      <label>LinkedIn / profile URL</label><input id="e-linkedin" value="${esc(d.linkedin||'')}" placeholder="linkedin.com/in/…">
       <label>Notes</label><textarea id="e-notes">${esc(d.notes||'')}</textarea>
     </form>`;
   $('pactions').innerHTML = `
@@ -797,24 +1301,33 @@ function savePerson(id){
   if(!p){
     // place new person near the centre of the current view
     const s=$('stage').getBoundingClientRect(); const v=state.view;
-    p={id:uid(), x:Math.round((s.width/2-v.tx)/v.scale), y:Math.round((s.height/2-v.ty)/v.scale)};
+    p={id:uid(), x:Math.round((s.width/2-v.tx)/v.scale), y:Math.round((s.height/2-v.ty)/v.scale), timeline:[]};
     state.people.push(p);
   }
-  p.name=name;
+  readForm(p);
+  save(); renderAll(); openPerson(p.id); toast('Saved');
+}
+/* pull every editor field into a person object (shared by both save paths) */
+function readForm(p){
+  p.name=$('e-name').value.trim();
   p.role=$('e-role').value.trim();
+  p.company=$('e-company').value.trim();
   p.kind=$('e-kind').value;
   p.group=$('e-group').value||undefined;
   p.birthday=$('e-birthday').value||'';
   p.location=$('e-location').value.trim();
+  p.cadence=parseInt($('e-cadence').value,10)||0;
   p.help=$('e-help').value.trim();
   p.helpAreas=parseList($('e-helpAreas').value);
+  p.tags=parseList($('e-tags').value);
   p.hobbies=parseList($('e-hobbies').value);
   p.likes=parseList($('e-likes').value);
   p.funFacts=$('e-funFacts').value.split('\n').map(x=>x.trim()).filter(Boolean);
-  p.contact=$('e-contact').value.trim();
+  p.email=$('e-email').value.trim();
+  p.phone=$('e-phone').value.trim();
+  p.linkedin=$('e-linkedin').value.trim();
   p.lastContact=$('e-lastContact').value||'';
   p.notes=$('e-notes').value.trim();
-  save(); renderAll(); openPerson(p.id); toast('Saved');
 }
 
 function deletePerson(id){
@@ -892,14 +1405,10 @@ let pendingPos=null;
 const _savePerson=savePerson;
 savePerson=function(id){
   if(!id && pendingPos){
-    const name=$('e-name').value.trim(); if(!name){toast('Name is required'); return;}
-    const p={id:uid(), x:Math.round(pendingPos.x), y:Math.round(pendingPos.y)};
+    const name=$('e-name').value.trim(); if(!name){toast('Name is required'); $('e-name').focus(); return;}
+    const p={id:uid(), x:Math.round(pendingPos.x), y:Math.round(pendingPos.y), timeline:[]};
     state.people.push(p);
-    p.name=name; p.role=$('e-role').value.trim(); p.kind=$('e-kind').value; p.group=$('e-group').value||undefined;
-    p.birthday=$('e-birthday').value||''; p.location=$('e-location').value.trim(); p.help=$('e-help').value.trim();
-    p.helpAreas=parseList($('e-helpAreas').value); p.hobbies=parseList($('e-hobbies').value); p.likes=parseList($('e-likes').value);
-    p.funFacts=$('e-funFacts').value.split('\n').map(x=>x.trim()).filter(Boolean);
-    p.contact=$('e-contact').value.trim(); p.lastContact=$('e-lastContact').value||''; p.notes=$('e-notes').value.trim();
+    readForm(p);
     pendingPos=null; save(); renderAll(); openPerson(p.id); toast('Added'); return;
   }
   pendingPos=null; _savePerson(id);
@@ -974,6 +1483,187 @@ window.addEventListener('pagehide', ()=>{
 });
 
 /* ============================================================
+   "Add from notes" — paste text, extract fields on-device, confirm,
+   then create/update a person. No network, nothing saved until Apply.
+   ============================================================ */
+let importFound = null;   // {field: {value, on}} after a scan
+
+function openImport(){ openImportFor(''); }
+function openImportFor(id){
+  const sel=$('imp-target');
+  sel.innerHTML = `<option value="">➕ New person</option>` +
+    state.people.slice().sort((a,b)=>a.name.localeCompare(b.name))
+      .map(p=>`<option value="${p.id}"${p.id===id?' selected':''}>${esc(p.name)}</option>`).join('');
+  $('imp-text').value=''; $('imp-result').style.display='none'; $('imp-found').innerHTML='';
+  $('imp-apply').disabled=true; importFound=null;
+  $('scrim').classList.add('open');
+  setTimeout(()=>$('imp-text').focus(),60);
+}
+function closeImport(){ $('scrim').classList.remove('open'); }
+
+/* lightweight, transparent extraction heuristics */
+function extractFields(text){
+  const out={};
+  const lines=text.split(/\r?\n/).map(l=>l.trim());
+  const nonEmpty=lines.filter(Boolean);
+
+  // email + phone
+  const em=text.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i); if(em) out.email=em[0];
+  const ph=text.match(/(\+?\d[\d\s().-]{7,}\d)/); if(ph) out.phone=ph[1].trim();
+
+  // linkedin url
+  const li=text.match(/(?:https?:\/\/)?(?:[a-z]{2,3}\.)?linkedin\.com\/[^\s)]+/i); if(li) out.linkedin=li[0];
+
+  // name: first non-empty line that looks like a person's name (1–4 capitalised words)
+  const nameLine=nonEmpty.find(l=>/^[A-ZÀ-Þ][\p{L}'.-]+(?:\s+[A-ZÀ-Þ(][\p{L}'.()-]+){0,3}$/u.test(l) && l.length<48 && !/@|http|\d/.test(l));
+  if(nameLine) out.name=nameLine.replace(/\s*\(.*?\)\s*/g,' ').trim();
+
+  // headline / role — LinkedIn style "Role at Company". Only trust it when it reads
+  // like a title (short, capitalised, no sentence punctuation) so prose notes don't
+  // get mangled into a "role". Prefer the line right after a detected name.
+  const looksLikeTitle=(l)=> l && l.length<52 && !/[.!?]/.test(l) && /\s+at\s+|\s+@\s+/i.test(l) && !/@[a-z0-9.-]+\.[a-z]/i.test(l);
+  let headline=null;
+  if(nameLine){ const i=nonEmpty.indexOf(nameLine); const nxt=nonEmpty[i+1]; if(nxt && !/@|http|linkedin/i.test(nxt) && nxt.length<60) headline=nxt; }
+  if(!headline || !/\s+at\s+|\s+@\s+/i.test(headline)) headline = nonEmpty.find(looksLikeTitle) || headline;
+  if(headline){
+    if(/\s+at\s+|\s+@\s+/i.test(headline)){
+      const m=headline.split(/\s+at\s+|\s+@\s+/i);
+      const role=m[0].trim(), comp=(m[1]||'').replace(/[.,;(].*$/,'').trim();
+      if(role.split(/\s+/).length<=6 && /^[A-ZÀ-Þ]/.test(role)){ out.role=role; if(comp) out.company=comp; }
+    } else if(headline.length<52 && /^[A-ZÀ-Þ]/.test(headline) && !/[.!?]/.test(headline)){
+      out.role=headline.trim();
+    }
+  }
+
+  // helper: clean a labelled value — stop at sentence end, drop trailing email/phone
+  const clean=(v)=> v.split(/[.\n]|·|\||  +/)[0].replace(/[a-z0-9._%+-]+@\S+|\+?\d[\d\s().-]{6,}\d/gi,'').replace(/[,;:\s]+$/,'').trim();
+
+  // location: a "Location:" label, else a bare "City, Region" line
+  const locLabel=text.match(/location[:\s]+([^\n]+)/i);
+  if(locLabel) out.location=clean(locLabel[1]);
+  else { const loc=nonEmpty.find(l=>/^[A-ZÀ-Þ][\p{L}\s.'-]+,\s*[A-ZÀ-Þ][\p{L}\s.]+$/u.test(l) && l.length<40 && l!==nameLine); if(loc) out.location=loc; }
+
+  // company via explicit label / "works at X"
+  if(!out.company){
+    const compLabel=text.match(/\b(?:company|works?\s+at|employer)[:\s]+([^\n.]+)/i);
+    if(compLabel) out.company=clean(compLabel[1]);
+  }
+  // trim a company down to the org name (drop "… as a data scientist", trailing brackets)
+  if(out.company) out.company=out.company.split(/\s+(?:as|who|which|where|is|was)\s+/i)[0].replace(/[)\].,;]+$/,'').trim();
+
+  // birthday: labelled, or "born" + a date (allow commas so "March 14, 1990" keeps its year)
+  const bd=text.match(/(?:birthday|b-?day|born|d\.o\.b\.?)[:\s]+([^\n;.]+)/i);
+  if(bd){ const iso=parseLooseDate(bd[1]); if(iso) out.birthday=iso; }
+
+  // drop empties that cleaning may have produced
+  Object.keys(out).forEach(k=>{ if(!out[k]) delete out[k]; });
+  return out;
+}
+/* is (y,m,d) a real calendar date? */
+function validYMD(y,m,d){ return m>=1&&m<=12&&d>=1&&d<=31&&y>=1900&&y<=2100; }
+/* parse a variety of human date strings into a valid YYYY-MM-DD, else null */
+function parseLooseDate(s){
+  s=(s||'').trim();
+  let m=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m){ const y=+m[1],mo=+m[2],d=+m[3]; return validYMD(y,mo,d)?`${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`:null; }
+  const months={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+  m=s.match(/([a-z]{3,})\.?\s+(\d{1,2})(?:,?\s+(\d{4}))?/i);
+  if(m){ const mo=months[m[1].slice(0,3).toLowerCase()], d=+m[2], y=+(m[3]||1900);
+    if(mo && validYMD(y,mo,d)) return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+  m=s.match(/(\d{1,2})[\/.](\d{1,2})(?:[\/.](\d{2,4}))?/);
+  if(m){
+    let a=+m[1], b=+m[2], y=m[3]?+m[3]:1900; if(m[3]&&m[3].length===2) y=1900+ +m[3];
+    let mo,d;
+    if(a>12){ d=a; mo=b; }         // 22/07 → D/M
+    else if(b>12){ mo=a; d=b; }    // 07/22 → M/D (US)
+    else { mo=a; d=b; }            // ambiguous → assume M/D
+    return validYMD(y,mo,d)?`${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`:null;
+  }
+  return null;
+}
+const FIELD_LABELS={name:'Name',role:'Role',company:'Company',location:'Location',email:'Email',phone:'Phone',linkedin:'LinkedIn',birthday:'Birthday'};
+function scanImport(){
+  const text=$('imp-text').value.trim();
+  if(!text){ toast('Paste some text first'); return; }
+  const targetId=$('imp-target').value;
+  const target=targetId?person(targetId):null;
+  const found=extractFields(text);
+  // if updating an existing person, don't offer to overwrite their name
+  if(target) delete found.name;
+  importFound={};
+  const keys=Object.keys(FIELD_LABELS).filter(k=>found[k]);
+  const box=$('imp-found');
+  if(!keys.length){
+    box.innerHTML=`<div class="found-none">Couldn't pick out structured fields — but you can still save the whole text as a note below.</div>`;
+  } else {
+    box.innerHTML=keys.map(k=>{
+      importFound[k]={value:found[k], on:true};
+      const disp = k==='birthday' ? (fmtDate(found[k])||found[k]) : found[k];
+      return `<div class="found-row">
+        <input type="checkbox" checked onchange="importFound['${k}'].on=this.checked">
+        <span class="fk">${FIELD_LABELS[k]}</span>
+        <input type="text" value="${esc(disp)}" oninput="importFound['${k}'].value=this.value">
+      </div>`;
+    }).join('');
+  }
+  $('imp-result').style.display='block';
+  $('imp-apply').disabled=false;
+}
+function applyImport(){
+  const targetId=$('imp-target').value;
+  const rawText=$('imp-text').value.trim();
+  let p = targetId?person(targetId):null;
+  const isNew=!p;
+  if(isNew){
+    const s=$('stage').getBoundingClientRect(); const v=state.view;
+    p={id:uid(), timeline:[], hobbies:[],likes:[],funFacts:[],helpAreas:[],tags:[],
+       x:Math.round((s.width/2-v.tx)/v.scale)+(Math.random()*120-60),
+       y:Math.round((s.height/2-v.ty)/v.scale)+(Math.random()*120-60)};
+    // name: prefer a scanned name, else first line
+    const scannedName=importFound&&importFound.name&&importFound.name.on?importFound.name.value.trim():'';
+    p.name = scannedName || (rawText.split(/\r?\n/).find(Boolean)||'New contact').slice(0,60);
+    state.people.push(p);
+  }
+  p.timeline=p.timeline||[];
+  let applied=0;
+  if(importFound){
+    Object.keys(importFound).forEach(k=>{
+      const f=importFound[k]; if(!f.on||!f.value) return;
+      if(k==='name'){ if(isNew) return; p.name=f.value.trim(); applied++; return; }
+      if(k==='birthday'){ const iso=parseLooseDate(f.value)||f.value; if(/^\d{4}-\d{2}-\d{2}$/.test(iso)){ p.birthday=iso; applied++; } return; }
+      p[k]=f.value.trim(); applied++;
+    });
+  }
+  if($('imp-note').checked && rawText){
+    p.timeline.push({date:todayISO(), type:'import', text:rawText});
+    p.lastContact=todayISO(); applied++;
+  }
+  save(); closeImport(); renderAll();
+  setView('map'); openPerson(p.id); centerOn(p.id);
+  toast(isNew?`Added ${p.name}`:`Updated ${p.name} · ${applied} change${applied===1?'':'s'}`);
+}
+
+/* ============================================================
+   Map: auto-tidy layout — cluster people around their group hub,
+   ungrouped in a loose grid off to the side.
+   ============================================================ */
+function tidyLayout(){
+  const cols=Math.max(1,Math.ceil(Math.sqrt(state.groups.length||1)));
+  const GAP=760;
+  state.groups.forEach((g,i)=>{ g.x=700+(i%cols)*GAP; g.y=620+Math.floor(i/cols)*GAP; });
+  state.groups.forEach(g=>{
+    const members=state.people.filter(p=>p.group===g.id);
+    const R=members.length>8?260:190;
+    members.forEach((p,i)=>{ const a=(i/members.length)*Math.PI*2 - Math.PI/2;
+      p.x=Math.round(g.x+Math.cos(a)*R); p.y=Math.round(g.y+Math.sin(a)*R); });
+  });
+  const loose=state.people.filter(p=>!group(p.group));
+  const baseX=700+cols*GAP, cy=620;
+  loose.forEach((p,i)=>{ p.x=baseX+(i%4)*150; p.y=cy+Math.floor(i/4)*150; });
+  save(); renderAll(); fitView(); toast('Tidied the map');
+}
+
+/* ============================================================
    Export / import
    ============================================================ */
 function exportData(){
@@ -999,9 +1689,16 @@ function importData(ev){
 /* ============================================================
    Boot
    ============================================================ */
-$('search').addEventListener('input', applyFilters);
+$('search').addEventListener('input', ()=>{ applyFilters(); renderSheets(); });
 $('stage').addEventListener('click', e=>{ if(e.target.id==='stage'||e.target.id==='world'||e.target.id==='wires'){ if(!linkMode) closePanel(); } });
-window.addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(linkMode){toggleLinkMode();} else closePanel(); } });
+$('scrim').addEventListener('click', e=>{ if(e.target.id==='scrim') closeImport(); });
+window.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    if($('scrim').classList.contains('open')){ closeImport(); }
+    else if(linkMode){ toggleLinkMode(); }
+    else closePanel();
+  }
+});
 
 if(!CONFIG.demo){
   $('mode-badge').remove();
@@ -1013,6 +1710,11 @@ if(!CONFIG.api){ const sd=$('syncdot'); if(sd) sd.remove(); }
 
 // persist the initial state once so seed / starter-group ids stay stable across reloads
 try{ if(!CONFIG.store.getItem(CONFIG.storageKey)) save(); }catch(e){}
+
+// restore the last-used view (default: Radar — the actionable landing screen)
+let startView='radar';
+try{ const v=localStorage.getItem('dornyei-connections-view'); if(['map','list','radar'].includes(v)) startView=v; }catch(e){}
+setView(startView);
 renderAll();
 applyTransform();
 
