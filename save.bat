@@ -39,13 +39,29 @@ echo.
 echo Pushing to GitHub (public)...
 git push -u origin main
 if errorlevel 1 (
-  echo.
-  echo -------------------------------------------------------------
-  echo Public push FAILED. First push? Sign in to GitHub when prompted,
-  echo and make sure the repo exists at:
-  echo     https://github.com/bdornyei42/portfolio
-  echo -------------------------------------------------------------
-  exit /b 1
+  echo Push rejected - remote has commits you don't have locally. Integrating with rebase...
+  git pull --rebase origin main
+  if errorlevel 1 (
+    echo.
+    echo -------------------------------------------------------------
+    echo Could not auto-integrate remote changes - likely a merge conflict
+    echo or a GitHub sign-in/access problem. Resolve it manually, then
+    echo run save.bat again:
+    echo     git pull --rebase origin main
+    echo     git push origin main
+    echo Repo: https://github.com/bdornyei42/portfolio
+    echo -------------------------------------------------------------
+    exit /b 1
+  )
+  git push -u origin main
+  if errorlevel 1 (
+    echo.
+    echo -------------------------------------------------------------
+    echo Public push still failed after integrating remote changes.
+    echo Check your GitHub sign-in/access, then run save.bat again.
+    echo -------------------------------------------------------------
+    exit /b 1
+  )
 )
 
 echo.
@@ -96,13 +112,30 @@ echo.
 echo Pushing to GitHub (private)...
 git push -u origin main
 if errorlevel 1 (
-  echo.
-  echo -------------------------------------------------------------
-  echo Private push FAILED. Check that bdornyei42/portfolio-private
-  echo exists and you have access, then run save.bat again.
-  echo -------------------------------------------------------------
-  popd
-  exit /b 1
+  echo Push rejected - remote has commits you don't have locally. Integrating with rebase...
+  git pull --rebase origin main
+  if errorlevel 1 (
+    echo.
+    echo -------------------------------------------------------------
+    echo Could not auto-integrate remote changes for the private repo -
+    echo likely a merge conflict or access problem. Resolve it manually:
+    echo     cd private
+    echo     git pull --rebase origin main
+    echo     git push origin main
+    echo -------------------------------------------------------------
+    popd
+    exit /b 1
+  )
+  git push -u origin main
+  if errorlevel 1 (
+    echo.
+    echo -------------------------------------------------------------
+    echo Private push still failed after integrating remote changes.
+    echo Check that bdornyei42/portfolio-private exists and you have access.
+    echo -------------------------------------------------------------
+    popd
+    exit /b 1
+  )
 )
 
 popd
