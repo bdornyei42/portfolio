@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "public-preview",
+      "name": "wrangler-dev",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["--yes", "serve", "public", "-l", "5055"],
-      "port": 5055
+      "runtimeArgs": ["wrangler", "dev", "--port", "8787"],
+      "port": 8787
     }
   ]
 }

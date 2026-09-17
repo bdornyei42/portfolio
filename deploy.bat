@@ -29,6 +29,23 @@ REM both the admin planner and the public demo use it without any CDN.
 mkdir site\vendor
 copy /y public\vendor\*.js     site\vendor\ >nul
 
+REM --- Coming-soon vs live mode --------------------------------------------
+REM The homepage served at "/" depends on a one-word marker file, .site-mode:
+REM   live  (or missing) -> the real public\index.html is served, as normal.
+REM   soon             -> public\coming-soon.html is served at "/" instead,
+REM                       so the unfinished site stays out of search results.
+REM Flip it with site-mode.bat (soon | live), which sets the marker and
+REM redeploys. deploy.bat on its own always honors whatever mode is set.
+set "SITE_MODE=live"
+if exist ".site-mode" set /p SITE_MODE=<.site-mode
+if /i "%SITE_MODE%"=="soon" (
+  echo Mode: COMING SOON  ^(serving public\coming-soon.html at "/"^)
+  copy /y public\coming-soon.html site\index.html >nul
+) else (
+  echo Mode: LIVE  ^(serving the full public\index.html^)
+)
+echo.
+
 echo Staged for deploy:
 dir /s /b site
 echo.
