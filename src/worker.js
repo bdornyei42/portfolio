@@ -90,6 +90,11 @@ const BUDGET_OVERRIDES_KEY = "budget:overrides";
 // written by the budget page's "Recurring" tab, used to build the forecast.
 const BUDGET_RECURRING_KEY = "budget:recurring";
 
+// Card benefit state (card open dates, benefits ticked off by hand, muted alerts,
+// point valuations), written by the budget page's "Cards & rewards" tab and read by
+// private/notify.js so desktop alerts skip what you've already used.
+const BUDGET_CARDS_KEY = "budget:cards";
+
 async function handleBudget(request, env, key = BUDGET_KEY) {
   if (!env.BUDGET_KV) {
     return json({ error: "KV not configured" }, 500);
@@ -137,6 +142,8 @@ export default {
       if (url.pathname === "/admin/api/budget/overrides") return handleBudget(request, env, BUDGET_OVERRIDES_KEY);
       // Recurring income/expense rules (GET/PUT from the budget page), own key.
       if (url.pathname === "/admin/api/budget/recurring") return handleBudget(request, env, BUDGET_RECURRING_KEY);
+      // Card benefit state (GET/PUT from the budget page, GET from notify.js), own key.
+      if (url.pathname === "/admin/api/budget/cards") return handleBudget(request, env, BUDGET_CARDS_KEY);
     }
 
     return env.ASSETS.fetch(request);

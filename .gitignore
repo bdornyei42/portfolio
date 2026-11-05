@@ -8,3 +8,6 @@ site/
 # Tooling
 node_modules/
 .wrangler/
+
+# local wrangler dev secrets (test-only admin login)
+.dev.vars

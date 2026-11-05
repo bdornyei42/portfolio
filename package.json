@@ -6,6 +6,7 @@
   "scripts": {
     "claim": "node private/claim.js",
     "sync": "node private/sync.js",
+    "notify": "node private/notify.js",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy"
   },
