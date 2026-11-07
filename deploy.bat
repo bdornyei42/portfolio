@@ -20,11 +20,16 @@ copy /y public\index.html      site\ >nul
 copy /y public\dashboard.html  site\ >nul
 copy /y public\connections.html site\ >nul
 copy /y public\planner-demo.html site\ >nul
+copy /y public\workshop.html  site\ >nul
 REM Whole admin/ folder (hub + budget + rejections + planner) goes
 REM behind Basic Auth. Only .html + .js (cards.js, the budget page's card
 REM engine) are copied, so no stray files leak.
 copy /y private\admin\*.html   site\admin\ >nul
 copy /y private\admin\*.js     site\admin\ >nul
+REM The shared tool-page ribbon (public\frame.js) serves both the public demos
+REM and the private tools, so it goes next to each.
+copy /y public\frame.js        site\ >nul
+copy /y public\frame.js        site\admin\ >nul
 REM Shared, public, no-auth static libs (served from /vendor). Currently just
 REM pdf.js, lazy-loaded by the planner's syllabus PDF importer. Same-origin so
 REM both the admin planner and the public demo use it without any CDN.

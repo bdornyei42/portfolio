@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<title>The workshop — Bendegúz Dörnyei</title>
+<meta name="description" content="The tools Ben Dörnyei builds and uses every day — a year planner, a budget, and a map of people — open to try with sample data, right in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2420; --paper:#E7EAE1; --paper-2:#DCE0D3; --card:#F3F5EF; --paprika:#C1440E; --gold:#B98A1F;
+    --forest:#2F4A3D; --slate:#55625C; --line:rgba(27,36,32,0.14); --red:#A8321E; --cream:#FBF3E4;
+  }
+  *{ box-sizing:border-box; }
+  @media (prefers-reduced-motion: reduce){ *{ animation-duration:.001ms !important; transition-duration:.001ms !important; } }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:'Public Sans', system-ui, sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  a{ color:inherit; }
+  h1,h2,h3{ font-family:'Newsreader', Georgia, serif; font-weight:500; margin:0; letter-spacing:-0.01em; }
+  .eyebrow{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.09em; text-transform:uppercase; color:var(--paprika); }
+  .wrap{ max-width:1080px; margin:0 auto; padding:0 28px; }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--paprika); outline-offset:3px; }
+
+  header.topbar{ position:sticky; top:0; z-index:20; background:rgba(231,234,225,.86); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+  .topbar .wrap{ display:flex; justify-content:space-between; align-items:center; padding-top:15px; padding-bottom:15px; }
+  .mark{ font-family:'IBM Plex Mono', monospace; font-size:13px; letter-spacing:.05em; text-decoration:none; }
+  .topbar nav{ display:flex; gap:24px; font-size:14px; }
+  .topbar nav a{ text-decoration:none; color:var(--slate); } .topbar nav a:hover{ color:var(--paprika); }
+
+  /* the same tuscan wall as the home page, now with the shutters thrown open */
+  .entry{ position:relative; overflow:hidden;
+    background:
+      radial-gradient(420px 260px at 12% 20%, rgba(255,236,200,.5), transparent 70%),
+      radial-gradient(380px 240px at 88% 80%, rgba(170,98,44,.2), transparent 70%),
+      radial-gradient(300px 200px at 60% 10%, rgba(196,120,60,.16), transparent 70%),
+      linear-gradient(160deg, #E7B77C, #D99A5B 55%, #C9874A); }
+  .entry .wrap{ display:grid; grid-template-columns:minmax(0, 360px) minmax(0, 1fr); gap:48px; align-items:center; padding-top:64px; padding-bottom:64px; }
+  .entry h1{ font-size:clamp(40px, 7vw, 66px); line-height:1; color:#2b1a12; }
+  .entry h1 em{ font-style:italic; font-weight:400; color:var(--red); }
+  .entry .eyebrow{ color:#6B2A16; margin-bottom:16px; display:block; }
+  .entry p{ font-size:18px; color:#3a2417; max-width:540px; margin:20px 0 0; }
+  /* the window sits in the middle of its column so the thrown-open shutters stay out of the text */
+  .win{ position:relative; width:200px; margin:0 auto; }
+  .win .surround{ padding:11px; background:linear-gradient(180deg, #EFE6D2, #DCCDAE); border-radius:120px 120px 6px 6px / 78px 78px 6px 6px; box-shadow:0 2px 0 rgba(90,55,25,.25); }
+  .win .opening{ position:relative; height:270px; overflow:visible; border-radius:110px 110px 3px 3px / 70px 70px 3px 3px;
+    background:radial-gradient(150px 120px at 50% 30%, #FFE7AE 0%, #F2B868 40%, #B9733C 72%, #6B3F22 100%); }
+  .win .opening::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(180deg, #5A321A, #3a2010); box-shadow:0 -2px 0 #7A4A28; }
+  .win .lamp{ position:absolute; left:50%; top:22px; width:44px; height:20px; margin-left:-22px; border-radius:40px 40px 4px 4px; background:#2F4A3D; box-shadow:0 18px 40px 16px rgba(255,226,150,.6); }
+  .win .shutter{ position:absolute; top:4px; bottom:4px; width:44%;
+    background:linear-gradient(180deg, transparent 47%, #8A2618 47% 53%, transparent 53%), repeating-linear-gradient(180deg, #7E2416 0 2px, #B23A22 2px 8px, #C54A2C 8px 10px);
+    box-shadow:inset 0 0 0 7px #9C2F1C; }
+  .win .shutter.l{ left:-41%; transform:perspective(600px) rotateY(-28deg); transform-origin:100% 50%; }
+  .win .shutter.r{ right:-41%; transform:perspective(600px) rotateY(28deg); transform-origin:0 50%; }
+  .win .sill{ height:12px; margin:0 -10px; background:linear-gradient(180deg, #EFE6D2, #CDBB98); box-shadow:0 3px 0 rgba(90,55,25,.3); }
+  .win .planter{ position:relative; height:28px; margin:14px 6px 0; background:linear-gradient(180deg, #7A4526, #5B311A); }
+  .win .planter::before{ content:""; position:absolute; left:-6px; right:-6px; top:-22px; height:30px;
+    background:radial-gradient(circle at 8% 60%, #D62E2E 5px, transparent 6px), radial-gradient(circle at 20% 35%, #E8453C 6px, transparent 7px), radial-gradient(circle at 34% 62%, #C21F2B 5px, transparent 6px),
+      radial-gradient(circle at 48% 30%, #E8453C 6px, transparent 7px), radial-gradient(circle at 62% 58%, #D62E2E 6px, transparent 7px), radial-gradient(circle at 76% 33%, #F05A4B 5px, transparent 6px),
+      radial-gradient(circle at 90% 58%, #C21F2B 6px, transparent 7px), radial-gradient(ellipse 14px 8px at 14% 86%, #3E6B3A 90%, transparent), radial-gradient(ellipse 14px 8px at 42% 88%, #4E7D45 90%, transparent),
+      radial-gradient(ellipse 14px 8px at 70% 86%, #3E6B3A 90%, transparent), radial-gradient(ellipse 14px 8px at 94% 88%, #4E7D45 90%, transparent); }
+  .entry .stripe{ position:absolute; left:0; right:0; bottom:0; height:4px; background:repeating-linear-gradient(90deg, var(--red) 0 14px, #EFE6CF 14px 28px); }
+  @media (max-width:760px){ .entry .wrap{ grid-template-columns:1fr; gap:34px; padding-top:44px; } .win{ width:150px; } .win .opening{ height:190px; } }
+
+  /* the tools */
+  section{ padding:64px 0 24px; }
+  .tools{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:1px; background:var(--line); border:1px solid var(--line); }
+  @media (max-width:900px){ .tools{ grid-template-columns:1fr; } }
+  .tool{ background:var(--card); text-decoration:none; color:var(--ink); display:flex; flex-direction:column; transition:background .2s ease; }
+  .tool:hover, .tool:focus-visible{ background:#ECEFE6; }
+  .tool .pic{ display:block; height:170px; border-bottom:1px solid var(--line); background:#EEF0E8; }
+  .tool .pic svg{ width:100%; height:100%; display:block; }
+  .tool .body{ padding:22px 24px 22px; display:flex; flex-direction:column; flex:1; }
+  .tool .eyebrow{ color:var(--forest); }
+  .tool h3{ font-size:26px; margin:8px 0 8px; }
+  .tool p{ color:var(--slate); font-size:15px; margin:0 0 16px; }
+  .tool ul{ list-style:none; padding:0; margin:0 0 18px; display:flex; flex-wrap:wrap; gap:6px; }
+  .tool li{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.03em; color:var(--slate); border:1px solid var(--line); padding:1px 8px; }
+  .tool .go{ margin-top:auto; font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--red); display:inline-flex; gap:8px; }
+  .tool .go .arrow{ transition:transform .25s ease; } .tool:hover .go .arrow{ transform:translateX(4px); }
+  .how{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:28px; padding:40px 0 10px; }
+  @media (max-width:760px){ .how{ grid-template-columns:1fr; gap:18px; } }
+  .how div{ border-top:2px solid var(--ink); padding-top:12px; }
+  .how b{ display:block; font-family:'Newsreader', Georgia, serif; font-weight:500; font-size:19px; margin-bottom:4px; }
+  .how span{ color:var(--slate); font-size:14.5px; }
+  footer{ padding:40px 0 48px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--slate); border-top:1px solid var(--line); margin-top:56px; }
+  footer a{ text-decoration:none; } footer a:hover{ color:var(--paprika); }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <a class="mark" href="./">B. DÖRNYEI</a>
+    <nav><a href="./">Home</a><a href="./#contact">Contact</a></nav>
+  </div>
+</header>
+
+<div class="entry">
+  <div class="wrap">
+    <div class="win" aria-hidden="true">
+      <div class="surround"><div class="opening"><span class="lamp"></span><span class="shutter l"></span><span class="shutter r"></span></div></div>
+      <div class="sill"></div><div class="planter"></div>
+    </div>
+    <div>
+      <span class="eyebrow">The workshop</span>
+      <h1>Pull up a <em>chair</em>.</h1>
+      <p>These are the tools I built to run my own life and still use every week. The copies here run on sample data, entirely in your browser — click anything, change anything, nothing you do is saved or sent anywhere.</p>
+    </div>
+  </div>
+  <div class="stripe"></div>
+</div>
+
+<div class="wrap">
+  <section>
+    <div class="tools">
+      <a class="tool in" href="planner-demo.html">
+        <span class="pic" aria-hidden="true">
+          <svg viewBox="0 0 360 170" preserveAspectRatio="xMidYMid slice">
+            <rect width="360" height="170" fill="#EEF0E8"/>
+            <g font-family="IBM Plex Mono, monospace" font-size="8" fill="#55625C">
+              <text x="36" y="26">SEP</text><text x="100" y="26">OCT</text><text x="164" y="26">NOV</text><text x="228" y="26">DEC</text><text x="292" y="26">JAN</text>
+            </g>
+            <g stroke="rgba(27,36,32,.12)"><path d="M30 34H340M30 66H340M30 98H340M30 130H340"/><path d="M94 34V150M158 34V150M222 34V150M286 34V150"/></g>
+            <rect x="34" y="40" width="120" height="18" fill="#2F4A3D"/><rect x="100" y="72" width="150" height="18" fill="#3b6fc0"/>
+            <rect x="170" y="104" width="44" height="18" fill="#C1440E"/><rect x="228" y="104" width="100" height="18" fill="#B98A1F"/>
+            <rect x="40" y="136" width="70" height="10" fill="#c96f93"/><circle cx="204" cy="49" r="5" fill="#C1440E"/><circle cx="268" cy="81" r="5" fill="#C1440E"/>
+          </svg>
+        </span>
+        <span class="body">
+          <span class="eyebrow">Planning</span>
+          <h3>Year Planner</h3>
+          <p>A whole semester on one screen: courses on a grid, a weekly schedule, a calendar and every deadline in order. Paste a syllabus and it builds the term.</p>
+          <ul><li>semester grid</li><li>weekly schedule</li><li>deadlines</li><li>syllabus import</li></ul>
+          <span class="go">Open the planner <span class="arrow">→</span></span>
+        </span>
+      </a>
+      <a class="tool in d2" href="dashboard.html">
+        <span class="pic" aria-hidden="true">
+          <svg viewBox="0 0 360 170" preserveAspectRatio="xMidYMid slice">
+            <rect width="360" height="170" fill="#EEF0E8"/>
+            <g stroke="rgba(27,36,32,.12)"><path d="M30 40H340M30 80H340M30 120H340"/></g>
+            <path d="M30 150H340" stroke="rgba(27,36,32,.35)"/>
+            <g fill="#3b6fc0"><rect x="42" y="96" width="16" height="54"/><rect x="82" y="72" width="16" height="78"/><rect x="122" y="104" width="16" height="46"/><rect x="162" y="60" width="16" height="90"/><rect x="202" y="88" width="16" height="62"/></g>
+            <rect x="242" y="44" width="16" height="106" fill="#C1440E"/><rect x="282" y="80" width="16" height="70" fill="#3b6fc0" opacity=".45"/>
+            <path d="M30 70H340" stroke="#C1440E" stroke-dasharray="4 4"/><text x="336" y="64" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#C1440E">budget</text>
+          </svg>
+        </span>
+        <span class="body">
+          <span class="eyebrow">Money</span>
+          <h3>Budget</h3>
+          <p>Where the money actually went — by category, merchant and month — plus investments, recurring bills and a forecast of the months ahead.</p>
+          <ul><li>spending by category</li><li>merchants</li><li>investments</li><li>recurring + forecast</li></ul>
+          <span class="go">Open the budget <span class="arrow">→</span></span>
+        </span>
+      </a>
+      <a class="tool in d3" href="connections.html">
+        <span class="pic" aria-hidden="true">
+          <svg viewBox="0 0 360 170" preserveAspectRatio="xMidYMid slice">
+            <rect width="360" height="170" fill="#EEF0E8"/>
+            <g stroke="#7d8781" stroke-width="1.2"><path d="M180 85L90 50M180 85L100 130M180 85L270 45M180 85L280 120M90 50L60 95M270 45L320 80M280 120L320 80M100 130L60 95"/></g>
+            <circle cx="180" cy="85" r="15" fill="#C1440E"/><circle cx="90" cy="50" r="10" fill="#2F4A3D"/><circle cx="100" cy="130" r="9" fill="#3b6fc0"/>
+            <circle cx="270" cy="45" r="11" fill="#3b6fc0"/><circle cx="280" cy="120" r="9" fill="#2F4A3D"/><circle cx="60" cy="95" r="7" fill="#B98A1F"/><circle cx="320" cy="80" r="7" fill="#c96f93"/>
+          </svg>
+        </span>
+        <span class="body">
+          <span class="eyebrow">People</span>
+          <h3>Connections</h3>
+          <p>A living map of the people I know and how they connect — with a radar of who I haven’t talked to in too long, birthdays, and where each person can help.</p>
+          <ul><li>relationship map</li><li>radar</li><li>groups</li><li>notes import</li></ul>
+          <span class="go">Open connections <span class="arrow">→</span></span>
+        </span>
+      </a>
+    </div>
+
+    <div class="how">
+      <div><b>Runs in your browser</b><span>No account, no server. Close the tab and it’s gone.</span></div>
+      <div><b>Sample data</b><span>Made-up courses, money and people, so you can see it working.</span></div>
+      <div><b>The real ones</b><span>My private versions sync to my own Cloudflare account and track the real thing.</span></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 Bendegúz Dörnyei</span>
+    <span><a href="./">← Back home</a> · <a href="mailto:ben.dornyei@gmail.com">ben.dornyei@gmail.com</a></span>
+  </footer>
+</div>
+</body>
+</html>

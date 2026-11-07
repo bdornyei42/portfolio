@@ -3,6 +3,8 @@
 // read from the ADMIN_USER / ADMIN_PASSWORD secrets (set once with
 // `wrangler secret put`) — never hardcoded here, never committed anywhere.
 
+import Anthropic from "@anthropic-ai/sdk";
+
 function timingSafeEqual(a, b) {
   const enc = new TextEncoder();
   const aBytes = enc.encode(a);
@@ -99,6 +101,56 @@ const BUDGET_CARDS_KEY = "budget:cards";
 // side-income log), written by the budget page's "Plan & save" tab.
 const BUDGET_PLAN_KEY = "budget:plan";
 
+// Amazon orders + items + card charges, PUT by private/amazon/main.py (amazon-orders),
+// read by the budget page to split each Amazon charge into essential / non-essential items.
+const BUDGET_AMAZON_KEY = "budget:amazon";
+
+// Applications tracker (admin/apply.html): your tracked applications, profile, story bank and
+// answers (written by the page), and opportunities found by private/apply/main.py (written by
+// the scraper, read by the page). Two keys so a scrape never clobbers your edits. Same KV.
+const APPLY_KEY = "apply:state";
+const APPLY_DISCOVER_KEY = "apply:discover";
+
+// Drafts a cover letter / statement / answer with Claude from what apply.html sends (the call,
+// your matching evidence, your style rules). Needs the ANTHROPIC_API_KEY secret:
+//   npx wrangler secret put ANTHROPIC_API_KEY
+// Without it the page falls back to copying the prompt to your clipboard.
+const DRAFT_MAX_CHARS = 40000;
+async function handleDraft(request, env) {
+  if (request.method !== "POST") return json({ error: "method not allowed" }, 405);
+  if (!env.ANTHROPIC_API_KEY) return json({ error: "no_key", message: "ANTHROPIC_API_KEY secret not set" }, 501);
+  let body;
+  try { body = await request.json(); } catch { return json({ error: "invalid JSON" }, 400); }
+  const { system, user } = body || {};
+  if (typeof system !== "string" || typeof user !== "string" || !user.trim()) return json({ error: "system and user text required" }, 400);
+  if (system.length + user.length > DRAFT_MAX_CHARS) return json({ error: "too long" }, 413);
+
+  const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+  try {
+    const response = await client.beta.messages.create({
+      model: "claude-opus-5-5",
+      max_tokens: 16000,
+      output_config: { effort: "high" },
+      // a policy decline re-runs on Anthropic's recommended fallback model instead of failing
+      betas: ["server-side-fallback-2026-07-01"],
+      fallbacks: "default",
+      system,
+      messages: [{ role: "user", content: user }],
+    });
+    if (response.stop_reason === "refusal") {
+      return json({ error: "refusal", message: response.stop_details?.explanation || "The model declined this request." }, 422);
+    }
+    const text = response.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+    return json({ text, model: response.model, stop: response.stop_reason,
+      usage: { input: response.usage.input_tokens, output: response.usage.output_tokens } });
+  } catch (e) {
+    if (e instanceof Anthropic.AuthenticationError) return json({ error: "auth", message: "The ANTHROPIC_API_KEY secret was rejected." }, 502);
+    if (e instanceof Anthropic.RateLimitError) return json({ error: "rate_limit", message: "Rate limited — try again in a minute." }, 429);
+    if (e instanceof Anthropic.APIError) return json({ error: "api", message: `Claude API error ${e.status ?? ""}` }, 502);
+    throw e;
+  }
+}
+
 async function handleBudget(request, env, key = BUDGET_KEY) {
   if (!env.BUDGET_KV) {
     return json({ error: "KV not configured" }, 500);
@@ -150,6 +202,13 @@ export default {
       if (url.pathname === "/admin/api/budget/cards") return handleBudget(request, env, BUDGET_CARDS_KEY);
       // Savings plan (GET/PUT from the budget page), own key.
       if (url.pathname === "/admin/api/budget/plan") return handleBudget(request, env, BUDGET_PLAN_KEY);
+      // Amazon item data (PUT from private/amazon/main.py, GET from the budget page), own key.
+      if (url.pathname === "/admin/api/budget/amazon") return handleBudget(request, env, BUDGET_AMAZON_KEY);
+      // Applications tracker state (page) and discovered opportunities (scraper), own keys.
+      if (url.pathname === "/admin/api/apply") return handleBudget(request, env, APPLY_KEY);
+      if (url.pathname === "/admin/api/apply/discover") return handleBudget(request, env, APPLY_DISCOVER_KEY);
+      // Claude drafting for applications (POST only, needs ANTHROPIC_API_KEY).
+      if (url.pathname === "/admin/api/apply/draft") return handleDraft(request, env);
     }
 
     return env.ASSETS.fetch(request);

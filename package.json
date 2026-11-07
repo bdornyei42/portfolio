@@ -13,5 +13,8 @@
   "devDependencies": {
     "wrangler": "^4.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0"
+  }
 }

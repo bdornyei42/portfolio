@@ -132,6 +132,8 @@
     background:linear-gradient(to bottom, rgba(231,234,225,0) 0%, rgba(231,234,225,0) 62%, rgba(231,234,225,.72) 88%, var(--paper) 100%); }
   .hero.hero-top{ position:relative; z-index:1; width:100%; padding:96px 28px 150px; color:#F6F2E6; text-shadow:0 1px 16px rgba(20,35,70,.5); }
   .hero.hero-top .eyebrow, .hero.hero-top h1, .hero.hero-top h1 em{ color:#F6F2E6; }
+  .hero h1 .ben{ font-style:italic; font-weight:400; color:var(--paprika); white-space:nowrap; }
+  .hero.hero-top h1 .ben{ color:#F7B98A; }
   .art-credit{ margin-top:30px; font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.05em; opacity:.88; }
   .art-credit a{ text-decoration:none; } .art-credit a:hover{ text-decoration:underline; }
   .art-credit em{ font-family:'Newsreader', Georgia, serif; font-size:13.5px; letter-spacing:0; }
@@ -181,6 +183,69 @@
   }
   .demo-card:hover .open .arrow{ transform:translateX(4px); }
   .demo-card .open .arrow{ transition:transform .25s ease; }
+
+  /* ===== studio window: stucco wall, travertine surround, red louvered shutters, geraniums ===== */
+  .studio{ display:grid; grid-template-columns:minmax(0, 330px) minmax(0, 1fr); gap:48px; align-items:center; margin-top:48px; }
+  @media (max-width:760px){ .studio{ grid-template-columns:1fr; gap:28px; justify-items:center; } .studio-text{ justify-self:stretch; } }
+  .tuscan{ display:block; width:100%; max-width:330px; text-decoration:none; cursor:pointer; }
+  .tuscan .wall{ display:block; position:relative; padding:34px 38px 30px;
+    background:
+      radial-gradient(120px 80px at 18% 22%, rgba(255,236,200,.55), transparent 70%),
+      radial-gradient(140px 90px at 82% 70%, rgba(170,98,44,.22), transparent 70%),
+      radial-gradient(90px 60px at 70% 12%, rgba(196,120,60,.18), transparent 70%),
+      radial-gradient(160px 110px at 30% 88%, rgba(255,226,180,.35), transparent 70%),
+      linear-gradient(160deg, #E7B77C, #D99A5B 55%, #C9874A);
+    box-shadow:inset 0 0 0 1px rgba(110,60,25,.18); }
+  .tuscan .surround{ display:block; padding:12px; background:linear-gradient(180deg, #EFE6D2, #DCCDAE);
+    border-radius:132px 132px 6px 6px / 86px 86px 6px 6px; box-shadow:0 2px 0 rgba(90,55,25,.25), inset 0 0 0 1px rgba(120,90,50,.25); }
+  .tuscan .opening{ display:block; position:relative; height:300px; overflow:hidden; perspective:900px;
+    border-radius:120px 120px 3px 3px / 76px 76px 3px 3px; background:#3a2417; }
+  /* the room you see once the shutters swing: lamp-lit, three framed tools on the wall */
+  .tuscan .room{ position:absolute; inset:0; display:block;
+    background:radial-gradient(160px 130px at 50% 28%, #FFE7AE 0%, #F2B868 38%, #B9733C 70%, #6B3F22 100%); }
+  .tuscan .lamp{ position:absolute; left:50%; top:22px; width:46px; height:22px; margin-left:-23px; border-radius:40px 40px 4px 4px; background:#2F4A3D; box-shadow:0 18px 40px 16px rgba(255,226,150,.65); }
+  .tuscan .minis{ position:absolute; left:14px; right:14px; top:96px; display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+  .tuscan .minis span{ display:grid; justify-items:center; gap:4px; padding:7px 4px 6px; background:#F6F0E2; border:3px solid #7A4A28;
+    font:italic 400 12px 'Newsreader', Georgia, serif; color:#3a2417; }
+  .tuscan .minis i{ display:block; width:34px; height:24px; }
+  .tuscan .g-grid{ background:repeating-linear-gradient(90deg, #C1440E 0 6px, transparent 6px 9px), repeating-linear-gradient(0deg, #2F4A3D 0 5px, transparent 5px 8px); background-blend-mode:multiply; opacity:.8; }
+  .tuscan .g-bars{ background:linear-gradient(to top, #3b6fc0 70%, transparent 70%) 2px 100% / 6px 100% no-repeat, linear-gradient(to top, #3b6fc0 45%, transparent 45%) 11px 100% / 6px 100% no-repeat,
+    linear-gradient(to top, #C1440E 85%, transparent 85%) 20px 100% / 6px 100% no-repeat, linear-gradient(to top, #3b6fc0 30%, transparent 30%) 29px 100% / 5px 100% no-repeat; }
+  .tuscan .g-net{ background:radial-gradient(circle at 20% 30%, #C1440E 3px, transparent 4px), radial-gradient(circle at 75% 25%, #2F4A3D 3px, transparent 4px),
+    radial-gradient(circle at 50% 75%, #3b6fc0 3px, transparent 4px), linear-gradient(28deg, transparent 47%, #7A4A28 48% 52%, transparent 53%), linear-gradient(-35deg, transparent 47%, #7A4A28 48% 52%, transparent 53%); }
+  .tuscan .desk{ position:absolute; left:0; right:0; bottom:0; height:62px; background:linear-gradient(180deg, #5A321A, #3a2010); box-shadow:0 -2px 0 #7A4A28; }
+  /* shutters: louvers + stiles + a mid rail, hinged at the outer edges */
+  .tuscan .shutter{ position:absolute; top:0; bottom:0; width:50%; display:block; transition:transform .95s cubic-bezier(.2,.75,.25,1); backface-visibility:hidden;
+    background:
+      linear-gradient(180deg, transparent 47%, #8A2618 47% 53%, transparent 53%),
+      repeating-linear-gradient(180deg, #7E2416 0 2px, #B23A22 2px 8px, #C54A2C 8px 10px);
+    box-shadow:inset 0 0 0 7px #9C2F1C, inset 0 0 0 8px rgba(0,0,0,.25); }
+  .tuscan .shutter.l{ left:0; transform-origin:0 50%; }
+  .tuscan .shutter.r{ right:0; transform-origin:100% 50%; }
+  .tuscan .shutter::before, .tuscan .shutter::after{ content:""; position:absolute; width:12px; height:6px; background:#2b1a12; }
+  .tuscan .shutter.l::before{ left:-2px; top:22%; } .tuscan .shutter.l::after{ left:-2px; bottom:18%; }
+  .tuscan .shutter.r::before{ right:-2px; top:22%; } .tuscan .shutter.r::after{ right:-2px; bottom:18%; }
+  .tuscan:hover .shutter.l, .tuscan:focus-visible .shutter.l{ transform:rotateY(-32deg); }
+  .tuscan:hover .shutter.r, .tuscan:focus-visible .shutter.r{ transform:rotateY(32deg); }
+  .tuscan.open .shutter.l{ transform:rotateY(-118deg); } .tuscan.open .shutter.r{ transform:rotateY(118deg); }
+  .tuscan .sill{ display:block; height:12px; margin:0 -10px; background:linear-gradient(180deg, #EFE6D2, #CDBB98); box-shadow:0 3px 0 rgba(90,55,25,.3); }
+  /* window box of red geraniums */
+  .tuscan .planter{ display:block; position:relative; height:30px; margin:14px 6px 0; background:linear-gradient(180deg, #7A4526, #5B311A); border-radius:2px; }
+  .tuscan .blooms{ position:absolute; left:-6px; right:-6px; top:-22px; height:30px; display:block;
+    background:
+      radial-gradient(circle at 8% 60%, #D62E2E 5px, transparent 6px), radial-gradient(circle at 18% 35%, #E8453C 6px, transparent 7px),
+      radial-gradient(circle at 30% 62%, #C21F2B 5px, transparent 6px), radial-gradient(circle at 42% 30%, #E8453C 6px, transparent 7px),
+      radial-gradient(circle at 55% 58%, #D62E2E 6px, transparent 7px), radial-gradient(circle at 67% 33%, #F05A4B 5px, transparent 6px),
+      radial-gradient(circle at 79% 60%, #C21F2B 6px, transparent 7px), radial-gradient(circle at 91% 36%, #E8453C 5px, transparent 6px),
+      radial-gradient(ellipse 14px 8px at 13% 85%, #3E6B3A 90%, transparent), radial-gradient(ellipse 14px 8px at 36% 88%, #4E7D45 90%, transparent),
+      radial-gradient(ellipse 14px 8px at 61% 85%, #3E6B3A 90%, transparent), radial-gradient(ellipse 14px 8px at 86% 88%, #4E7D45 90%, transparent); }
+  .studio-text h3{ font-size:clamp(28px, 4vw, 36px); line-height:1.1; margin:10px 0 14px; }
+  .studio-text h3 em{ font-style:italic; font-weight:400; color:var(--paprika); }
+  .studio-text p{ color:var(--ink); font-size:16.5px; max-width:520px; margin:0 0 22px; }
+  .studio-cta{ display:inline-flex; align-items:center; gap:9px; padding:12px 20px; background:#A8321E; color:#FBF3E4; text-decoration:none;
+    font-family:'IBM Plex Mono', monospace; font-size:13px; letter-spacing:.05em; text-transform:uppercase; transition:background .2s ease; }
+  .studio-cta:hover, .studio-cta:focus-visible{ background:#8A2618; }
+  .studio-cta .arrow{ transition:transform .25s ease; } .studio-cta:hover .arrow{ transform:translateX(4px); }
 
   /* featured project (external venture) */
   .feature-card{
@@ -289,8 +354,8 @@
 <div class="hero-art">
   <img class="hero-paint" src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Szinyei_Merse%2C_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" alt="" referrerpolicy="no-referrer" decoding="async" onerror="this.remove()">
   <div class="hero hero-top">
-    <div class="eyebrow">Global Affairs · Statistics &amp; Data Science — Yale</div>
-    <h1>Bendegúz<br><em>Dörnyei</em></h1>
+    <div class="eyebrow">Making messy data behave — for better policy</div>
+    <h1>Bendegúz <span class="ben">“Ben”</span><br><em>Dörnyei</em></h1>
     <div class="art-credit">Szinyei Merse Pál · <a href="https://commons.wikimedia.org/wiki/File:Szinyei_Merse,_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" target="_blank" rel="noopener noreferrer"><em>Léggömb</em></a>, 1878 · Hungarian National Gallery</div>
   </div>
 </div>
@@ -373,7 +438,7 @@
     <h2>Things I've <span class="serif-italic">built</span></h2>
     <span class="count">01 venture · 03 tools</span>
   </div>
-  <p class="demos-intro reveal">A company I founded, plus small single-page apps I built to run my own life. Everything here is real and clickable.</p>
+  <p class="demos-intro reveal">A company I founded, and the small apps I built to run my own life.</p>
 
   <a class="feature-card reveal" href="https://sterlingadmissions.com" target="_blank" rel="noopener">
     <div class="fc-main">
@@ -384,27 +449,32 @@
     <span class="visit">sterlingadmissions.com <span class="arrow">↗</span></span>
   </a>
 
-  <p class="demos-note reveal"><span class="dot"></span> The three below are public demos: seeded with sample data and running entirely in your browser. Nothing you enter is saved or sent anywhere.</p>
-
-  <div class="demo-grid reveal">
-    <a class="demo-card" href="planner-demo.html">
-      <div class="eyebrow">Planning</div>
-      <h3>Year Planner</h3>
-      <p>A whole year at a glance. Drop events onto a twelve-month grid, tag them by category, and track goals across the calendar — a single-page app with no page reloads.</p>
-      <span class="open">Open demo <span class="arrow">→</span></span>
+  <!-- the studio window: red shutters on a tuscan wall. click swings them open, then into the workshop -->
+  <div class="studio reveal">
+    <a class="tuscan" id="tuscan" href="workshop.html" aria-label="Open the window and step into my workshop">
+      <span class="wall">
+        <span class="surround">
+          <span class="opening">
+            <span class="room" aria-hidden="true">
+              <span class="lamp"></span>
+              <span class="minis"><span><i class="g-grid"></i>Planner</span><span><i class="g-bars"></i>Budget</span><span><i class="g-net"></i>People</span></span>
+              <span class="desk"></span>
+            </span>
+            <span class="shutter l" aria-hidden="true"></span>
+            <span class="shutter r" aria-hidden="true"></span>
+          </span>
+        </span>
+        <span class="sill" aria-hidden="true"></span>
+        <span class="planter" aria-hidden="true"><span class="blooms"></span></span>
+      </span>
     </a>
-    <a class="demo-card" href="dashboard.html">
-      <div class="eyebrow">Personal finance</div>
-      <h3>Budget Dashboard</h3>
-      <p>Log transactions, sort them into categories, and watch the summary tiles recompute live. A compact take on the spreadsheet I used to keep by hand.</p>
-      <span class="open">Open demo <span class="arrow">→</span></span>
-    </a>
-    <a class="demo-card" href="connections.html">
-      <div class="eyebrow">Network</div>
-      <h3>Connection Tracker</h3>
-      <p>An interactive map of people and how they connect — nodes for contacts, links for relationships, searchable and filterable. Useful when your network outgrows your memory.</p>
-      <span class="open">Open demo <span class="arrow">→</span></span>
-    </a>
+    <div class="studio-text">
+      <div class="eyebrow">Open studio</div>
+      <h3>Come in — the <em>window’s</em> open.</h3>
+      <p>Behind those shutters is my workshop: the planner that runs my semesters, the budget that keeps me honest, and a map of the people I don’t want to lose touch with. They’re the same tools I use every day, filled with sample data so you can poke around and break things.</p>
+      <a class="studio-cta" href="workshop.html" onclick="return openWindow(event)">Open the window <span class="arrow">→</span></a>
+      <div class="demos-note" style="margin:18px 0 0;"><span class="dot"></span> 3 tools · no sign-up · nothing you type leaves your browser</div>
+    </div>
   </div>
 </section>
 
@@ -463,13 +533,26 @@
 <div class="fine">
   <span>© 2026 Bendegúz Dörnyei</span>
   <span style="display:flex; gap:18px; flex-wrap:wrap;">
+    <a href="workshop.html">The workshop</a>
     <a href="planner-demo.html">Year planner</a>
-    <a href="dashboard.html">Budget dashboard</a>
-    <a href="connections.html">Connection tracker</a>
+    <a href="dashboard.html">Budget</a>
+    <a href="connections.html">Connections</a>
   </span>
 </div>
 
 <script>
+  // the studio window: swing the shutters, then step in (straight through if motion is reduced or a new tab was asked for)
+  function openWindow(e){
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return true;
+    const w = document.getElementById('tuscan'), href = w.getAttribute('href');
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return true;
+    e.preventDefault();
+    w.classList.add('open');
+    setTimeout(() => { location.href = href; }, 950);
+    return false;
+  }
+  document.getElementById('tuscan').addEventListener('click', openWindow);
+
   const els = document.querySelectorAll('.reveal');
   if('IntersectionObserver' in window){
     const io = new IntersectionObserver((entries)=>{
