@@ -10,6 +10,7 @@
      your name. The real index.html has no such tag, so when you switch back to
      live mode the full site becomes indexable again. -->
 <meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -42,16 +43,23 @@
   }
   a{color:inherit;}
 
-  main{
-    flex:1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:64px 28px;
-    position:relative;
-    overflow:hidden;
+  /* split: words on paper, Szinyei Merse Pál's Léggömb (1878, public domain) beside them */
+  main{ flex:1; display:grid; grid-template-columns:minmax(0, 1.05fr) minmax(0, 1fr); min-height:100vh; }
+  .text-side{ display:flex; flex-direction:column; justify-content:center; padding:72px 64px 56px; position:relative; }
+  .inner{max-width:560px; width:100%; position:relative; z-index:2; margin:auto 0;}
+  .art-side{ margin:0; position:relative; overflow:hidden; background:linear-gradient(to bottom, #3f6dbd, #8aa6d6 60%, #c9c9b8); }
+  .art-side img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 30%; display:block; }
+  .art-side::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:5px; z-index:1;
+    background:repeating-linear-gradient(180deg, var(--paprika) 0 14px, #EFE6CF 14px 28px); }
+  .art-side figcaption{ position:absolute; left:26px; right:22px; bottom:18px; z-index:1; font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.05em; color:#F6F2E6; text-shadow:0 1px 10px rgba(20,35,70,.65); }
+  .art-side figcaption em{ font-family:'Newsreader', Georgia, serif; font-size:14px; letter-spacing:0; }
+  .art-side figcaption a{ text-decoration:none; } .art-side figcaption a:hover{ text-decoration:underline; }
+  @media (max-width:820px){
+    main{ grid-template-columns:1fr; }
+    .art-side{ order:-1; height:48vh; min-height:300px; }
+    .art-side::before{ top:auto; width:auto; right:0; height:5px; background:repeating-linear-gradient(90deg, var(--paprika) 0 14px, #EFE6CF 14px 28px); }
+    .text-side{ padding:40px 28px 32px; }
   }
-  .inner{max-width:640px; width:100%; position:relative; z-index:2;}
 
   .eyebrow{
     font-family:'IBM Plex Mono', monospace;
@@ -111,8 +119,8 @@
   }
   .contact a:hover, .contact a:focus-visible{ border-color:var(--paprika); color:var(--paprika); }
 
-  /* signature flourish, echoing the main site */
-  .thread-svg{
+  /* signature flourish — the painting carries the page now, so it stays hidden */
+  .thread-svg{ display:none;
     position:absolute;
     right:-40px;
     top:50%;
@@ -135,7 +143,7 @@
   @media (max-width:820px){ .thread-svg{display:none;} }
 
   footer{
-    padding:0 28px 34px;
+    padding:28px 0 0;
     font-family:'IBM Plex Mono', monospace;
     font-size:11px;
     color:var(--slate);
@@ -147,6 +155,7 @@
 <body>
 
 <main>
+  <div class="text-side">
   <div class="inner">
     <div class="eyebrow">Global Affairs · Statistics &amp; Data Science</div>
     <h1>Bendegúz<br><em>Dörnyei</em></h1>
@@ -157,13 +166,13 @@
       <a href="https://www.linkedin.com/in/ben-dornyei/" target="_blank" rel="noopener">LinkedIn ↗</a>
     </div>
   </div>
-
-  <svg class="thread-svg" viewBox="0 0 150 150" aria-hidden="true">
-    <path d="M10,110 C40,110 30,60 60,60 C85,60 75,20 100,20 C115,20 118,35 132,32" />
-  </svg>
+    <footer>© 2026 Bendegúz Dörnyei</footer>
+  </div>
+  <figure class="art-side">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Szinyei_Merse%2C_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" alt="Szinyei Merse Pál, Léggömb (The Balloon), 1878: a red-and-cream striped hot-air balloon drifting through a deep blue sky above a low horizon" referrerpolicy="no-referrer" decoding="async">
+    <figcaption>Szinyei Merse Pál · <a href="https://commons.wikimedia.org/wiki/File:Szinyei_Merse,_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" target="_blank" rel="noopener noreferrer"><em>Léggömb</em></a>, 1878 · Hungarian National Gallery</figcaption>
+  </figure>
 </main>
-
-<footer>© 2026 Bendegúz Dörnyei</footer>
 
 </body>
 </html>

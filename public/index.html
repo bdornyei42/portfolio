@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
 <title>Bendegúz Dörnyei</title>
 <meta name="description" content="Bendegúz (“Ben”) Dörnyei — quantitative policy researcher. Statistics, data science, and AI applied to global affairs, from democratic backsliding in Hungary to the World Bank's household surveys.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -120,6 +121,23 @@
   }
   @keyframes draw{ to{ stroke-dashoffset:0; } }
   @media (max-width:760px){ .thread-svg{display:none;} }
+
+  /* hero band: Szinyei Merse Pál, "Léggömb" (1878, public domain), fading into the paper */
+  .hero-art{ position:relative; overflow:hidden; min-height:86vh; display:flex; align-items:center; background:linear-gradient(to bottom, #3f6dbd, #8aa6d6 70%, var(--paper)); }
+  /* painting wider than the band and anchored right, so the balloon floats beside the name, not behind it */
+  .hero-paint{ position:absolute; top:0; bottom:0; left:0; width:145%; height:100%; object-fit:cover; object-position:50% 16%; display:block; }
+  .hero-art::before{ content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(90deg, rgba(25,50,110,.34) 0%, rgba(25,50,110,.16) 42%, rgba(25,50,110,0) 66%); }
+  .hero-art::after{ content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(to bottom, rgba(231,234,225,0) 0%, rgba(231,234,225,0) 62%, rgba(231,234,225,.72) 88%, var(--paper) 100%); }
+  .hero.hero-top{ position:relative; z-index:1; width:100%; padding:96px 28px 150px; color:#F6F2E6; text-shadow:0 1px 16px rgba(20,35,70,.5); }
+  .hero.hero-top .eyebrow, .hero.hero-top h1, .hero.hero-top h1 em{ color:#F6F2E6; }
+  .art-credit{ margin-top:30px; font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.05em; opacity:.88; }
+  .art-credit a{ text-decoration:none; } .art-credit a:hover{ text-decoration:underline; }
+  .art-credit em{ font-family:'Newsreader', Georgia, serif; font-size:13.5px; letter-spacing:0; }
+  .hero.hero-rest{ padding-top:8px; }
+  .hero.hero-rest .lede{ margin-top:0; }
+  @media (max-width:640px){ .hero.hero-top{ padding:72px 28px 70px; } }
 
   /* ===== Section shell ===== */
   section{max-width:1040px; margin:0 auto; padding:74px 28px;}
@@ -268,9 +286,15 @@
   </div>
 </header>
 
-<div class="hero">
-  <div class="eyebrow">Global Affairs · Statistics &amp; Data Science — Yale</div>
-  <h1>Bendegúz<br><em>Dörnyei</em></h1>
+<div class="hero-art">
+  <img class="hero-paint" src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Szinyei_Merse%2C_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" alt="" referrerpolicy="no-referrer" decoding="async" onerror="this.remove()">
+  <div class="hero hero-top">
+    <div class="eyebrow">Global Affairs · Statistics &amp; Data Science — Yale</div>
+    <h1>Bendegúz<br><em>Dörnyei</em></h1>
+    <div class="art-credit">Szinyei Merse Pál · <a href="https://commons.wikimedia.org/wiki/File:Szinyei_Merse,_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" target="_blank" rel="noopener noreferrer"><em>Léggömb</em></a>, 1878 · Hungarian National Gallery</div>
+  </div>
+</div>
+<div class="hero hero-rest">
   <p class="lede">I use statistics, data science, and a bit of AI to understand how institutions actually behave — from democratic backsliding in Hungary to the World Bank's household surveys. Currently an LSMS Survey Innovation Fellow at the World Bank and an M.P.P. candidate at Yale's Jackson School.</p>
   <div class="meta-row">
     <span>NEW HAVEN, CT</span>

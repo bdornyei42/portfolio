@@ -95,6 +95,10 @@ const BUDGET_RECURRING_KEY = "budget:recurring";
 // private/notify.js so desktop alerts skip what you've already used.
 const BUDGET_CARDS_KEY = "budget:cards";
 
+// Savings plan (food & drink plan, budget caps, subscriptions marked to cancel,
+// side-income log), written by the budget page's "Plan & save" tab.
+const BUDGET_PLAN_KEY = "budget:plan";
+
 async function handleBudget(request, env, key = BUDGET_KEY) {
   if (!env.BUDGET_KV) {
     return json({ error: "KV not configured" }, 500);
@@ -144,6 +148,8 @@ export default {
       if (url.pathname === "/admin/api/budget/recurring") return handleBudget(request, env, BUDGET_RECURRING_KEY);
       // Card benefit state (GET/PUT from the budget page, GET from notify.js), own key.
       if (url.pathname === "/admin/api/budget/cards") return handleBudget(request, env, BUDGET_CARDS_KEY);
+      // Savings plan (GET/PUT from the budget page), own key.
+      if (url.pathname === "/admin/api/budget/plan") return handleBudget(request, env, BUDGET_PLAN_KEY);
     }
 
     return env.ASSETS.fetch(request);
