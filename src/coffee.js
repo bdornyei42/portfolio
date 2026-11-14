@@ -214,6 +214,17 @@ export class CoffeeClub extends DurableObject {
       this.sql.exec("UPDATE members SET phone = '1' || phone WHERE length(phone) = 10 AND substr(phone, 1, 1) BETWEEN '2' AND '9'");
       this.sql.exec("INSERT INTO meta (k, v) VALUES ('fix_us_numbers', '1')");
     }
+    // finding a time: each member's free hours per group, the picked plan, and email opt-in
+    this.sql.exec("CREATE TABLE IF NOT EXISTS avail (week INTEGER NOT NULL, gid INTEGER NOT NULL, member TEXT NOT NULL, slots TEXT NOT NULL DEFAULT '[]', PRIMARY KEY (week, gid, member))");
+    if (!this.q("PRAGMA table_info(groups)").some((c) => c.name === "plan_at")) {
+      this.sql.exec("ALTER TABLE groups ADD COLUMN plan_at TEXT");
+      this.sql.exec("ALTER TABLE groups ADD COLUMN plan_place TEXT");
+      this.sql.exec("ALTER TABLE groups ADD COLUMN plan_by TEXT");
+    }
+    if (!this.q("PRAGMA table_info(members)").some((c) => c.name === "email")) {
+      this.sql.exec("ALTER TABLE members ADD COLUMN email TEXT");
+      this.sql.exec("ALTER TABLE members ADD COLUMN notify INTEGER NOT NULL DEFAULT 0");
+    }
     if (!this.q("PRAGMA table_info(members)").some((c) => c.name === "no_photo"))
       this.sql.exec("ALTER TABLE members ADD COLUMN no_photo INTEGER NOT NULL DEFAULT 0");
     if (!this.q("PRAGMA table_info(members)").some((c) => c.name === "interests"))
@@ -265,6 +276,39 @@ export class CoffeeClub extends DurableObject {
     } catch (e) {
       return { sent: false, error: String(e?.message || e) };
     }
+  }
+
+  // tell everyone in the group who asked for it: time, place, who's coming, calendar link
+  async mailPlan(week, gid) {
+    const g = this.one("SELECT * FROM groups WHERE week = ? AND gid = ?", week, gid);
+    if (!g?.plan_at) return { sent: 0 };
+    const people = JSON.parse(g.members).map((id) => this.member(id)).filter(Boolean);
+    const to = people.filter((m) => m.notify && m.email).map((m) => m.email);
+    if (!to.length) return { sent: 0 };
+    if (!this.env.EMAIL) return { sent: 0, error: "Email isn't set up on the site yet." };
+    const [d, hh] = g.plan_at.split("|"), h = +hh;
+    const when = new Date(d + "T12:00:00Z").toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric" }) + ` at ${((h + 11) % 12) + 1}${h < 12 ? "am" : "pm"}`;
+    const stamp = (hr) => d.replace(/-/g, "") + "T" + String(hr).padStart(2, "0") + "0000";
+    const place = g.plan_place || "a café you pick together";
+    const gcal = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent("Coffee: " + people.map((m) => m.name.split(" ")[0]).join(", ")) +
+      "&dates=" + stamp(h) + "/" + stamp(h + 1) + "&ctz=America/New_York&location=" + encodeURIComponent(g.plan_place ? g.plan_place + ", New Haven, CT" : "New Haven, CT") +
+      "&details=" + encodeURIComponent("Jackson Coffee Buddies, round " + week + ". https://dornyei.com/jackson-coffee-buddies");
+    const h2 = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    const names = people.map((m) => m.name).join(", ");
+    const subject = `Coffee: ${when}, ${place}`;
+    const text = `${subject}\nWith ${names}.\nAdd it to your calendar: ${gcal}\nSee your group: https://dornyei.com/jackson-coffee-buddies`;
+    const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1f1a17;max-width:560px">
+      <h2 style="color:#3152a4;margin:0 0 6px">Coffee is on</h2>
+      <p style="font-size:18px;margin:0 0 6px"><b>${h2(when)}</b><br>${h2(place)}</p>
+      <p style="margin:0 0 16px;color:#5a5048">With ${h2(names)}.</p>
+      <p><a href="${h2(gcal)}" style="background:#3152a4;color:#fff;padding:10px 16px;border-radius:999px;text-decoration:none;font-weight:bold">Add to Google Calendar</a></p>
+      <p style="margin-top:18px;color:#8d8278;font-size:13px">You asked Jackson Coffee Buddies to email you when your group picks a time. Turn it off in your profile at https://dornyei.com/jackson-coffee-buddies</p></div>`;
+    let sent = 0, error = "";
+    for (const addr of to) {
+      try { await this.env.EMAIL.send({ to: addr, from: { email: "coffee@dornyei.com", name: "Jackson Coffee Buddies" }, subject, html, text }); sent++; }
+      catch (e) { error = String(e?.message || e); }
+    }
+    return { sent, error };
   }
 
   // take down every photo of a member (their upload and any headshot found online), for good
@@ -413,6 +457,8 @@ export class CoffeeClub extends DurableObject {
       done: !!g.done_at, doneAt: g.done_at, doneBy: g.done_by ? (people.get(g.done_by)?.name || "") : null,
       cafe: g.cafe || "", photos, mine: ids.includes(viewer.id),
       chat: g.chat || "", chatBy: g.chat_by ? (people.get(g.chat_by)?.name || "") : null,
+      avail: Object.fromEntries(this.q("SELECT member, slots FROM avail WHERE week = ? AND gid = ?", g.week, g.gid).map((a) => [a.member, JSON.parse(a.slots)])),
+      plan: g.plan_at ? { at: g.plan_at, place: g.plan_place || "", by: people.get(g.plan_by)?.name || "" } : null,
     };
   }
 
@@ -428,7 +474,7 @@ export class CoffeeClub extends DurableObject {
     const metIds = new Set();
     for (const g of mine) if (g.done) for (const p of g.members) if (p.id !== viewer.id) metIds.add(p.id);
     return {
-      me: { ...this.pub(viewer, viewer), wa: viewer.wa, active: !!viewer.active, admin: !!viewer.admin },
+      me: { ...this.pub(viewer, viewer), wa: viewer.wa, active: !!viewer.active, admin: !!viewer.admin, email: viewer.email || "", notify: !!viewer.notify },
       week: weekInfo(),
       group: mine.find((g) => g.week === n) || null,
       history: mine.filter((g) => g.week !== n),
@@ -599,7 +645,7 @@ export class CoffeeClub extends DurableObject {
         this.sql.exec("UPDATE groups SET members = ? WHERE week = ? AND gid = ?", JSON.stringify(rest), g.week, g.gid);
       }
       this.sql.exec("DELETE FROM photos WHERE owner = ? OR owner = ?", viewer.id, "headshot:" + viewer.id);
-      this.sql.exec("UPDATE members SET name = 'Former member', wa = '', phone = NULL, photo = NULL, jackson_photo = NULL, bio = '', interests = '[]', active = 0, removed = 1 WHERE id = ?", viewer.id);
+      this.sql.exec("UPDATE members SET name = 'Former member', wa = '', phone = NULL, photo = NULL, jackson_photo = NULL, bio = '', interests = '[]', email = NULL, notify = 0, active = 0, removed = 1 WHERE id = ?", viewer.id);
       this.sql.exec("DELETE FROM sessions WHERE member = ?", viewer.id);
       this.rebalance();
       return json({ ok: true }, 200, { "Set-Cookie": `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0` });
@@ -614,6 +660,12 @@ export class CoffeeClub extends DurableObject {
         // a number-only member who just picked a name joins this week
         if (!viewer.name) this.slotIn(viewer.id);
       }
+      if (b.email !== undefined) {
+        const e = String(b.email || "").trim().slice(0, 120);
+        if (e && !/^[^\s@<>]+@[^\s@<>]+\.[a-z]{2,}$/i.test(e)) return err("That doesn't look like an email address.");
+        this.sql.exec("UPDATE members SET email = ? WHERE id = ?", e || null, viewer.id);
+      }
+      if (b.notify !== undefined) this.sql.exec("UPDATE members SET notify = ? WHERE id = ?", b.notify ? 1 : 0, viewer.id);
       if (b.bio !== undefined) this.sql.exec("UPDATE members SET bio = ? WHERE id = ?", String(b.bio).replace(/[<>]/g, "").slice(0, 140), viewer.id);
       if (b.active !== undefined) this.sql.exec("UPDATE members SET active = ? WHERE id = ?", b.active ? 1 : 0, viewer.id);
       if (Array.isArray(b.interests)) {
@@ -680,6 +732,30 @@ export class CoffeeClub extends DurableObject {
     }
 
     // the table's WhatsApp group: someone makes it in WhatsApp and pastes the invite link here
+    // your free hours for this group: slot keys "YYYY-MM-DD|HH" (New York time)
+    if (path === "/avail" && method === "POST") {
+      const { week, gid, slots } = await body();
+      const g = this.one("SELECT members FROM groups WHERE week = ? AND gid = ?", +week, +gid);
+      if (!g || !JSON.parse(g.members).includes(viewer.id)) return err("Not your group.", 403);
+      const r = weekRange(+week);
+      const clean = [...new Set((Array.isArray(slots) ? slots : []).map(String))]
+        .filter((k) => /^\d{4}-\d{2}-\d{2}\|\d{2}$/.test(k) && k.slice(0, 10) >= r.start && k.slice(0, 10) <= r.end).slice(0, 400);
+      this.sql.exec("INSERT INTO avail (week, gid, member, slots) VALUES (?, ?, ?, ?) ON CONFLICT(week, gid, member) DO UPDATE SET slots = excluded.slots", +week, +gid, viewer.id, JSON.stringify(clean));
+      return json(this.me(this.fresh(viewer)));
+    }
+    // pick (or clear) the group's time and place; people who opted in get an email
+    if (path === "/plan" && method === "POST") {
+      const { week, gid, at, place } = await body();
+      const g = this.one("SELECT * FROM groups WHERE week = ? AND gid = ?", +week, +gid);
+      if (!g || (!JSON.parse(g.members).includes(viewer.id) && !viewer.admin)) return err("Not your group.", 403);
+      if (!at) { this.sql.exec("UPDATE groups SET plan_at = NULL, plan_place = NULL, plan_by = NULL WHERE week = ? AND gid = ?", +week, +gid); return json(this.me(this.fresh(viewer))); }
+      if (!/^\d{4}-\d{2}-\d{2}\|\d{2}$/.test(String(at))) return err("Pick a time from the grid.");
+      const pl = String(place || "").replace(/[<>]/g, "").slice(0, 80);
+      this.sql.exec("UPDATE groups SET plan_at = ?, plan_place = ?, plan_by = ?, cafe = CASE WHEN ? != '' THEN ? ELSE cafe END WHERE week = ? AND gid = ?", String(at), pl, viewer.id, pl, pl, +week, +gid);
+      const mail = await this.mailPlan(+week, +gid);
+      return json({ ...this.me(this.fresh(viewer)), mail });
+    }
+
     if (path === "/chat" && method === "POST") {
       const { week, gid, link } = await body();
       const g = this.one("SELECT * FROM groups WHERE week = ? AND gid = ?", +week, +gid);
