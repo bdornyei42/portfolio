@@ -473,6 +473,7 @@ const INTERESTS = [
   "Running", "Hiking", "Cooking", "Music", "Film", "Soccer", "Books", "Travel", "Startups", "Photography",
 ];
 
+CAFES.sort((a, b) => a.walk - b.walk || a.name.localeCompare(b.name)); // closest first everywhere
 let S = null, firstReveal = true;
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -796,13 +797,13 @@ function interestsTile(g) {
 }
 
 // ----- find a time: when2meet-style grid for the round (New York time) -----
-// 15-minute slots, 8:00am to 8:45pm (keys "YYYY-MM-DD|HHMM", New York time)
-const SLOTS = Array.from({ length: 52 }, (_, i) => String(8 + Math.floor(i / 4)).padStart(2, "0") + ["00", "15", "30", "45"][i % 4]);
+// 15-minute slots, 7:00am to midnight (keys "YYYY-MM-DD|HHMM", New York time)
+const SLOTS = Array.from({ length: 68 }, (_, i) => String(7 + Math.floor(i / 4)).padStart(2, "0") + ["00", "15", "30", "45"][i % 4]);
 const toMin = (hm) => +hm.slice(0, 2) * 60 + +hm.slice(2, 4);
 const fromMin = (m) => String(Math.floor(m / 60)).padStart(2, "0") + String(m % 60).padStart(2, "0");
 let planPage = 0, dragMode = null, draft = null, saveTimer = null;
 const nyToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
-const timeLabel = (hm) => { const h = +hm.slice(0, 2), m = hm.slice(2, 4); return `${((h + 11) % 12) + 1}${m !== "00" ? ":" + m : ""}${h < 12 ? "am" : "pm"}`; };
+const timeLabel = (hm) => { const h = +hm.slice(0, 2) % 24, m = hm.slice(2, 4); return `${((h + 11) % 12) + 1}${m !== "00" ? ":" + m : ""}${h < 12 ? "am" : "pm"}`; };
 const slotLabel = (k) => { const [d, hm] = k.split("|"); return `${day(d, { weekday: "short", month: "short", day: "numeric" })}, ${timeLabel(hm)}`; };
 function roundDays(w) {
   const out = [], start = w.start > nyToday() ? w.start : nyToday();
@@ -810,7 +811,8 @@ function roundDays(w) {
   return out;
 }
 function planLinks(g) {
-  const [d, hm] = g.plan.at.split("|"), m0 = toMin(hm), st = (m) => d.replace(/-/g, "") + "T" + fromMin(m) + "00";
+  const [d, hm] = g.plan.at.split("|"), m0 = toMin(hm);
+  const st = (m) => { const nd = new Date(Date.parse(d + "T12:00:00Z") + Math.floor(m / 1440) * 864e5).toISOString().slice(0, 10); return nd.replace(/-/g, "") + "T" + fromMin(m % 1440) + "00"; };
   const title = "Coffee: " + g.members.map(first).join(", ");
   const where = g.plan.place ? g.plan.place + ", New Haven, CT" : "New Haven, CT";
   const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${st(m0)}/${st(m0 + 60)}&ctz=America/New_York&location=${encodeURIComponent(where)}&details=${encodeURIComponent("Jackson Coffee Buddies. https://dornyei.com/jackson-coffee-buddies")}`;

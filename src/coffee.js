@@ -327,7 +327,10 @@ export class CoffeeClub extends DurableObject {
     const [d, hm] = g.plan_at.split("|"), h = +hm.slice(0, 2), mi = +hm.slice(2, 4) || 0;
     const when = new Date(d + "T12:00:00Z").toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric" }) + ` at ${((h + 11) % 12) + 1}${mi ? ":" + String(mi).padStart(2, "0") : ""}${h < 12 ? "am" : "pm"}`;
     // an hour from the picked start
-    const stamp = (mins) => d.replace(/-/g, "") + "T" + String(Math.floor(mins / 60)).padStart(2, "0") + String(mins % 60).padStart(2, "0") + "00";
+    const stamp = (mins) => {
+      const nd = new Date(Date.parse(d + "T12:00:00Z") + Math.floor(mins / 1440) * 864e5).toISOString().slice(0, 10), m = mins % 1440;
+      return nd.replace(/-/g, "") + "T" + String(Math.floor(m / 60)).padStart(2, "0") + String(m % 60).padStart(2, "0") + "00";
+    };
     const place = g.plan_place || "a café you pick together";
     const gcal = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent("Coffee: " + people.map((m) => m.name.split(" ")[0]).join(", ")) +
       "&dates=" + stamp(h * 60 + mi) + "/" + stamp(h * 60 + mi + 60) + "&ctz=America/New_York&location=" + encodeURIComponent(g.plan_place ? g.plan_place + ", New Haven, CT" : "New Haven, CT") +
