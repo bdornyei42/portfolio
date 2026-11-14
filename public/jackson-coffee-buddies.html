@@ -390,6 +390,7 @@ footer .linkbtn{color:#fff}
     <button class="btn sm ghost" id="notify-test" type="button">Send this round's list now</button>
     <span class="small muted" id="notify-status"></span>
   </div>
+  <div id="dupes"></div>
   <div class="scroll"><table><thead><tr><th></th><th>Name</th><th>On WhatsApp</th><th>Number</th><th>Last signed in</th><th>Matched</th><th></th></tr></thead><tbody id="org-rows"></tbody></table></div>
 </div></section>
 
@@ -574,13 +575,31 @@ function renderSignin() {
         });
       } catch (er) { $("#e").textContent = er.message; }
     }
+  } else if (s.at === "maybe") {
+    el.innerHTML = `<h3>Is one of these you?</h3>
+      <p>Someone with that name is already on the list. Pick yourself so you keep your group, or join as a new person.</p>
+      <div class="picks">${s.matches.map((m) => `<button type="button" data-id="${esc(m.id)}"><span><b>${esc(m.name)}</b>${m.wa ? `<br><span class="muted small">“${esc(m.wa)}” on WhatsApp</span>` : ""}</span><span class="small"><b>That's me</b></span></button>`).join("")}</div>
+      <div class="err" id="e"></div>
+      <p class="small" style="margin:8px 0 0">None of them? <button class="linkbtn" id="new" type="button">Join as ${esc(s.name)}</button></p>`;
+    el.querySelectorAll(".picks button").forEach((b) => b.onclick = async () => {
+      try { await post("/claim", { phone: s.phone, id: b.dataset.id }); boot(); } catch (er) { $("#e").textContent = er.message; }
+    });
+    $("#new").onclick = async () => { try { await post("/join", { phone: s.phone, name: s.name, force: true }); boot(); } catch (er) { $("#e").textContent = er.message; } };
   } else {
     el.innerHTML = `<h3>Join</h3><p>Your name as people know it. You'll get a group this week.</p>
       <form id="f2" class="row"><label class="sr" for="nm">Your name</label><input id="nm" type="text" autocomplete="name" placeholder="First and last name" required><button class="btn" type="submit">Join</button></form>
       <div class="err" id="e"></div><p class="small" style="margin:8px 0 0"><button class="linkbtn" id="b" type="button">Back</button></p>`;
     $("#nm").focus();
     $("#b").onclick = () => { step = { at: "who", phone: s.phone }; renderSignin(); };
-    $("#f2").onsubmit = async (ev) => { ev.preventDefault(); try { await post("/join", { phone: s.phone, name: $("#nm").value }); boot(); } catch (er) { $("#e").textContent = er.message; } };
+    $("#f2").onsubmit = async (ev) => {
+      ev.preventDefault();
+      try {
+        const r = await post("/join", { phone: s.phone, name: $("#nm").value, force: !!s.force });
+        if (r.ok) return boot();
+        // someone with that name is already on the list: ask before making a second profile
+        step = { at: "maybe", phone: s.phone, name: $("#nm").value, matches: r.matches }; renderSignin();
+      } catch (er) { $("#e").textContent = er.message; }
+    };
   }
 }
 async function showDoor() {
@@ -975,6 +994,17 @@ async function renderOrg() {
     $("#org-rows").querySelectorAll("[data-reset]").forEach((b) => b.onclick = async () => { if (confirm("Unlink this number? They can claim their name again.")) { await post("/admin/member", { id: b.dataset.reset, resetPhone: true }); renderOrg(); } });
     $("#org-rows").querySelectorAll("[data-rm]").forEach((b) => b.onclick = async () => { if (confirm("Remove them? They won't be matched anymore.")) { await post("/admin/member", { id: b.dataset.rm, remove: true }); renderOrg(); } });
     filterOrg();
+    try {
+      const { pairs } = await call("/admin/duplicates");
+      const label = (m) => `<b>${esc(m.name)}</b>${m.linked ? " (signed in)" : ""}`;
+      $("#dupes").innerHTML = pairs.length ? `<div class="tile" style="margin-bottom:14px"><h3>Possible duplicates</h3><p>Same first name, one of them without a number. Merge if it's the same person: the profile with the number moves into the other one.</p>
+        ${pairs.map(([a, b]) => { const [from, into] = a.linked && !b.linked ? [a, b] : [b, a];
+          return `<p style="margin:6px 0">${label(a)} and ${label(b)} <button class="btn sm ghost" type="button" data-from="${esc(from.id)}" data-into="${esc(into.id)}" data-names="${esc(from.name + " into " + into.name)}">Merge</button></p>`; }).join("")}</div>` : "";
+      $("#dupes").querySelectorAll("[data-from]").forEach((b) => b.onclick = async () => {
+        if (!confirm(`Merge ${b.dataset.names}? This can't be undone. Only do it if they're the same person.`)) return;
+        try { await post("/admin/merge", { from: b.dataset.from, into: b.dataset.into }); S = await call("/me"); render(); toast("Merged."); } catch (er) { toast(er.message); }
+      });
+    } catch {}
     try { const nt = await call("/admin/notify"); if (document.activeElement !== $("#notify-email")) $("#notify-email").value = nt.email; $("#notify-status").textContent = nt.ready ? "" : "Email sending isn't connected yet."; } catch {}
   } catch (er) { $("#org-sum").textContent = er.message; }
 }

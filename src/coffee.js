@@ -71,6 +71,13 @@ function weekInfo() {
 
 // ---------- helpers ----------
 const digits = (s) => String(s || "").replace(/\D/g, "");
+// what people type into the sign-in box: 10 digits with no + or 00 means a US/Canadian number
+function typedPhone(s) {
+  const raw = String(s || "").trim(), d = digits(raw);
+  return d.length === 10 && !/^(\+|00)/.test(raw) ? "1" + d : d;
+}
+// unclaimed profiles whose name looks like the one being typed (to avoid duplicate people)
+function nameTokens(s) { return slug(s).split("-").filter((t) => t.length > 1); }
 function phoneMatch(stored, typed) {
   if (!stored || typed.length < 7) return false;
   if (stored === typed) return true;
@@ -196,6 +203,11 @@ export class CoffeeClub extends DurableObject {
     if (!this.q("PRAGMA table_info(groups)").some((c) => c.name === "chat")) {
       this.sql.exec("ALTER TABLE groups ADD COLUMN chat TEXT");
       this.sql.exec("ALTER TABLE groups ADD COLUMN chat_by TEXT");
+    }
+    // one-time: numbers typed as 10 digits before typedPhone() existed were US/Canadian without the 1
+    if (!this.q("SELECT v FROM meta WHERE k = 'fix_us_numbers'").length) {
+      this.sql.exec("UPDATE members SET phone = '1' || phone WHERE length(phone) = 10 AND substr(phone, 1, 1) BETWEEN '2' AND '9'");
+      this.sql.exec("INSERT INTO meta (k, v) VALUES ('fix_us_numbers', '1')");
     }
     if (!this.q("PRAGMA table_info(members)").some((c) => c.name === "no_photo"))
       this.sql.exec("ALTER TABLE members ADD COLUMN no_photo INTEGER NOT NULL DEFAULT 0");
@@ -413,7 +425,7 @@ export class CoffeeClub extends DurableObject {
     if (path === "/login" && method === "POST") {
       if (this.throttled(ip)) return err("Too many tries. Wait a bit and try again.", 429);
       const { phone } = await body();
-      const d = digits(phone);
+      const d = typedPhone(phone);
       if (d.length < 7) return err("Type the full number you use on WhatsApp.");
       const hits = this.q("SELECT * FROM members WHERE removed = 0 AND phone IS NOT NULL").filter((m) => phoneMatch(m.phone, d));
       if (hits.length === 1) {
@@ -438,7 +450,7 @@ export class CoffeeClub extends DurableObject {
     if (path === "/claim" && method === "POST") {
       if (this.throttled(ip)) return err("Too many tries. Wait a bit and try again.", 429);
       const { phone, id } = await body();
-      const d = digits(phone);
+      const d = typedPhone(phone);
       if (d.length < 7) return err("Type the full number you use on WhatsApp.");
       if (this.q("SELECT phone FROM members WHERE phone IS NOT NULL AND removed = 0").some((m) => phoneMatch(m.phone, d)))
         return err("That number already belongs to someone. Try signing in with it.");
@@ -452,12 +464,19 @@ export class CoffeeClub extends DurableObject {
     // not on the list at all → join (sits down at a table this week)
     if (path === "/join" && method === "POST") {
       if (this.throttled(ip)) return err("Too many tries. Wait a bit and try again.", 429);
-      const { phone, name } = await body();
-      const d = digits(phone), nm = cleanName(name);
+      const { phone, name, force } = await body();
+      const d = typedPhone(phone), nm = cleanName(name);
       if (d.length < 7) return err("Type the full number you use on WhatsApp.");
       if (nm.length < 2) return err("Add the name people know you by.");
       if (this.q("SELECT phone FROM members WHERE phone IS NOT NULL AND removed = 0").some((m) => phoneMatch(m.phone, d)))
         return err("That number already belongs to someone. Try signing in with it.");
+      if (!force) {
+        const want = nameTokens(nm);
+        const matches = this.q("SELECT id, name, wa FROM members WHERE removed = 0 AND phone IS NULL AND admin = 0 AND name != ''")
+          .filter((m) => { const have = new Set([...nameTokens(m.name), ...nameTokens(m.wa)]); return want.length && have.has(want[0]); })
+          .slice(0, 6).map((m) => ({ id: m.id, name: m.name, wa: m.wa !== m.name ? m.wa : "" }));
+        if (matches.length) return json({ ok: false, reason: "maybe", matches });
+      }
       this.miss(ip);
       let id = slug(nm), k = 2;
       while (this.one("SELECT 1 AS x FROM members WHERE id = ?", id)) id = slug(nm) + "-" + k++;
@@ -642,6 +661,50 @@ export class CoffeeClub extends DurableObject {
             photo: m.photo ? `/api/coffee/img/${m.photo}` : m.jackson_photo || null,
           })),
         });
+      }
+      // merge `from` into `into`: number, sessions, photo, bio and interests move over if `into`
+      // lacks them; `from` is swapped for `into` in every group (or dropped where both sit), then deleted
+      if (path === "/admin/merge" && method === "POST") {
+        const { from, into, name } = await body();
+        const a = this.member(from), b = this.member(into);
+        if (!a || !b || a.id === b.id) return err("Pick two different people.");
+        if (a.admin) return err("Merge the other way round: the organizer's profile has to stay.");
+        this.sql.exec(`UPDATE members SET phone = COALESCE(phone, ?), photo = COALESCE(photo, ?), bio = CASE WHEN bio = '' THEN ? ELSE bio END,
+          interests = CASE WHEN interests = '[]' THEN ? ELSE interests END, seen = MAX(COALESCE(seen, 0), COALESCE(?, 0)), active = MAX(active, ?) WHERE id = ?`,
+          a.phone, a.photo, a.bio || "", a.interests || "[]", a.seen, a.active, b.id);
+        if (name) this.sql.exec("UPDATE members SET name = ? WHERE id = ?", cleanName(name), b.id);
+        this.sql.exec("UPDATE sessions SET member = ? WHERE member = ?", b.id, a.id);
+        this.sql.exec("UPDATE photos SET owner = ? WHERE owner = ?", b.id, a.id);
+        for (const g of this.q("SELECT week, gid, members, done_by FROM groups")) {
+          const ids = JSON.parse(g.members);
+          if (!ids.includes(a.id)) continue;
+          const next = ids.includes(b.id) ? ids.filter((x) => x !== a.id) : ids.map((x) => (x === a.id ? b.id : x));
+          this.sql.exec("UPDATE groups SET members = ?, done_by = CASE WHEN done_by = ? THEN ? ELSE done_by END WHERE week = ? AND gid = ?", JSON.stringify(next), a.id, b.id, g.week, g.gid);
+        }
+        // if both sat in different groups this round, keep `into` where it was and drop the extra seat
+        const n = weekOf(), here = this.q("SELECT gid, members FROM groups WHERE week = ?", n).filter((g) => JSON.parse(g.members).includes(b.id));
+        if (here.length > 1) for (const g of here.slice(1)) this.sql.exec("UPDATE groups SET members = ? WHERE week = ? AND gid = ?", JSON.stringify(JSON.parse(g.members).filter((x) => x !== b.id)), n, g.gid);
+        this.sql.exec("DELETE FROM members WHERE id = ?", a.id);
+        return json({ ok: true });
+      }
+      if (path === "/admin/duplicates" && method === "GET") {
+        const ms = this.q("SELECT id, name, wa, phone, seen FROM members WHERE removed = 0 AND name != ''");
+        const pairs = [];
+        for (let i = 0; i < ms.length; i++) for (let j = i + 1; j < ms.length; j++) {
+          const A = ms[i], B = ms[j];
+          const ta = slug(A.name).split("-").filter(Boolean), tb = slug(B.name).split("-").filter(Boolean);
+          if (!ta.length || !tb.length || ta[0] !== tb[0]) continue;
+          // same first name; then either one of them is a first name only ("Esther" vs "Esther Yang"),
+          // or the surnames agree (an initial like "N." has to match the other surname's first letter)
+          if (ta.length > 1 && tb.length > 1) {
+            const la = ta[ta.length - 1], lb = tb[tb.length - 1];
+            const same = la.length === 1 || lb.length === 1 ? la[0] === lb[0] : la === lb;
+            if (!same) continue;
+          }
+          if (A.phone && B.phone) continue; // two linked numbers = two real people
+          pairs.push([A, B].map((m) => ({ id: m.id, name: m.name, wa: m.wa, linked: !!m.phone, seen: !!m.seen })));
+        }
+        return json({ pairs });
       }
       if (path === "/admin/notify" && method === "GET") return json({ email: this.getMeta("notify_email") || "", ready: !!this.env.EMAIL });
       if (path === "/admin/notify" && method === "POST") {
