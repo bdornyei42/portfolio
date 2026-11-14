@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandemic Risk Assessment Framework · Bendegúz Dörnyei</title>
+<meta name="description" content="Advancing a Global Framework for Pandemic Risk Assessment (Dec 2025). A review of 11 pandemic risk and preparedness tools and 27 expert consultations, with the United Nations Foundation and the Yale Jackson School. Co-authored by Bendegúz Dörnyei.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2420; --paper:#E7EAE1; --paper-2:#DCE0D3; --card:#F3F5EF;
+    --paprika:#C1440E; --brick:#A8321E; --forest:#2F4A3D; --slate:#55625C; --line:rgba(27,36,32,0.14);
+    --deep:#0F2338; --deep-2:#16304B; --sky:#7FB8E8; --sky-2:#B9D8F2; --deep-line:rgba(220,235,250,.16);
+    --cream:#F1F4F7; --cream-dim:rgba(241,244,247,.68);
+    --serif:'Newsreader', Georgia, serif; --mono:'IBM Plex Mono', ui-monospace, monospace; --sans:'Public Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  a{color:inherit;} img{max-width:100%; display:block;}
+  h1,h2,h3{font-family:var(--serif); font-weight:500; margin:0; letter-spacing:-0.01em;}
+  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--paprika);}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 28px;}
+  @media (max-width:640px){ .wrap{padding:0 18px;} }
+  a:focus-visible, button:focus-visible{outline:2px solid var(--paprika); outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important; transition-delay:0ms !important;} }
+  .js .reveal{opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s ease;}
+  .js .reveal.in{opacity:1; transform:none;}
+
+  header.topbar{position:fixed; top:0; left:0; right:0; z-index:50; color:var(--cream); border-bottom:1px solid transparent; transition:background .3s, color .3s, border-color .3s;}
+  header.topbar.scrolled{background:rgba(15,35,56,.88); backdrop-filter:blur(8px); border-bottom-color:var(--deep-line);}
+  header.topbar.solid{background:rgba(231,234,225,.9); color:var(--ink); border-bottom-color:var(--line);}
+  .topbar .wrap{display:flex; justify-content:space-between; align-items:center; padding-top:14px; padding-bottom:14px; gap:16px;}
+  .mark{font-family:var(--mono); font-size:13px; letter-spacing:.05em; text-decoration:none;}
+  .top-nav{display:flex; gap:22px; font-size:13.5px; align-items:center;}
+  .top-nav a{text-decoration:none; opacity:.8;} .top-nav a:hover{opacity:1; color:var(--paprika);}
+  .top-nav .pdf{opacity:1; font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; border:1px solid currentColor; padding:5px 10px;}
+  @media (max-width:700px){ .top-nav .hide-sm{display:none;} }
+
+  /* hero */
+  .hero{position:relative; overflow:hidden; color:var(--cream); padding:128px 0 84px;
+    background:radial-gradient(90% 70% at 85% 30%, #24507A 0%, var(--deep-2) 45%, var(--deep) 100%);}
+  .hero canvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; opacity:.9;}
+  .hero .wrap{position:relative; display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr); gap:56px; align-items:center;}
+  @media (max-width:880px){ .hero .wrap{grid-template-columns:1fr;} .hero .cover{max-width:300px;} }
+  .hero .eyebrow{color:var(--sky);}
+  .hero h1{font-size:clamp(36px,5.6vw,68px); line-height:1.02; margin-top:16px;}
+  .hero h1 em{font-style:italic; font-weight:400; color:var(--sky-2);}
+  .hero .sub{font-size:clamp(17px,1.9vw,19.5px); color:var(--cream-dim); margin:22px 0 0; max-width:620px;}
+  .byline{display:flex; flex-wrap:wrap; gap:8px 20px; margin-top:22px; font-family:var(--mono); font-size:12px; color:var(--cream-dim);}
+  .byline b{color:var(--cream); font-weight:500;}
+  .cta-row{display:flex; flex-wrap:wrap; gap:12px; margin-top:28px;}
+  .btn{display:inline-flex; align-items:center; gap:9px; padding:12px 18px; font-family:var(--mono); font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border:1px solid currentColor; color:inherit; transition:background .2s;}
+  .btn.primary{background:var(--brick); border-color:var(--brick); color:#FBF3E4;} .btn.primary:hover{background:#8A2618; border-color:#8A2618;}
+  .btn.ghost:hover{background:rgba(241,244,247,.08);}
+  .btn .arrow{transition:transform .25s;} .btn:hover .arrow{transform:translateX(3px);}
+  .cover{justify-self:center; width:100%; max-width:380px; transform:rotate(2.2deg); box-shadow:0 40px 70px -30px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.08); transition:transform .5s ease; text-decoration:none;}
+  .cover:hover{transform:rotate(0deg) translateY(-4px);}
+
+  .stats{background:var(--deep); color:var(--cream); border-top:1px solid var(--deep-line);}
+  .stats .grid{display:grid; grid-template-columns:repeat(4,1fr);}
+  .stat{padding:26px 22px; border-left:1px solid var(--deep-line);} .stat:first-child{border-left:none;}
+  .stat .n{font-family:var(--serif); font-size:clamp(32px,3.8vw,46px); line-height:1;}
+  .stat .l{font-family:var(--mono); font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--cream-dim); margin-top:10px;}
+  @media (max-width:760px){ .stats .grid{grid-template-columns:1fr 1fr;} .stat:nth-child(3){border-left:none;} .stat:nth-child(n+3){border-top:1px solid var(--deep-line);} }
+
+  section.blk{padding:92px 0; border-bottom:1px solid var(--line);}
+  @media (max-width:640px){ section.blk{padding:64px 0;} }
+  .sec-head{display:grid; grid-template-columns:120px 1fr; gap:24px; margin-bottom:42px;}
+  .sec-head .num{font-family:var(--mono); font-size:12px; color:var(--paprika); letter-spacing:.08em; padding-top:12px;}
+  .sec-head h2{font-size:clamp(30px,4.2vw,48px); line-height:1.06;}
+  .sec-head h2 em{font-style:italic; font-weight:400; color:#24507A;}
+  .sec-head p{font-size:18px; max-width:700px; margin:16px 0 0;}
+  @media (max-width:760px){ .sec-head{grid-template-columns:1fr; gap:6px;} .sec-head .num{padding-top:0;} }
+  .note{font-family:var(--mono); font-size:11.5px; color:var(--slate);}
+
+  /* why now */
+  .why{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  .why div{background:var(--card); padding:28px 24px;}
+  .why b{display:block; font-family:var(--serif); font-weight:500; font-size:clamp(44px,5vw,64px); line-height:1; color:#24507A;}
+  .why p{margin:12px 0 0; color:var(--slate); font-size:15px;}
+  @media (max-width:820px){ .why{grid-template-columns:1fr;} }
+  .quote{margin:44px 0 0; font-family:var(--serif); font-style:italic; font-size:clamp(24px,3vw,34px); line-height:1.25; max-width:820px;}
+  .quote cite{display:block; font-style:normal; font-family:var(--mono); font-size:11.5px; color:var(--slate); margin-top:10px; letter-spacing:.04em;}
+
+  /* landscape */
+  .land{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  @media (max-width:900px){ .land{grid-template-columns:1fr 1fr;} }
+  @media (max-width:520px){ .land{grid-template-columns:1fr;} }
+  .fam{background:var(--card); padding:20px 18px 22px; display:flex; flex-direction:column;}
+  .fam h3{font-size:20px; line-height:1.15;}
+  .fam .meta{font-family:var(--mono); font-size:11px; color:var(--slate); margin:8px 0 16px; line-height:1.5;}
+  .fam .chips{display:flex; flex-wrap:wrap; gap:7px; margin-top:auto;}
+  .chip{all:unset; cursor:pointer; font-family:var(--mono); font-size:13px; padding:6px 10px; border:1px solid var(--fc); color:var(--fc); background:#fff; transition:background .2s, color .2s;}
+  .chip:hover, .chip[aria-pressed="true"]{background:var(--fc); color:#fff;}
+  .chip:focus-visible{outline:2px solid var(--paprika); outline-offset:2px;}
+  .fam .bar{height:4px; background:var(--fc); margin:-20px -18px 16px;}
+  .detail{margin-top:18px; background:#fff; border:1px solid var(--line); border-left:4px solid var(--dc, #24507A); padding:18px 20px; min-height:96px; transition:border-color .3s;}
+  .detail h3{font-size:22px;} .detail .k{font-family:var(--mono); font-size:11px; color:var(--slate); letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px;}
+  .detail p{margin:8px 0 0; color:var(--ink); font-size:15px; max-width:820px;}
+
+  /* gaps */
+  .gaps{display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
+  @media (max-width:900px){ .gaps{grid-template-columns:1fr 1fr;} }
+  @media (max-width:520px){ .gaps{grid-template-columns:1fr;} }
+  .gap{border-top:2px solid var(--ink); padding-top:16px;}
+  .gap .i{font-family:var(--mono); font-size:12px; color:var(--paprika);}
+  .gap h3{font-size:22px; line-height:1.15; margin:8px 0;}
+  .gap p{margin:0; color:var(--slate); font-size:14.5px;}
+
+  /* principles */
+  .tiers{display:grid; grid-template-columns:repeat(3,1fr); gap:28px;}
+  @media (max-width:900px){ .tiers{grid-template-columns:1fr;} }
+  .tier h3{font-size:14px; font-family:var(--mono); font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:var(--slate); padding-bottom:10px; border-bottom:1px solid var(--line);}
+  .pr{border-bottom:1px solid var(--line);}
+  .pr button{all:unset; cursor:pointer; display:grid; grid-template-columns:34px 1fr 18px; gap:8px; width:100%; padding:14px 0; align-items:baseline; box-sizing:border-box;}
+  .pr button:focus-visible{outline:2px solid var(--paprika); outline-offset:2px;}
+  .pr .n{font-family:var(--mono); font-size:12px; color:var(--paprika);}
+  .pr .t{font-family:var(--serif); font-size:19px; line-height:1.25;}
+  .pr .pm{font-family:var(--mono); color:var(--slate); transition:transform .3s;}
+  .pr[open] .pm{transform:rotate(45deg);}
+  .pr .body{display:grid; grid-template-rows:0fr; transition:grid-template-rows .35s ease;}
+  .pr[open] .body{grid-template-rows:1fr;}
+  .pr .body > div{overflow:hidden;}
+  .pr .body p{margin:0 0 16px 42px; color:var(--slate); font-size:14.5px;}
+
+  /* recommendations */
+  .recs{counter-reset:rc; display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  @media (max-width:760px){ .recs{grid-template-columns:1fr;} }
+  .recs div{background:var(--card); padding:20px 22px;}
+  .recs .k{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--paprika);}
+  .recs h3{font-size:21px; margin:6px 0 6px;}
+  .recs p{margin:0; color:var(--slate); font-size:14.5px;}
+  .trigger{margin-top:36px; display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--line);}
+  .trigger div{padding:16px 16px; background:var(--tc); color:#fff;}
+  .trigger b{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; opacity:.85;}
+  .trigger span{font-family:var(--serif); font-size:18px; line-height:1.25; display:block; margin-top:6px;}
+  @media (max-width:760px){ .trigger{grid-template-columns:1fr 1fr;} }
+
+  /* role */
+  .role{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:48px;}
+  @media (max-width:860px){ .role{grid-template-columns:1fr;} }
+  .role h3{font-size:24px; margin-bottom:14px;}
+  .role ul{list-style:none; margin:0; padding:0;}
+  .role li{padding:12px 0; border-top:1px solid var(--line); font-size:15.5px; color:var(--slate);}
+  .role li b{color:var(--ink); font-weight:600;}
+  .venues{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+  .venues span{font-family:var(--mono); font-size:12px; padding:5px 10px; border:1px solid var(--ink);}
+  .authors{font-size:15px; color:var(--slate); line-height:1.8;}
+  .authors b{color:var(--ink); font-weight:600;}
+  .dl{display:grid; gap:12px; margin-top:24px;}
+  .dl a{display:grid; grid-template-columns:1fr auto; gap:4px 14px; align-items:center; text-decoration:none; padding:16px 18px; background:var(--card); border:1px solid var(--line); transition:background .2s, border-color .2s;}
+  .dl a:hover, .dl a:focus-visible{background:#fff; border-color:var(--ink);}
+  .dl b{font-family:var(--serif); font-weight:500; font-size:18px;} .dl span{font-family:var(--mono); font-size:11px; color:var(--slate);}
+  .dl em{grid-row:1 / span 2; grid-column:2; font-style:normal; font-family:var(--mono); color:var(--paprika); font-size:18px;}
+
+  footer{padding:56px 0 40px;}
+  footer .wrap{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; align-items:flex-end;}
+  footer h2{font-size:clamp(28px,4vw,40px);} footer h2 em{font-style:italic; font-weight:400; color:var(--paprika);}
+  footer .links{display:flex; flex-direction:column; gap:8px; align-items:flex-end;}
+  footer .links a{text-decoration:none; border-bottom:1px solid var(--line); font-size:15px;} footer .links a:hover{color:var(--paprika); border-color:var(--paprika);}
+  .fine{font-family:var(--mono); font-size:11px; color:var(--slate); padding-bottom:36px;}
+  .fine .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+
+  /* ===== outbreak hero ===== */
+  .hero{ cursor:crosshair; min-height:92vh; display:flex; align-items:center; padding-bottom:160px; }
+  .hero canvas#sim{ position:absolute; inset:0; width:100%; height:100%; opacity:1; pointer-events:none; }
+  .hero .wrap{ width:100%; }
+  .hero a, .hero .cover{ cursor:pointer; }
+  .hud{ position:absolute; left:28px; bottom:22px; z-index:2; font-family:var(--mono); font-size:11.5px; color:var(--cream-dim); pointer-events:none; }
+  .hud-row{ display:flex; flex-wrap:wrap; gap:6px 16px; align-items:center; }
+  .hud-row b{ color:var(--cream); font-weight:500; margin-right:4px; }
+  .hud-row i{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .hud .d-s{ background:rgba(190,220,245,.9); } .hud .d-i{ background:#F37A5A; } .hud .d-r{ background:rgba(140,160,180,.7); }
+  .hud-day{ color:#F37A5A; letter-spacing:.08em; text-transform:uppercase; }
+  .hud canvas{ display:block; margin-top:8px; width:300px; height:54px; border-bottom:1px solid var(--deep-line); }
+  .hud-note{ margin-top:6px; font-size:10.5px; opacity:.75; }
+  @media (max-width:880px){ .hud{ position:relative; left:auto; bottom:auto; margin:28px 18px 0; } .hero{ flex-direction:column; align-items:stretch; padding-bottom:40px; } .hud canvas{ width:100%; } }
+</style>
+<!-- seo-head -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#3B67B5">
+<link rel="canonical" href="https://bdornyei42.ben-dornyei.workers.dev/pandemic-risk">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bendegúz Dörnyei">
+<meta property="og:url" content="https://bdornyei42.ben-dornyei.workers.dev/pandemic-risk">
+<meta property="og:title" content="Advancing a Global Framework for Pandemic Risk Assessment">
+<meta property="og:description" content="A review of 11 risk tools, 59 documents and 27 expert consultations. 12 design principles for a next-generation pandemic risk assessment. With the UN Foundation and the Yale Jackson School, Dec 2025.">
+<meta property="og:image" content="https://bdornyei42.ben-dornyei.workers.dev/media/og/pandemic.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cover of Advancing a Global Framework for Pandemic Risk Assessment">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Report", "name": "Advancing a Global Framework for Pandemic Risk Assessment", "author": {"@type": "Person", "name": "Bendegúz Dörnyei", "url": "https://bdornyei42.ben-dornyei.workers.dev/"}, "funder": {"@type": "Organization", "name": "United Nations Foundation"}, "url": "https://bdornyei42.ben-dornyei.workers.dev/pandemic-risk", "image": "https://bdornyei42.ben-dornyei.workers.dev/media/og/pandemic.jpg", "inLanguage": "en"}</script>
+<!-- /seo-head -->
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+
+<header class="topbar" id="topbar">
+  <div class="wrap">
+    <a class="mark" href="/">B. DÖRNYEI</a>
+    <nav class="top-nav" aria-label="Report sections">
+      <a href="#landscape" class="hide-sm">Tools</a>
+      <a href="#principles" class="hide-sm">Principles</a>
+      <a href="/#gallery">Projects</a>
+      <a class="pdf" href="files/pandemic-risk-assessment-framework-2025.pdf" target="_blank" rel="noopener">PDF</a>
+    </nav>
+  </div>
+</header>
+
+<header class="hero" id="hero">
+  <canvas id="sim" aria-label="Animated outbreak simulation on a contact network; click to seed a new outbreak"></canvas>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Policy report · UN Foundation and Yale Jackson · Dec 2025</div>
+      <h1>Advancing a Global Framework for Pandemic Risk Assessment</h1>
+      <p class="sub">A review of 11 pandemic risk and preparedness tools, based on 59 documents and 27 expert consultations. The report sets out 12 design principles for a next-generation assessment.</p>
+      <div class="byline"><span><b>Co-author</b>, with eight Yale colleagues</span><span>For the United Nations Foundation</span></div>
+      <div class="cta-row">
+        <a class="btn primary" href="files/pandemic-risk-assessment-framework-2025.pdf" target="_blank" rel="noopener">Read the report <span class="arrow">→</span></a>
+        <a class="btn ghost" href="#landscape">See the tools</a>
+      </div>
+    </div>
+    <a class="cover" href="files/pandemic-risk-assessment-framework-2025.pdf" target="_blank" rel="noopener" aria-label="Open the report PDF"><img src="media/pandemic/cover.webp" alt="Report cover: Advancing a Global Framework for Pandemic Risk Assessment, December 2025, produced in collaboration with the United Nations Foundation and Yale Jackson School of Global Affairs"></a>
+  </div>
+  <div class="hud" aria-hidden="true">
+    <div class="hud-row"><span class="hud-day" id="hud-day">day 0</span><span><i class="d-s"></i><b id="hud-s">0</b> susceptible</span><span><i class="d-i"></i><b id="hud-i">0</b> infected</span><span><i class="d-r"></i><b id="hud-r">0</b> recovered</span></div>
+    <canvas id="curve" width="300" height="54"></canvas>
+    <div class="hud-note">Illustrative outbreak on a contact network. Click to restart.</div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="wrap grid">
+    <div class="stat"><div class="n" data-count="11">11</div><div class="l">Risk &amp; preparedness tools reviewed</div></div>
+    <div class="stat"><div class="n" data-count="59">59</div><div class="l">Documents in the scoping review</div></div>
+    <div class="stat"><div class="n" data-count="27">27</div><div class="l">Expert consultations</div></div>
+    <div class="stat"><div class="n" data-count="12">12</div><div class="l">Design principles</div></div>
+  </div>
+</div>
+
+<main>
+<section class="blk" id="why">
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="num">01</div><div><h2>A COVID-like pandemic has a 2–3% chance each year</h2><p>Models that include climate change, global interconnectedness, urbanization and biodiversity loss predict pandemics far more often. No single tool tracks every driver of the risk.</p></div></div>
+    <div class="why reveal">
+      <div><b>2–3%</b><p>estimated annual probability of a COVID-like pandemic</p></div>
+      <div><b>~50%</b><p>chance of one emerging within the next 25 years</p></div>
+      <div><b>0.6%</b><p>of global income lost each year to expected pandemic losses</p></div>
+    </div>
+    <p class="note" style="margin-top:10px;">Figures from the report’s introduction.</p>
+    <blockquote class="quote reveal">“If evidence generated does not shift policy, then what is the point?”<cite>Expert consultant, interviewed for the report</cite></blockquote>
+  </div>
+</section>
+
+<section class="blk" id="landscape">
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="num">02</div><div><h2>Eleven tools in four families</h2><p>The tools include WHO accountability instruments and Moody’s catastrophe models. Each covers part of the risk. Select a tool for details.</p></div></div>
+    <div class="land reveal" id="land"></div>
+    <div class="detail reveal" id="detail" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="blk" id="gaps">
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="num">03</div><div><h2>Four gaps in existing tools</h2><p>Preparedness indices are descriptive and pathogen tools are narrow. Few models produce decision-ready outputs.</p></div></div>
+    <div class="gaps reveal">
+      <div class="gap"><span class="i">01</span><h3>Static variables</h3><p>Tools rely on fixed inputs and update irregularly, which hurts timeliness and prediction.</p></div>
+      <div class="gap"><span class="i">02</span><h3>No subnational data</h3><p>National averages hide local differences in risk and capacity.</p></div>
+      <div class="gap"><span class="i">03</span><h3>Little political context</h3><p>Trust, polarization and misinformation affect outbreaks and compliance. Tools barely include them.</p></div>
+      <div class="gap"><span class="i">04</span><h3>Weak economic links</h3><p>Tools rarely link risk to economic and fiscal impact, which finance ministries and funders use to decide.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="principles">
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="num">04</div><div><h2>Twelve design principles for a new tool</h2><p>The principles come from the gaps in existing frameworks and from expert views on how the tools are used. They are grouped in three tiers.</p></div></div>
+    <div class="tiers reveal" id="tiers"></div>
+  </div>
+</section>
+
+<section class="blk" id="recs">
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="num">05</div><div><h2>What the report recommends</h2><p>The report proposes a modular assessment ecosystem based in an independent institution. It would express risk in money and link it to actions agreed in advance.</p></div></div>
+    <div class="recs reveal">
+      <div><span class="k">Foundational</span><h3>Governance and mandate</h3><p>Share ownership across global, regional and national levels for legitimacy and buy-in. State the purpose publicly, publish the methods and show uncertainty as ranges.</p></div>
+      <div><span class="k">Architecture</span><h3>Subnational and sociopolitical data</h3><p>Use local data even when incomplete. Treat trust and polarization as core determinants.</p></div>
+      <div><span class="k">Architecture</span><h3>Ecological drivers and live data</h3><p>Put climate, land use and antimicrobial resistance at the center. Use a modular design with automated data feeds and versioned updates.</p></div>
+      <div><span class="k">Outputs</span><h3>Outputs for decision-makers</h3><p>Frame outputs for each user and express risk as cost of inaction and ROI. Link risk tiers to predefined responses.</p></div>
+    </div>
+    <div class="trigger reveal" aria-label="Example of tiered triggers">
+      <div style="--tc:#3E6F9E"><b>Tier 1</b><span>Escalate surveillance</span></div>
+      <div style="--tc:#2C5580"><b>Tier 2</b><span>Targeted investments</span></div>
+      <div style="--tc:#1F3F63"><b>Tier 3</b><span>Surge financing</span></div>
+      <div style="--tc:#A8321E"><b>Tier 4</b><span>Activate playbooks</span></div>
+    </div>
+    <p class="note" style="margin-top:10px;">Each tier triggers a predefined action. The four actions are examples from the report.</p>
+  </div>
+</section>
+
+<section class="blk" id="role" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="num">06</div><div><h2>My work on the report</h2></div></div>
+    <div class="role reveal">
+      <div>
+        <h3>What I did</h3>
+        <ul>
+          <li><b>Pandemic Risk Consultant</b>, United Nations Foundation (part-time), April–December 2025.</li>
+          <li><b>Co-authored</b> the report, including the scoping review of 11 global risk tools and the synthesis behind the design principles.</li>
+          <li><b>Ran expert consultations</b> across multilateral organizations, academia, finance, nonprofits and the private sector.</li>
+          <li><b>Presented the findings</b> at:</li>
+        </ul>
+        <div class="venues"><span>World Health Organization</span><span>UN Headquarters</span><span>Columbia University</span><span>Mount Sinai</span></div>
+        <p class="note" style="margin-top:22px;">The UN Foundation plans to use the findings, with the National Academy of Medicine, to build a scientific agenda for pandemic risk assessment before the 2026 UN High-Level Meeting on Pandemic Preparedness and Response.</p>
+      </div>
+      <div>
+        <h3>Authors</h3>
+        <p class="authors">Mason Abrell, Ethan Chiu, <b>Bendegúz Dörnyei</b>, Sloane Huey, Yana Jayampathy, Lee-Ann Kao, Catalina Mahe, Nathan Mu, Jaimee Nguyen. Supported by the United Nations Foundation and the Yale Jackson School of Global Affairs.</p>
+        <div class="dl">
+          <a href="files/pandemic-risk-assessment-framework-2025.pdf" target="_blank" rel="noopener"><b>Full report</b><span>PDF · 60 pages · 4.8 MB</span><em>↓</em></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>More work</h2>
+    <div class="links">
+      <a href="/#gallery">More projects →</a>
+      <a href="thesis">Parliamentary discourse in Hungary →</a>
+      <a href="mailto:ben.dornyei@gmail.com">ben.dornyei@gmail.com</a>
+      <a href="https://www.linkedin.com/in/ben-dornyei/" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+<div class="fine"><div class="wrap"><span>© 2026 Bendegúz Dörnyei</span><a href="/" style="text-decoration:none;">← Home</a></div></div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, r=document) => r.querySelector(s), $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+  const bar = $('#topbar'), hero = $('#hero');
+  const onScroll = () => { bar.classList.toggle('scrolled', scrollY > 8); bar.classList.toggle('solid', hero.getBoundingClientRect().bottom < 60); };
+  addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  /* hero: an SIR outbreak spreading over a drifting contact network. Illustrative, not a forecast. */
+  (() => {
+    const cv = $('#sim'), ctx = cv.getContext('2d'), cc = $('#curve'), cx2 = cc.getContext('2d');
+    const S = 0, I = 1, R = 2, LINK = 92, P_INFECT = .045, REC_MIN = 70, REC_MAX = 130;
+    let W, H, nodes = [], day = 0, tick = 0, hist = [], raf, visible = true, idle = 0;
+    const size = () => { const r = devicePixelRatio || 1; W = cv.clientWidth; H = cv.clientHeight; cv.width = W * r; cv.height = H * r; ctx.setTransform(r, 0, 0, r, 0, 0);
+      const n = Math.round(Math.min(260, Math.max(90, W * H / 6500)));
+      nodes = Array.from({length:n}, () => ({x:Math.random() * W, y:Math.random() * H, vx:(Math.random() - .5) * .35, vy:(Math.random() - .5) * .35, st:S, t:0, ph:Math.random() * 6.28}));
+      seed(); };
+    const seed = (x, y) => { nodes.forEach(n => { n.st = S; n.t = 0; }); day = 0; tick = 0; hist = []; idle = 0;
+      let best = nodes[0], bd = 1e9; const tx = x ?? W * (.2 + Math.random() * .6), ty = y ?? H * (.25 + Math.random() * .5);
+      nodes.forEach(n => { const d = (n.x - tx) ** 2 + (n.y - ty) ** 2; if (d < bd){ bd = d; best = n; } });
+      best.st = I; best.t = REC_MIN + Math.random() * (REC_MAX - REC_MIN); };
+    const step = () => {
+      for (const a of nodes){ a.x += a.vx; a.y += a.vy; if (a.x < 0 || a.x > W) a.vx *= -1; if (a.y < 0 || a.y > H) a.vy *= -1; }
+      const inf = nodes.filter(n => n.st === I);
+      for (const a of inf){ for (const b of nodes){ if (b.st !== S) continue; const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < LINK && Math.random() < P_INFECT * (1 - d / LINK)){ b.st = I; b.t = REC_MIN + Math.random() * (REC_MAX - REC_MIN); } }
+        if (--a.t <= 0) a.st = R; }
+      tick++; if (tick % 6 === 0){ day++; const c = [0, 0, 0]; nodes.forEach(n => c[n.st]++); hist.push(c[I]); if (hist.length > 300) hist.shift();
+        $('#hud-day').textContent = 'day ' + day; $('#hud-s').textContent = c[S]; $('#hud-i').textContent = c[I]; $('#hud-r').textContent = c[R];
+        if (!c[I] && ++idle > 25) seed(); }
+    };
+    const draw = t => {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < nodes.length; i++){ const a = nodes[i];
+        for (let j = i + 1; j < nodes.length; j++){ const b = nodes[j], d = Math.hypot(a.x - b.x, a.y - b.y); if (d > LINK) continue;
+          const hot = (a.st === I && b.st !== R) || (b.st === I && a.st !== R);
+          ctx.strokeStyle = hot ? `rgba(240,120,90,${(1 - d / LINK) * .55})` : `rgba(150,195,235,${(1 - d / LINK) * .14})`;
+          ctx.lineWidth = hot ? 1.2 : 1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); } }
+      for (const n of nodes){
+        if (n.st === I){ const pu = (Math.sin(t / 260 + n.ph) + 1) / 2; ctx.fillStyle = `rgba(240,110,80,${.1 + pu * .18})`; ctx.beginPath(); ctx.arc(n.x, n.y, 7 + pu * 9, 0, 6.283); ctx.fill(); ctx.fillStyle = '#F37A5A'; ctx.beginPath(); ctx.arc(n.x, n.y, 3, 0, 6.283); ctx.fill(); }
+        else if (n.st === R){ ctx.fillStyle = 'rgba(140,160,180,.45)'; ctx.beginPath(); ctx.arc(n.x, n.y, 1.8, 0, 6.283); ctx.fill(); }
+        else { ctx.fillStyle = 'rgba(190,220,245,.85)'; ctx.beginPath(); ctx.arc(n.x, n.y, 2, 0, 6.283); ctx.fill(); } }
+      // epidemic curve
+      cx2.clearRect(0, 0, cc.width, cc.height); const mx = Math.max(10, ...hist);
+      cx2.beginPath(); hist.forEach((v, i) => { const x = i / 299 * cc.width, y = cc.height - 2 - v / mx * (cc.height - 6); i ? cx2.lineTo(x, y) : cx2.moveTo(x, y); });
+      cx2.strokeStyle = '#F37A5A'; cx2.lineWidth = 1.5; cx2.stroke();
+    };
+    const loop = t => { if (!reduce) step(); draw(t); if (visible && !reduce) raf = requestAnimationFrame(loop); };
+    size(); if (reduce){ for (let k = 0; k < 260; k++) step(); } loop(0);
+    addEventListener('resize', () => { cancelAnimationFrame(raf); size(); loop(0); });
+    hero.addEventListener('click', e => { if (e.target.closest('a')) return; const r = cv.getBoundingClientRect(); seed(e.clientX - r.left, e.clientY - r.top); if (reduce){ for (let k = 0; k < 120; k++) step(); loop(0); } });
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; cancelAnimationFrame(raf); if (visible && !reduce) raf = requestAnimationFrame(loop); }).observe(hero);
+  })();
+
+  const triggers = new Map(), when = (el, fn) => triggers.set(el, fn);
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return;
+    e.target.classList.add('in'); const fn = triggers.get(e.target); if (fn){ fn(); triggers.delete(e.target); } io.unobserve(e.target); }), {threshold:0, rootMargin:'0px 0px -12% 0px'}) : null;
+  const watch = el => io ? io.observe(el) : (el.classList.add('in'), triggers.get(el)?.());
+
+
+
+  /* counters */
+  $$('.stat .n[data-count]').forEach(el => { const to = +el.dataset.count; if (reduce) return;
+    when(el, () => { const t0 = performance.now(); const st = t => { const p = Math.min(1, (t - t0) / 1100); el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }); watch(el); });
+
+  /* landscape */
+  const FAM = [
+    {n:'Preparedness benchmarking', c:'#3E6F9E', purpose:'Assess capacities and preparedness', unit:'Country', out:'Scores, rankings, recommendations',
+      t:[['JEE','Joint External Evaluation'],['GHSI','Global Health Security Index'],['SPAR','States Parties Self-Assessment Annual Report'],['GPMB','Global Preparedness Monitoring Board']]},
+    {n:'Pathogen-specific risk assessment', c:'#A8321E', purpose:'Evaluate the risk posed by a pathogen', unit:'Pathogen & country', out:'Risk level ratings',
+      t:[['IRAT','Influenza Risk Assessment Tool (CDC, 2010). Scores influenza A strains circulating in animals on emergence and impact, using ten indicators. It ranks strains against each other and does not predict.'],
+         ['TIPRA','Tool for Influenza Pandemic Risk Assessment'],
+         ['PSAF','Pandemic Severity Assessment Framework (CDC, 2013). Rates early influenza pandemics on clinical severity and transmissibility. Works only after sustained human-to-human spread begins.']]},
+    {n:'Broad risk assessment', c:'#2F6B48', purpose:'Evaluate epidemic and pandemic risk', unit:'Country', out:'Risk level ratings',
+      t:[['INFORM-EPI','Index for Risk Management Epidemic Risk Index'],['CFA','Center for Forecasting and Outbreak Analytics risk assessments (CDC)']]},
+    {n:'Forecasting & modeling platforms', c:'#7A62C4', purpose:'Simulate and predict epidemic dynamics', unit:'Population or region', out:'Simulations, projections, risk maps',
+      t:[['GLEAM','Global Epidemic and Mobility project (Northeastern University & ISI Foundation, 2011). Simulates spread from pathogen traits, mobility, demographics and climate, using detailed local inputs. Weak for pathogens that have not yet emerged.'],
+         ['RMS-IDM','Moody’s RMS Infectious Disease Model (first built 2006). Probabilistic and subnational, written for risk managers who are not epidemiologists. Proprietary, so its predictive record is hard to assess.']]},
+  ];
+  $('#land').innerHTML = FAM.map((f, i) => `<div class="fam" style="--fc:${f.c}"><div class="bar"></div><h3>${f.n}</h3><div class="meta">${f.purpose}<br>Unit: ${f.unit}<br>Outputs: ${f.out}</div><div class="chips">${f.t.map(([a], j) => `<button type="button" class="chip" data-f="${i}" data-t="${j}" aria-pressed="false">${a}</button>`).join('')}</div></div>`).join('');
+  const detail = $('#detail');
+  function pick(i, j){ const f = FAM[i], [a, d] = f.t[j], dot = d.indexOf('. ');
+    const name = dot > 0 && d.length > 80 ? d.slice(0, dot) : d, more = dot > 0 && d.length > 80 ? d.slice(dot + 2) : '';
+    $$('.chip').forEach(c => c.setAttribute('aria-pressed', +c.dataset.f === i && +c.dataset.t === j));
+    detail.style.setProperty('--dc', f.c);
+    detail.innerHTML = `<div class="k">${f.n}</div><h3>${a} · <span style="font-weight:400">${name}</span></h3><p>${more || `${f.purpose}, at the level of ${f.unit.toLowerCase()}; produces ${f.out.toLowerCase()}.`}</p>`; }
+  $$('.chip').forEach(c => c.addEventListener('click', () => pick(+c.dataset.f, +c.dataset.t)));
+  pick(3, 1);
+
+  /* principles */
+  const PR = [
+    ['Foundational', [['Clarity of purpose','Say what a tool is for. Preparedness diagnostics get judged as crisis forecasts and are seen to “fail”.'],
+      ['Data governance','Clear standards for collecting, using and sharing data. Surveillance across humans, animals and the environment.'],
+      ['Transparency of methods','Document methods, sources, weights and assumptions. Disclose how proprietary inputs are used.'],
+      ['Ownership structure','Mix country-level and independent ownership for legitimacy and national buy-in.']]],
+    ['Architecture & operations', [['Inclusion of emerging risks','Include climate change, biodiversity loss, urbanization, interconnectedness and AI as risk drivers.'],
+      ['Political & social context','Include trust, political will and misinformation. They are hard to measure but affect outcomes.'],
+      ['Real-time, dynamic updates','Automated data feeds and frequent updates in place of static probabilities that go out of date.'],
+      ['Quantify uncertainty','Report ranges, confidence levels and assumptions so decision-makers can weigh the evidence.']]],
+    ['Outputs & use', [['Global to subnational','Use local data, even when incomplete, in place of national averages.'],
+      ['Versatility for users','One underlying assessment, framed for finance ministries, health agencies, multilaterals and funders.'],
+      ['Economic & cost-benefit analysis','Express risk as cost of inaction, fiscal exposure and return on investment.'],
+      ['Risk tiers for decisions','Tie each risk level to a predefined action.']]],
+  ];
+  let n = 0;
+  $('#tiers').innerHTML = PR.map(([h, items]) => `<div class="tier"><h3>${h}</h3>${items.map(([t, d]) => { n++; return `<div class="pr"><button type="button" aria-expanded="false"><span class="n">${String(n).padStart(2, '0')}</span><span class="t">${t}</span><span class="pm">+</span></button><div class="body"><div><p>${d}</p></div></div></div>`; }).join('')}</div>`).join('');
+  $$('.pr button').forEach(b => b.addEventListener('click', () => { const p = b.parentElement, open = !p.hasAttribute('open'); p.toggleAttribute('open', open); b.setAttribute('aria-expanded', open); }));
+  $$('.tier').forEach(t => { const first = t.querySelector('.pr'); first.setAttribute('open', ''); first.querySelector('button').setAttribute('aria-expanded', 'true'); });
+
+  $$('.reveal').forEach(watch);
+})();
+</script>
+</body>
+</html>

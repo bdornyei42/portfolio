@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Connection Tracker (Demo) — B. Dörnyei</title>
+<title>Connection Tracker (Demo) · Bendegúz Dörnyei</title>
 <meta name="description" content="Portfolio demo of a personal network tracker — an interactive map of people, groups, and how they connect. Seeded with fake sample data.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -330,6 +330,24 @@
   }
 </style>
 <script src="frame.js" defer></script>
+<!-- seo-head -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#3B67B5">
+<link rel="canonical" href="https://bdornyei42.ben-dornyei.workers.dev/connections">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bendegúz Dörnyei">
+<meta property="og:url" content="https://bdornyei42.ben-dornyei.workers.dev/connections">
+<meta property="og:title" content="Connection Tracker (Demo) · Bendegúz Dörnyei">
+<meta property="og:description" content="Portfolio demo of a personal network tracker — an interactive map of people, groups, and how they connect. Seeded with fake sample data.">
+<meta property="og:image" content="https://bdornyei42.ben-dornyei.workers.dev/media/og/home.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bendegúz “Ben” Dörnyei">
+<meta name="twitter:card" content="summary_large_image">
+<!-- /seo-head -->
 </head>
 <body>
 
@@ -460,35 +478,35 @@ function seedData(){
   const G = (id,name,color,x,y)=>({id,name,color,x,y});
   const groups = [
     G('g_fam','Family','#C1440E', 900, 700),
-    G('g_yale','Yale','#2F4A3D', 1900, 620),
+    G('g_yale','University','#2F4A3D', 1900, 620),
     G('g_startup','Startup World','#B98A1F', 1500, 1500),
-    G('g_policy','UN / Policy','#3E6B7A', 2650, 1350),
+    G('g_policy','Policy','#3E6B7A', 2650, 1350),
     G('g_mentor','Mentors','#7A4A6B', 2500, 500),
   ];
   const P = (o)=>Object.assign({kind:'person', hobbies:[], likes:[], funFacts:[], helpAreas:[], tags:[], timeline:[], cadence:0}, o);
   const people = [
-    P({id:'p1', name:'Anna Kovács', role:'Sister', group:'g_fam', birthday:'1999-08-27', location:'Budapest, HU',
+    P({id:'p1', name:'Maya Torres', role:'Sister', group:'g_fam', birthday:'1999-08-27', location:'Austin, TX',
        hobbies:['pottery','trail running'], likes:['matcha','vinyl records'], funFacts:['Speaks 4 languages','Once biked across Croatia'],
-       help:'Native German speaker — proofreads anything I write in German and knows the Berlin startup scene.', helpAreas:['German','Intros'],
+       help:'Fluent in Spanish — proofreads anything I write in Spanish and knows the Austin startup scene.', helpAreas:['Spanish','Intros'],
        tags:['family','close'], cadence:30,
-       contact:'anna@example.com', lastContact:'2026-08-10', notes:'Call more often.',
+       contact:'maya@example.com', lastContact:'2026-08-10', notes:'Call more often.',
        timeline:[{date:'2026-08-10',type:'call',text:'Long call — she\'s moving flats next month.'}], x:760, y:820}),
-    P({id:'p2', name:'Levente Kovács', role:'Father', group:'g_fam', birthday:'1968-03-12', location:'Budapest, HU',
+    P({id:'p2', name:'Rafael Torres', role:'Father', group:'g_fam', birthday:'1968-03-12', location:'San Antonio, TX',
        hobbies:['woodworking','chess'], likes:['espresso','history podcasts'], funFacts:['Built the family cabin by hand'],
        help:'30 years in manufacturing — great sounding board for anything operations or supply-chain.', helpAreas:['Operations','Advice'],
        contact:'', lastContact:'2026-08-18', notes:'', x:1040, y:840}),
-    P({id:'p3', name:'Dr. Priya Menon', role:'Thesis advisor', group:'g_yale', birthday:'1979-11-04', location:'New Haven, CT',
+    P({id:'p3', name:'Dr. Priya Menon', role:'Thesis advisor', group:'g_yale', birthday:'1979-11-04', location:'Boston, MA',
        hobbies:['birdwatching'], likes:['strong tea','field data'], funFacts:['Has a lake named after a beetle she catalogued'],
        help:'Statistics & causal inference. Will read drafts and connect me to the environmental-data lab.', helpAreas:['Statistics','Research','Intros'],
        contact:'p.menon@example.edu', lastContact:'2026-07-30', notes:'Office hours Thu 2pm.', x:1780, y:760}),
-    P({id:'p4', name:'Marcus Lee', role:'Roommate / SDS major', group:'g_yale', birthday:'2003-05-19', location:'New Haven, CT',
+    P({id:'p4', name:'Marcus Lee', role:'Roommate / stats major', group:'g_yale', birthday:'2003-05-19', location:'Boston, MA',
        hobbies:['climbing','lo-fi beats'], likes:['ramen','mechanical keyboards'], funFacts:['Ranked top-100 in a chess app'],
        help:'Ridiculously good at Python & data viz — my go-to for debugging D3 and pandas.', helpAreas:['Coding','Data viz'],
        contact:'marcus@example.edu', lastContact:'2026-08-19', notes:'', x:2050, y:800}),
     P({id:'p5', name:'Sofia Almeida', role:'Startup co-founder', group:'g_startup', birthday:'1997-02-02', location:'Lisbon, PT',
        hobbies:['surfing','sketching'], likes:['flat whites','risk decks'], funFacts:['Pitched on live TV at 22'],
        help:'Fundraising & pitch coaching. Warm intros to a dozen EU angels.', helpAreas:['Fundraising','Intros','Pitching'],
-       company:'Startup Maffia', tags:['work','founder'], cadence:30,
+       company:'Northbound Labs', tags:['work','founder'], cadence:30,
        contact:'sofia@example.com', lastContact:'2026-06-15', notes:'Owes me a coffee.', x:1360, y:1600}),
     P({id:'p6', name:'Tomás Reyes', role:'Product designer', group:'g_startup', birthday:'1995-09-30', location:'Remote',
        hobbies:['film photography','cooking'], likes:['negronis','Figma'], funFacts:['Shot a documentary in Patagonia'],
@@ -496,7 +514,7 @@ function seedData(){
        contact:'', lastContact:'2026-05-20', notes:'', x:1660, y:1640}),
     P({id:'p7', name:'Amina Diallo', role:'Program officer', group:'g_policy', birthday:'1988-12-08', location:'New York, NY',
        hobbies:['jazz','marathons'], likes:['bookstores','policy briefs'], funFacts:['Ran the NYC marathon 3x'],
-       help:'Knows the UN DESA hiring cycle inside-out and how to get a memo read.', helpAreas:['Policy','Careers','Intros'],
+       help:'Knows public-sector hiring cycles inside-out and how to get a memo read.', helpAreas:['Policy','Careers','Intros'],
        contact:'amina@example.org', lastContact:'2026-07-01', notes:'', x:2540, y:1250}),
     P({id:'p8', name:'James Okoro', role:'Data-for-good lead', group:'g_policy', birthday:'1985-06-21', location:'Geneva, CH',
        hobbies:['cycling','open data'], likes:['maps','GIS'], funFacts:['Maintains a popular open-data package'],
@@ -1388,7 +1406,7 @@ function gatherGroup(id){
 
 function startAddPerson(){ selectedId=null; document.querySelectorAll('.node.selected').forEach(n=>n.classList.remove('selected')); editPerson(null); }
 function startAddGroup(){
-  const name=prompt('New group name (e.g. “Family”, “Yale”, “Investors”):','');
+  const name=prompt('New group name (e.g. “Family”, “University”, “Investors”):','');
   if(!name||!name.trim())return;
   const s=$('stage').getBoundingClientRect(); const v=state.view;
   const g={id:uid(), name:name.trim(), color:PALETTE[state.groups.length%PALETTE.length],

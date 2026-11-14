@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Year Planner — demo · B. Dörnyei</title>
+<title>Year Planner (Demo) · Bendegúz Dörnyei</title>
+<meta name="description" content="Demo of a personal year planner, seeded with sample data and running entirely in your browser.">
 <meta name="robots" content="index, follow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -332,6 +333,24 @@
   .imp-opt input[type=checkbox]{width:auto; margin-top:3px;}
 </style>
 <script src="frame.js" defer></script>
+<!-- seo-head -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#3B67B5">
+<link rel="canonical" href="https://bdornyei42.ben-dornyei.workers.dev/planner-demo">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bendegúz Dörnyei">
+<meta property="og:url" content="https://bdornyei42.ben-dornyei.workers.dev/planner-demo">
+<meta property="og:title" content="Year Planner (Demo) · Bendegúz Dörnyei">
+<meta property="og:description" content="Demo of a personal year planner, seeded with sample data and running entirely in your browser.">
+<meta property="og:image" content="https://bdornyei42.ben-dornyei.workers.dev/media/og/home.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bendegúz “Ben” Dörnyei">
+<meta name="twitter:card" content="summary_large_image">
+<!-- /seo-head -->
 </head>
 <body>
 
@@ -380,7 +399,7 @@
    ============================================================ */
 const CONFIG = {
   MODE: "demo",            // "demo" | "real"
-  STORAGE_KEY: "yp-demo-v1",  // localStorage cache key
+  STORAGE_KEY: "yp-demo-v2",  // localStorage cache key (v2: neutral sample courses)
   DEMO: true,
   BACKEND: false,        // true => sync to Cloudflare KV via API
   API: "",             // planner API endpoint (real build only)
@@ -1243,7 +1262,7 @@ function openCourse(id=null){
       <div class="m-head"><h2>${c?"Edit course":"Add course"}</h2><button class="x" onclick="closeOverlay()">×</button></div>
       <div class="m-body">
         <div class="f-row">
-          <label class="f"><span class="lb">Course code</span><input type="text" id="c-code" value="${esc(cur.code)}" placeholder="GLBL 6539"></label>
+          <label class="f"><span class="lb">Course code</span><input type="text" id="c-code" value="${esc(cur.code)}" placeholder="PUBP 610"></label>
           <label class="f"><span class="lb">Title</span><input type="text" id="c-title" value="${esc(cur.title)}" placeholder="Mission-Driven Innovation"></label>
         </div>
         <div class="f-row">
@@ -1661,7 +1680,7 @@ function parseSyllabus(text){
   const codes=[...raw.matchAll(/\b([A-Z]{2,4})\s?(\d{3,4})\b/g)].map(m=>`${m[1]} ${m[2]}`);
   if(codes.length){ p.code=[...new Set(codes)].slice(0,3).join(" / "); }
 
-  // title from a "CODE: Title" line if present (e.g. "GLBL 5006: Fundamentals of …")
+  // title from a "CODE: Title" line if present (e.g. "PUBP 501: Foundations of …")
   const titleLineM=raw.match(/^[A-Z]{2,4}\s?\d{3,4}[A-Za-z0-9\/ ]*:\s*(.+)$/m);
   if(titleLineM){
     p.title=titleLineM[1].replace(/\s+(Fall|Spring|Summer|Winter|Autumn)\s+20\d{2}\s*$/i,"").trim();
@@ -1846,32 +1865,32 @@ function seedDemo(base){
   base.terms=[term]; base.activeTermId=term.id;
   const mk=(mi,dd)=>`2026-${pad(mi)}-${pad(dd)}`;
 
-  // Course 1: Mission-Driven Innovation (from the example syllabus)
-  const c1={id:"c1",termId:term.id,code:"GLBL 6539",title:"Mission-Driven Innovation",instructor:"S. Drummond, PhD",location:"Divinity School",days:[4],start:"13:30",end:"15:25",color:"#C1440E"};
+  // Course 1: Social Innovation Studio (from the example syllabus)
+  const c1={id:"c1",termId:term.id,code:"PUBP 610",title:"Social Innovation Studio",instructor:"E. Marsh, PhD",location:"Hall 3B",days:[4],start:"13:30",end:"15:25",color:"#C1440E"};
   // Course 2
-  const c2={id:"c2",termId:term.id,code:"S&DS 3200",title:"Statistical Inference",instructor:"J. Reyes",location:"Kline Tower 210",days:[1,3],start:"11:35",end:"12:50",color:"#2F4A3D"};
+  const c2={id:"c2",termId:term.id,code:"STAT 320",title:"Statistical Inference",instructor:"J. Reyes",location:"Science Bldg 210",days:[1,3],start:"11:35",end:"12:50",color:"#2F4A3D"};
   // Course 3
-  const c3={id:"c3",termId:term.id,code:"GLBL 5040",title:"Global Policy Practicum",instructor:"A. Okafor",location:"Horchow Hall",days:[2],start:"16:00",end:"17:50",color:"#3A6EA5"};
+  const c3={id:"c3",termId:term.id,code:"PUBP 540",title:"Policy Practicum",instructor:"A. Okafor",location:"Commons 12",days:[2],start:"16:00",end:"17:50",color:"#3A6EA5"};
   base.courses=[c1,c2,c3];
 
   const ev=[];
   const add=(o)=>ev.push({id:uid(),termId:term.id,done:false,weight:null,time:null,notes:"",...o});
 
-  // GLBL 6539 sessions (Thursdays) with topics
-  const s1=[["09","03","Introduction"],["09","10","Framing"],["09","17","Formulating a Problem Statement"],["09","24","World Café Workshop"],["10","01","Listening & Sensing"],["10","08","Stakeholder & Systems Mapping"],["10","15","Community Building"],["10","29","Design Hackathon"],["11","05","Planning & Evaluation"],["11","12","Revenue & Financing"],["11","19","Governance"],["12","03","Wrap-up & Next Steps"]];
+  // PUBP 610 sessions (Thursdays) with topics
+  const s1=[["09","03","Kickoff"],["09","10","Defining the Problem"],["09","17","User Research"],["09","24","Studio Workshop"],["10","01","Field Interviews"],["10","08","Systems Mapping"],["10","15","Partnerships"],["10","29","Prototype Sprint"],["11","05","Measuring Impact"],["11","12","Funding Models"],["11","19","Scaling Up"],["12","03","Final Showcase"]];
   s1.forEach(([m,d,t2])=>add({courseId:"c1",type:"class",title:"Class · "+t2,date:mk(m,d),time:"13:30",auto:true}));
-  // GLBL 6539 deadlines
-  add({courseId:"c1",type:"assignment",title:"Essay on Personal Framing",date:mk("09","09"),weight:15});
-  add({courseId:"c1",type:"assignment",title:"Problem Statement",date:mk("09","30"),weight:15});
-  add({courseId:"c1",type:"assignment",title:"Logic Model",date:mk("11","18"),weight:20});
-  add({courseId:"c1",type:"assignment",title:"Final Reflection",date:mk("12","09"),weight:20});
-  // GLBL 6539 breaks
+  // PUBP 610 deadlines
+  add({courseId:"c1",type:"assignment",title:"Opening Reflection",date:mk("09","09"),weight:15});
+  add({courseId:"c1",type:"assignment",title:"Problem Brief",date:mk("09","30"),weight:15});
+  add({courseId:"c1",type:"assignment",title:"Theory of Change",date:mk("11","18"),weight:20});
+  add({courseId:"c1",type:"assignment",title:"Final Portfolio",date:mk("12","09"),weight:20});
+  // PUBP 610 breaks
   add({courseId:"c1",type:"holiday",title:"Fall break",date:mk("10","22")});
   add({courseId:"c1",type:"holiday",title:"Thanksgiving",date:mk("11","26")});
   // a couple readings
-  add({courseId:"c1",type:"reading",title:"Ch. 1, Social Entrepreneurship",date:mk("09","17")});
+  add({courseId:"c1",type:"reading",title:"Reading: Ch. 1, Design for Impact",date:mk("09","17")});
 
-  // S&DS 3200 — MW classes (subset for demo look), a midterm + final + psets
+  // STAT 320 — MW classes (subset for demo look), a midterm + final + psets
   [["09","07"],["09","14"],["09","21"],["09","28"],["10","05"],["10","12"],["10","19"],["11","02"],["11","09"],["11","16"]].forEach(([m,d])=>{
     add({courseId:"c2",type:"class",title:"Lecture",date:mk(m,d),time:"11:35",auto:true});
   });
@@ -1881,7 +1900,7 @@ function seedDemo(base){
   add({courseId:"c2",type:"assignment",title:"Problem Set 3",date:mk("11","06"),weight:8});
   add({courseId:"c2",type:"exam",title:"Final Exam",date:mk("12","15"),weight:35});
 
-  // GLBL 5040 — Tuesdays, a memo + presentation + final paper
+  // PUBP 540 — Tuesdays, a memo + presentation + final paper
   [["09","08"],["09","15"],["09","29"],["10","06"],["10","13"],["11","03"],["11","10"],["11","17"]].forEach(([m,d])=>{
     add({courseId:"c3",type:"class",title:"Seminar",date:mk(m,d),time:"16:00",auto:true});
   });
@@ -1896,40 +1915,40 @@ function seedDemo(base){
 
   // sample recurring project/study blocks for the weekly schedule
   base.blocks=[
-    {id:"b1",termId:term.id,title:"Thesis writing",days:[1,3],start:"08:00",end:"09:30",color:"#7A4E7E",notes:""},
+    {id:"b1",termId:term.id,title:"Capstone writing",days:[1,3],start:"08:00",end:"09:30",color:"#7A4E7E",notes:""},
     {id:"b2",termId:term.id,title:"RA hours",days:[5],start:"13:00",end:"16:00",color:"#4C6663",notes:"Prof. Okafor's project"},
     {id:"b3",termId:term.id,title:"Gym",days:[1,3,5],start:"17:30",end:"18:30",color:"#3A7D44",notes:""},
   ];
 }
 
 /* the example syllabus text for the importer's "Use example" button */
-const EXAMPLE_SYLLABUS = `REL 8100 | GLBL 6539 | MGT 660
-Mission-Driven Innovation
+const EXAMPLE_SYLLABUS = `PUBP 610 | DES 520
+Social Innovation Studio
 Fall 2026
-Sarah Drummond, PhD and Teresa Chahine, ScD
+Elena Marsh, PhD and Omar Haddad, PhD
 Thursdays 1:30-3:25
 
 Course Deliverables:
-Engaged Participation (30%)
-Essay on Personal Framing due Sept 9 (15%)
-Problem Statement, due Sept 30 (15%)
-Logic Model, due Nov 18 (20%)
-Final reflection, due Dec 9 (20%)
+Participation (30%)
+Opening Reflection due Sept 9 (15%)
+Problem Brief, due Sept 30 (15%)
+Theory of Change, due Nov 18 (20%)
+Final Portfolio, due Dec 9 (20%)
 
-Session One. Thursday, Sept 3: Introduction
-Session Two. Thursday, Sept 10: Framing
-Session Three. Thursday, Sept 17: Formulating a Problem Statement
-Session Four. Thursday, Sept 24: Group Exercise, World Café Workshop
-Session Five. Thursday, Oct 1: Listening and Sensing in Social Innovation
-Session Six. Thursday, Oct 8: Stakeholder Analysis and Systems Mapping
-Session Seven. Thursday, Oct 15: Community Building and Relationship Building
+Session One. Thursday, Sept 3: Kickoff
+Session Two. Thursday, Sept 10: Defining the Problem
+Session Three. Thursday, Sept 17: User Research
+Session Four. Thursday, Sept 24: Studio Workshop
+Session Five. Thursday, Oct 1: Field Interviews
+Session Six. Thursday, Oct 8: Systems Mapping
+Session Seven. Thursday, Oct 15: Partnerships
 (Thursday Oct 22 is off for fall break)
-Session Eight. Thursday, Oct 29: Design Hackathon
-Session Nine. Thursday, Nov 5: Planning and Evaluation
-Session Ten. Thursday, Nov 12: Revenue & Financing
-Session Eleven. Thursday, Nov 19: Governance
+Session Eight. Thursday, Oct 29: Prototype Sprint
+Session Nine. Thursday, Nov 5: Measuring Impact
+Session Ten. Thursday, Nov 12: Funding Models
+Session Eleven. Thursday, Nov 19: Scaling Up
 (Thursday Nov 26 is off for Thanksgiving)
-Session Twelve. Thursday, Dec 3: Wrap-up, Implications and Next Steps`;
+Session Twelve. Thursday, Dec 3: Final Showcase`;
 
 /* boot */
 boot();

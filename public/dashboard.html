@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Budget Dashboard (Demo) — B. Dörnyei</title>
+<title>Budget Dashboard (Demo) · Bendegúz Dörnyei</title>
 <meta name="description" content="Portfolio demo of a personal finance dashboard — net worth, spending, investments, and monthly forecasting. Seeded with fake sample data, running entirely in your browser.">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -166,8 +166,27 @@
   .fc .fcell .k{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--slate);}
   .fc .fcell .v{font-family:'IBM Plex Mono',monospace; font-size:22px; margin-top:5px;}
   @media (max-width:720px){ .recurform{grid-template-columns:1fr 1fr;} .fc{grid-template-columns:1fr;} }
+  @media (max-width:640px){ table{display:block; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;} }
 </style>
 <script src="frame.js" defer></script>
+<!-- seo-head -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#3B67B5">
+<link rel="canonical" href="https://bdornyei42.ben-dornyei.workers.dev/dashboard">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bendegúz Dörnyei">
+<meta property="og:url" content="https://bdornyei42.ben-dornyei.workers.dev/dashboard">
+<meta property="og:title" content="Budget Dashboard (Demo) · Bendegúz Dörnyei">
+<meta property="og:description" content="Portfolio demo of a personal finance dashboard — net worth, spending, investments, and monthly forecasting. Seeded with fake sample data, running entirely in your browser.">
+<meta property="og:image" content="https://bdornyei42.ben-dornyei.workers.dev/media/og/home.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bendegúz “Ben” Dörnyei">
+<meta name="twitter:card" content="summary_large_image">
+<!-- /seo-head -->
 </head>
 <body>
 
@@ -179,7 +198,7 @@
   <div class="status" id="status"><span class="dot"></span>Loading…</div>
 
   <div class="notice demo-notice">
-    <b>This is a portfolio demo.</b> Every account, balance, holding and transaction below is fake sample data, generated fresh in your browser — nothing here touches a real bank or brokerage. It's the same interface I use privately, where a script pulls real transactions from SimpleFin Bridge, auto-categorizes them, and syncs holdings; that version runs on my own machine and behind auth, never on a public server. Edits you make here stay in this tab only and reset when you close it.
+    <b>This is a portfolio demo.</b> Every account, balance, holding and transaction below is fake sample data, generated fresh in your browser — nothing here touches a real bank or brokerage. It's the same interface I use privately, where a script pulls real transactions from a bank-data aggregator, auto-categorizes them, and syncs holdings; that version runs on my own machine and behind auth, never on a public server. Edits you make here stay in this tab only and reset when you close it.
   </div>
 
   <div id="synced-empty" class="notice" style="display:none;"></div>
@@ -267,7 +286,7 @@
       <h2>Add a manual transaction</h2>
       <form id="entry" onsubmit="addTx(event)">
         <div><label>Date</label><input type="date" id="f-date" required></div>
-        <div><label>Merchant</label><input type="text" id="f-merchant" placeholder="Blue Bottle" required></div>
+        <div><label>Merchant</label><input type="text" id="f-merchant" placeholder="Corner Coffee" required></div>
         <div><label>Amount ($)</label><input type="number" step="0.01" id="f-amount" placeholder="-6.50" required></div>
         <div><label>Category</label><select id="f-category"></select></div>
         <button type="submit">Add</button>
@@ -293,7 +312,7 @@
   <!-- ============ INVESTMENTS ============ -->
   <div class="tabpage" id="tab-investments">
     <div id="inv-empty" class="notice" style="display:none;">
-      <b>No investment accounts yet.</b> Once your Schwab (or other brokerage) connection syncs, its holdings appear here — positions, growth, and the Roth-vs-taxable split. Investment accounts are the ones SimpleFin returns with a <span class="mono">holdings</span> list.
+      <b>No investment accounts yet.</b> Once a brokerage connection syncs, its holdings appear here — positions, growth, and the Roth-vs-taxable split. Investment accounts are the ones the aggregator returns with a <span class="mono">holdings</span> list.
     </div>
     <div id="inv-body" style="display:none;">
       <div class="tiles" id="inv-tiles"></div>
@@ -333,7 +352,7 @@
 
   <!-- ============ RECURRING ============ -->
   <div class="tabpage" id="tab-recurring">
-    <div class="muted" style="margin-top:22px;">Set the fixed money that comes and goes every month — rent, subscriptions, and the weekly Jackson School stipend — so you always see what's committed. <span id="recur-save" class="savebadge"></span></div>
+    <div class="muted" style="margin-top:22px;">Set the fixed money that comes and goes every month — rent, subscriptions, and your paycheck — so you always see what's committed. <span id="recur-save" class="savebadge"></span></div>
 
     <section>
       <h2>Monthly forecast</h2>
@@ -916,7 +935,7 @@
   function renderRecurring(){
     // list
     const list = document.getElementById('recur-list');
-    if (!recurring.length){ list.innerHTML='<div class="muted">No recurring items yet. Add rent, subscriptions, or the weekly stipend below.</div>'; }
+    if (!recurring.length){ list.innerHTML='<div class="muted">No recurring items yet. Add rent, subscriptions, or your paycheck below.</div>'; }
     else {
       const order = {weekly:0,biweekly:1,monthly:2};
       list.innerHTML = recurring.slice().sort((a,b)=>(a.flow===b.flow?monthlyEquiv(b)-monthlyEquiv(a):a.flow==='in'?-1:1)).map(r=>{
@@ -1036,7 +1055,7 @@
   }
 
   /* ---------- demo sample data (fake, generated in-browser) ----------
-     Mirrors the shape the real Worker returns from SimpleFin: bank + credit +
+     Mirrors the shape the real Worker returns from the aggregator: bank + credit +
      investment accounts (with holdings), plus ~10 months of categorized
      transactions so every chart, the investments tab, and recurring-detection
      all have something to show. Nothing here is real. */
@@ -1049,15 +1068,15 @@
     const pick = arr => arr[Math.floor(rnd()*arr.length)];
     const amt = (lo,hi)=> -(Math.round((lo + rnd()*(hi-lo))*100)/100);  // negative = spend
 
-    const CARD='Chase Sapphire', CARD2='Quicksilver Card', CHK='Chase Total Checking', CHK2='360 Checking';
+    const CARD='Rewards Visa', CARD2='Cash-Back Card', CHK='Everyday Checking', CHK2='Online Checking';
     const M = {
-      Coffee:['SQ *BLUE BOTTLE',"Peet's Coffee",'Starbucks','Gregorys Coffee'],
-      'Food & Dining':['TST* SWEETGREEN','Chipotle','Shake Shack',"Joe's Pizza",'Thai Villa','Dig Inn'],
-      Groceries:["Trader Joe's",'Whole Foods Market','Fairway Market'],
-      Transport:['MTA*METROCARD','Uber','Lyft','Shell Oil'],
-      Shopping:['Amazon.com','Uniqlo','MUJI','Apple Store'],
-      Health:['CVS Pharmacy','Rite Aid'],
-      Travel:['Amtrak','Delta Air Lines','Airbnb'],
+      Coffee:['SQ *CORNER COFFEE CO','Bean & Leaf','Daily Grind','Lantern Espresso'],
+      'Food & Dining':['TST* GREENBOWL','Taco Stand','Burger Bros','Slice House','Noodle Bar','Market Kitchen'],
+      Groceries:['FreshMart','Green Grocer','Harvest Co-op'],
+      Transport:['CITY TRANSIT*FARE','RideShare Trip','CityCab','Fuel Stop'],
+      Shopping:['Online Marketplace','Threadline Apparel','Home & Co.','Tech Depot'],
+      Health:['Neighborhood Pharmacy','WellCare Clinic'],
+      Travel:['Regional Rail','SkyLine Air','StayAway Rentals'],
     };
 
     const tx=[]; let id=1;
@@ -1074,53 +1093,53 @@
       if (rnd()<0.04) push(d,CARD2,pick(M.Health),amt(8,60),'Health');
       if (rnd()<0.02) push(d,CARD,pick(M.Travel),amt(80,420),'Travel');
       // monthly fixed costs
-      if (dom===1)  push(d,CHK,'Landlord LLC RENT',-1450,'Rent/Housing');
-      if (dom===4)  push(d,CARD,'Spotify USA',-11.99,'Subscriptions');
-      if (dom===9)  push(d,CARD,'Netflix.com',-15.49,'Subscriptions');
-      if (dom===12) push(d,CARD,'OpenAI ChatGPT',-20.00,'Subscriptions');
-      if (dom===15) push(d,CHK,'Con Edison',amt(58,92),'Bills/Utilities');
-      if (dom===18) push(d,CHK,'Verizon Wireless',-45.00,'Bills/Utilities');
-      if (dom===6)  push(d,CARD2,'Blink Fitness',-34.00,'Health');
+      if (dom===1)  push(d,CHK,'Oak St Property Mgmt RENT',-1450,'Rent/Housing');
+      if (dom===4)  push(d,CARD,'Music Stream Plus',-11.99,'Subscriptions');
+      if (dom===9)  push(d,CARD,'Video Stream Co',-15.49,'Subscriptions');
+      if (dom===12) push(d,CARD,'Cloud Storage Pro',-20.00,'Subscriptions');
+      if (dom===15) push(d,CHK,'City Power & Light',amt(58,92),'Bills/Utilities');
+      if (dom===18) push(d,CHK,'Mobile Co Wireless',-45.00,'Bills/Utilities');
+      if (dom===6)  push(d,CARD2,'Neighborhood Gym',-34.00,'Health');
       // income
-      if (dow===5)  push(d,CHK,'YALE JACKSON STIPEND',425,'Income');
-      if (dom===2||dom===17) push(d,CHK2,'WORLD BANK PAYROLL',1850,'Income');
+      if (dow===5)  push(d,CHK,'FREELANCE CLIENT PMT',425,'Income');
+      if (dom===2||dom===17) push(d,CHK2,'ACME ANALYTICS PAYROLL',1850,'Income');
       // transfers (card payments / savings) — excluded from spend math
-      if (dom===22){ push(d,CHK,'CHASE CREDIT CRD AUTOPAY',-650,'Transfer'); push(d,CARD,'Payment Thank You',650,'Transfer'); }
-      if (dom===25) push(d,CHK2,'Transfer to Performance Savings',-400,'Transfer');
+      if (dom===22){ push(d,CHK,'CARD AUTOPAY',-650,'Transfer'); push(d,CARD,'Payment Thank You',650,'Transfer'); }
+      if (dom===25) push(d,CHK2,'Transfer to High-Yield Savings',-400,'Transfer');
     }
 
     const accounts = [
-      { org:'Chase', name:CHK, balance:4215.62, type:'depository' },
-      { org:'Chase', name:CARD, balance:-1863.40, type:'credit' },
-      { org:'Capital One', name:CHK2, balance:2648.19, type:'depository' },
-      { org:'Capital One', name:CARD2, balance:-742.11, type:'credit' },
-      { org:'Capital One', name:'Performance Savings', balance:15400.00, type:'depository' },
-      { org:'Charles Schwab', name:'Roth IRA', type:'investment', balance:16680, holdings:[
-        { symbol:'VTI',  description:'Vanguard Total Stock Market ETF',       shares:40, marketValue:10800, costBasis:8200 },
-        { symbol:'VXUS', description:'Vanguard Total International Stock ETF', shares:60, marketValue:3720,  costBasis:3400 },
-        { symbol:'BND',  description:'Vanguard Total Bond Market ETF',        shares:30, marketValue:2160,  costBasis:2250 },
+      { org:'Northwind Bank', name:CHK, balance:4215.62, type:'depository' },
+      { org:'Northwind Bank', name:CARD, balance:-1863.40, type:'credit' },
+      { org:'Harbor Credit Union', name:CHK2, balance:2648.19, type:'depository' },
+      { org:'Harbor Credit Union', name:CARD2, balance:-742.11, type:'credit' },
+      { org:'Harbor Credit Union', name:'High-Yield Savings', balance:15400.00, type:'depository' },
+      { org:'Summit Investing', name:'Roth IRA', type:'investment', balance:16680, holdings:[
+        { symbol:'TOTAL', description:'Total Market Index Fund',       shares:40, marketValue:10800, costBasis:8200 },
+        { symbol:'INTL', description:'International Index Fund', shares:60, marketValue:3720,  costBasis:3400 },
+        { symbol:'BOND', description:'Total Bond Index Fund',        shares:30, marketValue:2160,  costBasis:2250 },
       ]},
-      { org:'Charles Schwab', name:'Individual Brokerage', type:'investment', balance:20685, holdings:[
-        { symbol:'VOO',  description:'Vanguard S&P 500 ETF', shares:15, marketValue:7500, costBasis:6300 },
-        { symbol:'AAPL', description:'Apple Inc.',           shares:25, marketValue:5625, costBasis:4100 },
-        { symbol:'MSFT', description:'Microsoft Corp.',      shares:12, marketValue:5160, costBasis:3800 },
-        { symbol:'NVDA', description:'NVIDIA Corp.',         shares:20, marketValue:2400, costBasis:1500 },
+      { org:'Summit Investing', name:'Taxable Brokerage', type:'investment', balance:20685, holdings:[
+        { symbol:'LARGE', description:'Large-Cap Index Fund', shares:15, marketValue:7500, costBasis:6300 },
+        { symbol:'TECH', description:'Technology Sector Fund',           shares:25, marketValue:5625, costBasis:4100 },
+        { symbol:'DIVG', description:'Dividend Growth Fund',      shares:12, marketValue:5160, costBasis:3800 },
+        { symbol:'SMALL', description:'Small-Cap Index Fund',         shares:20, marketValue:2400, costBasis:1500 },
       ]},
-      { org:'Charles Schwab', name:'Traditional IRA (Rollover)', type:'investment', balance:8800, holdings:[
-        { symbol:'SCHB', description:'Schwab U.S. Broad Market ETF',    shares:80,  marketValue:4800, costBasis:4200 },
-        { symbol:'SCHF', description:'Schwab International Equity ETF',  shares:100, marketValue:4000, costBasis:3900 },
+      { org:'Summit Investing', name:'Traditional IRA (Rollover)', type:'investment', balance:8800, holdings:[
+        { symbol:'TOTAL', description:'Total Market Index Fund',    shares:80,  marketValue:4800, costBasis:4200 },
+        { symbol:'INTL', description:'International Index Fund',  shares:100, marketValue:4000, costBasis:3900 },
       ]},
     ];
 
     const goals = { categories:{ 'Food & Dining':350, 'Coffee':80, 'Groceries':400, 'Shopping':200, 'Subscriptions':60 } };
     const overrides = {};   // start clean so visitors can try re-filing a category tag
     const recurring = [
-      { id:'r-rent',    name:'Landlord LLC RENT',   amount:1450,  flow:'out', cadence:'monthly',  category:'Rent/Housing' },
-      { id:'r-spotify', name:'Spotify USA',         amount:11.99, flow:'out', cadence:'monthly',  category:'Subscriptions' },
-      { id:'r-netflix', name:'Netflix.com',         amount:15.49, flow:'out', cadence:'monthly',  category:'Subscriptions' },
-      { id:'r-gym',     name:'Blink Fitness',       amount:34,    flow:'out', cadence:'monthly',  category:'Health' },
-      { id:'r-stipend', name:'Yale Jackson Stipend',amount:425,   flow:'in',  cadence:'weekly',   category:'Income' },
-      { id:'r-payroll', name:'World Bank Payroll',  amount:1850,  flow:'in',  cadence:'biweekly', category:'Income' },
+      { id:'r-rent',    name:'Oak St Property Mgmt RENT',   amount:1450,  flow:'out', cadence:'monthly',  category:'Rent/Housing' },
+      { id:'r-spotify', name:'Music Stream Plus',         amount:11.99, flow:'out', cadence:'monthly',  category:'Subscriptions' },
+      { id:'r-netflix', name:'Video Stream Co',         amount:15.49, flow:'out', cadence:'monthly',  category:'Subscriptions' },
+      { id:'r-gym',     name:'Neighborhood Gym',       amount:34,    flow:'out', cadence:'monthly',  category:'Health' },
+      { id:'r-stipend', name:'Freelance Client',amount:425,   flow:'in',  cadence:'weekly',   category:'Income' },
+      { id:'r-payroll', name:'Acme Analytics Payroll',  amount:1850,  flow:'in',  cadence:'biweekly', category:'Income' },
     ];
 
     return { accounts, transactions:tx, goals, overrides, recurring };

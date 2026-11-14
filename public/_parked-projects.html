@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selected Work · Dörnyei</title>
+<meta name="description" content="Selected research and projects by Bendegúz (Ben) Dörnyei: an NLP pipeline for Hungarian parliamentary transcripts, a global pandemic risk assessment framework, the 2026 Environmental Performance Index, and Sterling Admissions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2420; --paper:#E7EAE1; --paper-2:#DCE0D3; --card:#F3F5EF;
+    --paprika:#C1440E; --brick:#A8321E; --forest:#2F4A3D; --slate:#55625C; --line:rgba(27,36,32,0.14);
+    --night:#101915; --cream:#F3EEDF; --cream-dim:rgba(243,238,223,.68);
+    --serif:'Newsreader', Georgia, serif; --mono:'IBM Plex Mono', ui-monospace, monospace; --sans:'Public Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  a{color:inherit;} img{max-width:100%; display:block;}
+  h1,h2,h3{font-family:var(--serif); font-weight:500; margin:0; letter-spacing:-0.01em;}
+  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--paprika);}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 28px;}
+  @media (max-width:640px){ .wrap{padding:0 18px;} }
+  a:focus-visible, button:focus-visible{outline:2px solid var(--paprika); outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important; transition-delay:0ms !important;} }
+  .js .reveal{opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s ease;}
+  .js .reveal.in{opacity:1; transform:none;}
+
+  header.topbar{position:sticky; top:0; z-index:20; backdrop-filter:blur(6px); background:rgba(231,234,225,.86); border-bottom:1px solid var(--line);}
+  .topbar .wrap{display:flex; justify-content:space-between; align-items:center; padding-top:16px; padding-bottom:16px;}
+  .mark{font-family:var(--mono); font-size:13px; letter-spacing:.05em; text-decoration:none;}
+  nav.top-nav{display:flex; gap:24px; font-size:14px;} nav.top-nav a{text-decoration:none; color:var(--slate);} nav.top-nav a:hover{color:var(--paprika);}
+
+  .intro{padding:84px 0 44px;}
+  .intro h1{font-size:clamp(44px,7vw,84px); line-height:.98; margin-top:14px;}
+  .intro h1 em{font-style:italic; font-weight:400; color:var(--forest);}
+  .intro p{max-width:620px; font-size:19px; margin:20px 0 0;}
+  .index{display:flex; flex-wrap:wrap; gap:8px 26px; margin-top:30px; font-family:var(--mono); font-size:12.5px; color:var(--slate);}
+  .index a{text-decoration:none;} .index a:hover{color:var(--paprika);} .index b{color:var(--paprika); font-weight:500; margin-right:6px;}
+  /* intro art: a framed detail of Pál Szinyei Merse's Meadow with Poppies (public domain); the pointer pans the view */
+  .intro{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,280px); gap:28px 52px; align-items:end;}
+  .intro-art{margin:0; min-width:0;}
+  .intro-art .frame{position:relative; aspect-ratio:4/5; overflow:hidden; border:1px solid var(--line); background:#5b7a2f; box-shadow:0 26px 40px -30px rgba(27,36,32,.55); outline:6px solid var(--card); outline-offset:-7px;}
+  .intro-art img{width:100%; height:100%; object-fit:cover; object-position:64% 70%; transform:scale(1.04); transition:object-position 1.2s cubic-bezier(.2,.8,.2,1), transform 1.2s ease;}
+  .intro-art .frame:hover img{transform:scale(1.1);}
+  .intro-art figcaption{margin-top:10px; font-family:var(--mono); font-size:11px; letter-spacing:.04em; color:var(--slate);}
+  .intro-art figcaption em{font-family:var(--serif); font-size:13px; letter-spacing:0; color:var(--ink);}
+  @media (max-width:860px){ .intro{grid-template-columns:1fr;} .intro-art .frame{aspect-ratio:3/1;} .intro-art img{object-position:60% 62%;} }
+  @media (prefers-reduced-motion: reduce){ .intro-art img, .intro-art .frame:hover img{transform:none;} }
+
+  /* featured thesis */
+  .feat{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); background:var(--night); color:var(--cream); text-decoration:none; position:relative; overflow:hidden; border:1px solid var(--night);}
+  @media (max-width:860px){ .feat{grid-template-columns:1fr;} }
+  .feat .tc{position:absolute; left:0; right:0; top:0; height:4px; display:flex;} .feat .tc i{flex:1;} .feat .tc i:nth-child(1){background:#B5321A;} .feat .tc i:nth-child(2){background:#F3EEDF;} .feat .tc i:nth-child(3){background:#2F6B48;}
+  .feat .txt{padding:44px 40px 40px; display:flex; flex-direction:column;}
+  @media (max-width:640px){ .feat .txt{padding:34px 22px 26px;} }
+  .feat .eyebrow{color:#F0A27A;}
+  .feat h2{font-size:clamp(30px,3.6vw,44px); line-height:1.05; margin:14px 0 14px;}
+  .feat h2 em{font-style:italic; font-weight:400; color:#F0A27A;}
+  .feat p{color:var(--cream-dim); margin:0; font-size:16px; max-width:480px;}
+  .feat .kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(243,238,223,.14); border:1px solid rgba(243,238,223,.14); margin:28px 0 28px;}
+  .feat .kpis div{background:var(--night); padding:12px 12px;}
+  .feat .kpis b{display:block; font-family:var(--serif); font-weight:500; font-size:24px; line-height:1.1;}
+  .feat .kpis span{font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--cream-dim);}
+  .go{margin-top:auto; font-family:var(--mono); font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; display:inline-flex; gap:9px; align-items:center;}
+  .go .arrow{transition:transform .25s;} a:hover .go .arrow{transform:translateX(4px);}
+  .feat .go{color:#F0A27A;}
+  .feat .viz{position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:40px 26px 30px; background:radial-gradient(80% 70% at 50% 100%, #1f3029, var(--night) 70%);}
+  .feat .viz svg{width:100%; max-width:520px; height:auto; overflow:visible;}
+  .feat .viz circle{transition:fill .7s ease;}
+  .feat .viz .yr{font-family:var(--serif); font-size:40px; line-height:1; margin-top:-62px; position:relative;}
+  .feat .viz .gv{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--cream-dim); margin-top:6px; min-height:16px;}
+
+  /* project rows */
+  .projects{display:grid; gap:28px; margin-top:28px;}
+  .proj{display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr); background:var(--card); border:1px solid var(--line); text-decoration:none; color:var(--ink); transition:border-color .25s, box-shadow .25s, transform .25s;}
+  div.proj:hover{transform:none;}
+  .proj a.go:hover{color:var(--brick);}
+  .proj:hover, .proj:focus-visible{border-color:var(--ink); box-shadow:0 22px 40px -32px rgba(27,36,32,.6); transform:translateY(-2px);}
+  .proj.flip{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);} .proj.flip .txt{order:2;}
+  @media (max-width:860px){ .proj, .proj.flip{grid-template-columns:1fr;} .proj.flip .txt{order:0;} }
+  .proj .txt{padding:36px 36px 32px; display:flex; flex-direction:column;}
+  @media (max-width:640px){ .proj .txt{padding:28px 20px 24px;} }
+  .proj .eyebrow{color:var(--forest);}
+  .proj h2{font-size:clamp(26px,3vw,36px); line-height:1.08; margin:12px 0 12px;}
+  .proj p{margin:0 0 14px; color:var(--slate); font-size:15.5px; max-width:520px;}
+  .proj .role{font-family:var(--mono); font-size:11.5px; color:var(--ink); letter-spacing:.03em; margin-bottom:22px;}
+  .proj .go{color:var(--paprika);}
+  .proj .vis{position:relative; overflow:hidden; min-height:300px; border-left:1px solid var(--line);}
+  .proj.flip .vis{border-left:none; border-right:1px solid var(--line);}
+  @media (max-width:860px){ .proj .vis, .proj.flip .vis{border:none; border-top:1px solid var(--line); min-height:240px;} }
+
+  .v-pan{background:radial-gradient(90% 80% at 70% 30%, #24507A, #0F2338); display:flex; align-items:center; justify-content:center; padding:30px;}
+  .v-pan img{width:58%; max-width:260px; transform:rotate(-3deg); box-shadow:0 30px 50px -24px rgba(0,0,0,.7); transition:transform .5s ease;}
+  .proj:hover .v-pan img{transform:rotate(0deg) scale(1.03);}
+  .v-pan .tag{position:absolute; right:16px; bottom:14px; font-family:var(--mono); font-size:11px; color:rgba(241,244,247,.8); letter-spacing:.05em;}
+
+  .v-epi{background:#F7F8F3; padding:30px 28px; display:flex; flex-direction:column; justify-content:center; gap:20px;}
+  .epi-n{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .epi-n b{display:block; font-family:var(--serif); font-weight:500; font-size:42px; line-height:1; color:#2F6B48;}
+  .epi-n span{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--slate);}
+  .epi-bar{display:flex; height:58px; border:1px solid var(--line);}
+  .epi-bar div{display:flex; align-items:flex-end; padding:6px 8px; color:#fff; font-family:var(--mono); font-size:10.5px; line-height:1.25; width:0; transition:width 1.1s cubic-bezier(.2,.8,.2,1); overflow:hidden;}
+  .epi-bar div b{font-weight:500; display:block; font-size:13px;}
+  .epi-cap{font-family:var(--mono); font-size:11px; color:var(--slate);}
+
+  .v-sa{background:linear-gradient(160deg, #24304A 0%, #121a2b 100%); color:#EEF1F6; padding:30px 28px; display:flex; flex-direction:column; justify-content:center; gap:14px;}
+  .portal{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .portal div{border:1px solid rgba(238,241,246,.2); padding:14px 12px 12px; background:rgba(255,255,255,.03); transition:background .3s, transform .3s;}
+  .proj:hover .portal div{background:rgba(255,255,255,.07);}
+  .proj:hover .portal div:nth-child(2){transform:translateY(-4px);}
+  .portal b{display:block; font-family:var(--serif); font-weight:500; font-size:19px;}
+  .portal span{font-family:var(--mono); font-size:10.5px; color:rgba(238,241,246,.65); letter-spacing:.04em;}
+  .portal i{display:block; height:5px; background:rgba(238,241,246,.16); margin-top:10px;} .portal i + i{width:70%; margin-top:6px;}
+  .badges{display:flex; flex-wrap:wrap; gap:8px;} .badges span{font-family:var(--mono); font-size:11px; border:1px solid rgba(238,241,246,.35); padding:4px 9px; color:#EEF1F6;}
+
+  .v-lsms{background:#F7F8F3; padding:24px 22px 18px; display:flex; flex-direction:column; gap:10px;}
+  .v-lsms svg{width:100%; height:auto; display:block; overflow:visible;}
+  .v-lsms svg text{font-family:var(--mono); font-size:10px; fill:var(--slate);}
+  .v-lsms .bar{fill:#2F6B48; transition:height .9s cubic-bezier(.2,.8,.2,1), y .9s cubic-bezier(.2,.8,.2,1);}
+  .v-lsms .bar.part{fill:#9DB89F;}
+  .v-lsms .share{fill:none; stroke:#C1440E; stroke-width:2; stroke-dasharray:900; stroke-dashoffset:900; transition:stroke-dashoffset 1.6s ease .4s;}
+  .v-lsms.go .share{stroke-dashoffset:0;}
+  .lsms-head{display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px 14px; font-family:var(--mono); font-size:11px; color:var(--slate);}
+  .lsms-head span:last-child{display:inline-flex; align-items:center; gap:5px;}
+  .lsms-head i{display:inline-block; width:9px; height:9px;}
+  .lsms-foot{font-family:var(--mono); font-size:10.5px; color:var(--slate);}
+  .v-egov{background:#F7F8F3; padding:26px 22px 18px; display:flex; flex-direction:column; justify-content:center; gap:14px;}
+  .egov-head{display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:4px 12px; min-height:46px;}
+  .egov-head b{font-family:var(--serif); font-weight:500; font-size:22px; line-height:1.15;}
+  .egov-head span{font-family:var(--mono); font-size:12px; color:var(--slate);}
+  .egov-strip{display:grid; grid-template-columns:repeat(20, minmax(0,1fr)); gap:3px; width:100%; align-self:stretch;}
+  .egov-strip i{display:block; width:100%; aspect-ratio:1; border-radius:50%; transform:scale(0); transition:transform .4s cubic-bezier(.3,1.6,.5,1), outline-color .2s; outline:2px solid transparent; outline-offset:1px;}
+  .v-egov.go .egov-strip i{transform:scale(1);}
+  .egov-strip i.hu{outline-color:var(--ink);}
+  .egov-strip i:hover{outline-color:var(--paprika);}
+  .egov-key{display:flex; flex-wrap:wrap; gap:6px 14px; font-family:var(--mono); font-size:11px; color:var(--slate);}
+  .egov-key span{display:inline-flex; align-items:center; gap:6px;} .egov-key i{width:9px; height:9px; border-radius:50%; display:inline-block;}
+  .v-maffia{background:#111214; color:#F4F2EC; padding:30px 28px; display:flex; flex-direction:column; justify-content:center; gap:4px;
+    background-image:radial-gradient(rgba(244,242,236,.12) 1px, transparent 1px); background-size:18px 18px;}
+  .mf-tag{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#7FD6E8;}
+  .mf-tt{font-family:var(--sans); font-weight:700; text-transform:uppercase; font-size:clamp(32px,4vw,48px); line-height:.92; letter-spacing:-.01em; margin-top:8px;}
+  .mf-2{-webkit-text-stroke:1.2px #F4F2EC; color:transparent; margin-top:22px;}
+  .mf-en{font-family:var(--mono); font-size:11.5px; color:rgba(244,242,236,.66); margin-top:6px;}
+  .proj:hover .mf-2{color:#FF5C7A; -webkit-text-stroke-color:#FF5C7A; transition:color .3s;}
+  .more{margin:64px 0 0; border-top:1px solid var(--line); padding-top:28px; display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  .more a{background:var(--card); padding:22px 24px; text-decoration:none; transition:background .2s;}
+  .more a:hover{background:#fff;}
+  .more .eyebrow{color:var(--forest);} .more h3{font-size:21px; margin:8px 0 4px;} .more p{margin:0; color:var(--slate); font-size:14.5px;}
+  @media (max-width:760px){ .more{grid-template-columns:1fr;} }
+
+  footer{padding:72px 0 40px;}
+  footer .wrap{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; align-items:flex-end;}
+  footer h2{font-size:clamp(30px,5vw,44px);} footer h2 em{font-style:italic; font-weight:400;}
+  footer .links{display:flex; flex-direction:column; gap:8px; align-items:flex-end;}
+  footer .links a{text-decoration:none; border-bottom:1px solid var(--line); font-size:15px;} footer .links a:hover{color:var(--paprika); border-color:var(--paprika);}
+  .fine{font-family:var(--mono); font-size:11px; color:var(--slate); padding-bottom:36px;}
+  .fine .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+
+  /* ===== the constellation ===== */
+  .sky{ position:relative; margin:0 0 34px; height:min(62vw, 560px); min-height:380px; background:radial-gradient(120% 100% at 30% 0%, #1d2a3f 0%, #0d1220 55%, #070a12 100%); overflow:hidden; color:#EEF1F6; }
+  .sky canvas{ position:absolute; inset:0; width:100%; height:100%; }
+  .sky svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .sky .lk{ fill:none; stroke:rgba(200,215,240,.22); stroke-width:1; transition:stroke .3s, stroke-width .3s, opacity .3s; }
+  .sky .lk.hot{ stroke:#F0A27A; stroke-width:1.6; }
+  .sky.focus .lk:not(.hot){ opacity:.12; }
+  .sky .th circle{ fill:#9FB4D8; transition:fill .3s, r .3s; }
+  .sky .th text{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; fill:rgba(200,215,240,.62); transition:fill .3s; }
+  .sky .th.hot circle{ fill:#F0A27A; } .sky .th.hot text{ fill:#F0A27A; }
+  .sky.focus .th:not(.hot){ opacity:.35; }
+  .sky .pr{ cursor:pointer; }
+  .sky .pr .halo{ fill:url(#glow); transition:r .35s ease; }
+  .sky .pr .core{ fill:#FFF8EA; }
+  .sky .pr.big text:not(.yr){ font-size:30px; fill:#F0A27A; } .sky .pr.big text.yr{ fill:#F0A27A; }
+  .sky .pr.big .halo{ animation:pulse 3.2s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+  @keyframes pulse{ 50%{ opacity:.7; transform:scale(1.12); } }
+  @media (prefers-reduced-motion: reduce){ .sky .pr.big .halo{ animation:none; } }
+  .sky .pr text{ font-family:'Newsreader', Georgia, serif; font-size:21px; fill:#F3EEDF; transition:fill .3s; }
+  .sky .pr text.yr{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:.06em; fill:rgba(243,238,223,.55); }
+  .sky .pr.hot text:not(.yr){ fill:#F0A27A; }
+  .sky.focus .pr:not(.hot){ opacity:.45; }
+  .sky .pr:focus-visible{ outline:none; } .sky .pr:focus-visible .core{ stroke:#F0A27A; stroke-width:3; }
+  .sky-cap{ position:absolute; left:26px; bottom:22px; right:26px; max-width:390px; pointer-events:none; }
+  .sky-k{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:#F0A27A; }
+  .sky-cap p{ margin:6px 0 0; font-family:'Newsreader', Georgia, serif; font-style:italic; font-size:clamp(17px,2vw,21px); color:#EEF1F6; line-height:1.35; }
+  @media (max-width:700px){ .sky{ height:auto; aspect-ratio:auto; min-height:0; padding-bottom:96px; } .sky svg{ position:relative; height:auto; } .sky .pr text{ font-size:34px; } .sky .pr text.yr, .sky .th text{ display:none; } .sky .th circle{ r:5px; } }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+<header class="topbar">
+  <div class="wrap">
+    <a class="mark" href="/">B. DÖRNYEI</a>
+    <nav class="top-nav"><a href="/">Home</a><a href="#contact">Contact</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <div class="intro-txt">
+    <div class="eyebrow">Projects · 2021–2026</div>
+    <h1>Research and <em>projects</em></h1>
+    <p>I work between data and policy, to support evidence-based decision-making and innovation. Below are five research and data projects, a company and a nonprofit. Each card links to the full project.</p>
+    <nav class="index" aria-label="Projects on this page">
+      <a href="#thesis"><b>01</b>Hungarian parliament NLP</a>
+      <a href="#pandemic"><b>02</b>Pandemic risk framework</a>
+      <a href="#epi"><b>03</b>2026 Environmental Performance Index</a>
+      <a href="#sterling"><b>04</b>Sterling Admissions</a>
+      <a href="#lsms"><b>05</b>World Bank LSMS impact tracker</a>
+      <a href="#egov"><b>06</b>UN e-Government Data Center</a>
+      <a href="#maffia"><b>07</b>Startup Maffia</a>
+    </nav>
+    </div>
+    <figure class="intro-art" id="intro-art">
+      <div class="frame"><img src="media/art/poppies.webp" alt="Detail of Pál Szinyei Merse, Meadow with Poppies: red poppies and white daisies across a green hillside" decoding="async"></div>
+      <figcaption>Pál Szinyei Merse · <em>Meadow with Poppies</em></figcaption>
+    </figure>
+  </div>
+
+  <section class="sky reveal" id="sky" aria-label="Projects by theme">
+    <canvas id="sky-stars" aria-hidden="true"></canvas>
+    <svg id="sky-svg" viewBox="0 0 1000 540" role="img" aria-labelledby="sky-t"><title id="sky-t">Seven projects, each linked to its themes</title></svg>
+    <div class="sky-cap"><span class="sky-k" id="sky-k">Projects by theme</span><p id="sky-p">Lines link each project to its themes. Click a project to jump to it.</p></div>
+  </section>
+
+  <a class="feat reveal" id="thesis" href="thesis">
+    <div class="tc" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="txt">
+      <div class="eyebrow">01 · Featured research</div>
+      <h2>Measuring Parliamentary Discourse in Hungary, <em>1990–2026</em></h2>
+      <p>A reproducible hybrid NLP pipeline for 36 years of Hungarian parliamentary transcripts. It measures personal attacks, access to the floor and breakdowns of order. Rules and an LLM check each other under a seven-case merge protocol.</p>
+      <div class="kpis"><div><b>82–91%</b><span>hybrid accuracy</span></div><div><b>~87k</b><span>pages in scope</span></div><div><b>57</b><span>annotated events</span></div></div>
+      <span class="go">Read the research <span class="arrow">→</span></span>
+    </div>
+    <div class="viz" aria-hidden="true">
+      <svg id="mini" viewBox="0 0 1000 520"></svg>
+      <div class="yr" id="mini-yr">1990</div>
+      <div class="gv" id="mini-gv">Antall · Boross</div>
+    </div>
+  </a>
+
+  <div class="projects">
+    <a class="proj flip reveal" id="pandemic" href="pandemic-risk">
+      <div class="txt">
+        <div class="eyebrow">02 · Policy report · UN Foundation × Yale Jackson · Dec 2025</div>
+        <h2>Advancing a Global Framework for Pandemic Risk Assessment</h2>
+        <p>A scoping review of eleven pandemic risk and preparedness tools, including WHO instruments and Moody’s catastrophe models, plus 27 expert consultations. It ends with twelve design principles for a next-generation assessment.</p>
+        <div class="role">Co-author · Pandemic Risk Consultant, UN Foundation · Presented at WHO, UN HQ, Columbia, Mount Sinai</div>
+        <span class="go">Read the report <span class="arrow">→</span></span>
+      </div>
+      <div class="vis v-pan"><img src="media/pandemic/cover.webp" alt="Cover of the Pandemic Risk Assessment report" loading="lazy"><span class="tag">60 pp · PDF</span></div>
+    </a>
+
+    <div class="proj reveal" id="epi">
+      <div class="txt">
+        <div class="eyebrow">03 · Research contributor · Yale Center for Environmental Law &amp; Policy</div>
+        <h2>2026 Environmental Performance Index</h2>
+        <p>The EPI scores 177 countries against established environmental policy targets. The UN and governments worldwide use it. Produced by Yale’s Center for Environmental Law &amp; Policy with Columbia’s CIESIN.</p>
+        <p>I analyzed climate and trade data in R, Python and SQL. Credited on the 2026 EPI team under Writing, Research and Production.</p>
+        <div class="role">Research Assistant, Yale Center for Environmental Law &amp; Policy · 2024–2025</div>
+        <div style="display:flex; flex-wrap:wrap; gap:10px 26px; margin-top:auto;">
+          <a class="go" href="https://epi.yale.edu/2026/welcome" target="_blank" rel="noopener" style="text-decoration:none;">2026 EPI website <span class="arrow">↗</span></a>
+          <a class="go" href="https://epi.yale.edu/2026/2026-epi-team" target="_blank" rel="noopener" style="text-decoration:none;">Team credits <span class="arrow">↗</span></a>
+        </div>
+      </div>
+      <div class="vis v-epi">
+        <div class="epi-n"><div><b>177</b><span>countries ranked</span></div><div><b>47</b><span>indicators</span></div><div><b>12</b><span>issue categories</span></div></div>
+        <div>
+          <div class="epi-cap" style="margin-bottom:6px;">Three policy objectives, weighted</div>
+          <div class="epi-bar" id="epi-bar">
+            <div data-w="45" style="background:#2F6B48"><span><b>45%</b>Ecosystem vitality</span></div>
+            <div data-w="30" style="background:#3E6F9E"><span><b>30%</b>Climate change</span></div>
+            <div data-w="25" style="background:#9A7316"><span><b>25%</b>Env. health</span></div>
+          </div>
+        </div>
+        <div class="epi-cap">Source: epi.yale.edu/2026 (methodology)</div>
+      </div>
+    </div>
+
+    <a class="proj flip reveal" id="sterling" href="https://sterlingadmissions.com" target="_blank" rel="noopener">
+      <div class="txt">
+        <div class="eyebrow">04 · Company · Founder · Aug 2026–present</div>
+        <h2>Sterling Admissions</h2>
+        <p>1:1 mentoring that pairs applicants to top US universities with recent admits from top-15 schools. Mentors help with strategy, essays, activity lists and school selection; students join from anywhere. I applied from Hungary without this kind of guidance.</p>
+        <p>I built the platform myself: student, mentor and admin portals, mentor payouts and compliance.</p>
+        <div class="role">Selected for Anthropic’s Claude for Startups and Stripe Startups</div>
+        <span class="go">sterlingadmissions.com <span class="arrow">↗</span></span>
+      </div>
+      <div class="vis v-sa">
+        <div class="portal" aria-hidden="true">
+          <div><b>Students</b><span>book · prepare · track</span><i></i><i></i></div>
+          <div><b>Mentors</b><span>sessions · payouts</span><i></i><i></i></div>
+          <div><b>Admin</b><span>matching · compliance</span><i></i><i></i></div>
+        </div>
+        <div class="badges"><span>Claude for Startups</span><span>Stripe Startups</span></div>
+      </div>
+    </a>
+
+    <a class="proj reveal" id="lsms" href="https://bdornyei42.github.io/WBG_LSMS_Impact/" target="_blank" rel="noopener">
+      <div class="txt">
+        <div class="eyebrow">05 · Data pipeline · World Bank, Development Economics · 2026</div>
+        <h2>LSMS Research Impact Tracker</h2>
+        <p>An automated Python pipeline on the OpenAlex API that counts research using the World Bank’s Living Standards Measurement Study (LSMS) surveys. It finds papers that name an LSMS survey and keeps one only if the survey is a real LSMS survey and the authors used its data. Citations alone do not count.</p>
+        <p><b style="color:var(--ink); font-weight:600;">7,566</b> of 16,674 retrieved papers confirmed since FY09. 78% are peer-reviewed, 92% open access. It refreshes on a schedule and feeds a public dashboard.</p>
+        <div class="role">LSMS Survey Innovation Fellow, World Bank · Jun 2026–present</div>
+        <span class="go">Open the live dashboard <span class="arrow">↗</span></span>
+      </div>
+      <div class="vis v-lsms">
+        <div class="lsms-head"><span>Papers using LSMS data, per fiscal year</span><span><i style="background:#2F6B48"></i>papers <i style="background:#C1440E; height:2px; width:14px; border-radius:0; margin-left:8px;"></i>share w/ an African-institution author</span></div>
+        <svg id="lsms-chart" viewBox="0 0 520 260" role="img" aria-label="Bar chart: papers per fiscal year rising from 168 in FY09 to 828 in FY26, with the share of papers with an African-institution author rising from 6% to 44%"></svg>
+        <div class="lsms-foot">FY27 is partial · Source: the tracker’s own data, OpenAlex</div>
+      </div>
+    </a>
+
+    <a class="proj flip reveal" id="egov" href="https://publicadministration.un.org/egovkb/Data-Center" target="_blank" rel="noopener">
+      <div class="txt">
+        <div class="eyebrow">06 · Public database · UN DESA · 2025</div>
+        <h2>UN E-Government Knowledge Base Data Center</h2>
+        <p>The UN’s public database behind the E-Government Survey. It holds the E-Government Development Index (with its online-service, telecommunications and human-capital components), the E-Participation Index and city-level LOSI scores for all 193 member states, every edition from 2003 to 2024. Users can compare countries and download the data.</p>
+        <p>At UN DESA I helped build the Data Center. I also measured digital-capacity gaps across 193 countries with an R pipeline. Ministers used the resulting reports and dashboards at the UN High-Level Political Forum.</p>
+        <div class="role">Digital Governance Researcher, UN DESA · summer 2025</div>
+        <span class="go">Open the Data Center <span class="arrow">↗</span></span>
+      </div>
+      <div class="vis v-egov">
+        <div class="egov-head"><b id="egov-name">193 member states</b><span id="egov-val">2024 EGDI, ranked · hover a dot</span></div>
+        <div class="egov-strip" id="egov-strip" role="img" aria-label="Strip of 193 countries ranked by 2024 E-Government Development Index, from Denmark at 0.98 to the Central African Republic at 0.09"></div>
+        <div class="egov-key"><span><i style="background:#2F6B48"></i>very high 76</span><span><i style="background:#7FA35A"></i>high 62</span><span><i style="background:#D3A43A"></i>middle 44</span><span><i style="background:#B5321A"></i>low 11</span></div>
+        <div class="lsms-foot" style="color:var(--slate);">Source: UN E-Government Survey 2024, via the Data Center</div>
+      </div>
+    </a>
+
+    <a class="proj reveal" id="maffia" href="startup-maffia">
+      <div class="txt">
+        <div class="eyebrow">07 · Nonprofit · President · Budapest · 2021–2022</div>
+        <h2>Startup Maffia</h2>
+        <p>A volunteer-run, non-political association that gave Hungary’s young founders free expert evenings, workshops and introductions. Speakers included the James Webb telescope’s European electronics lead and a US growth operator. The Startup Piknik meetup brought the startup community together.</p>
+        <div class="role">43 events · 165,000+ hybrid attendees · $85,000 raised</div>
+        <span class="go">See the events <span class="arrow">→</span></span>
+      </div>
+      <div class="vis v-maffia">
+        <span class="mf-tag">Startup Maffia #41</span>
+        <span class="mf-tt">Magyarok<br>az űrben</span>
+        <span class="mf-en">Hungarians in Space · HUBHUB · Feb 2022</span>
+        <span class="mf-tt mf-2">Startup<br>Piknik</span>
+        <span class="mf-en">381 RSVPs · HUB55 · Aug 2021</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="more reveal" style="grid-template-columns:1fr;">
+    <a href="workshop.html"><span class="eyebrow">Demos</span><h3>The workshop →</h3><p>The planner, budget and network tools I use, filled with sample data so you can try them.</p></a>
+  </div>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <h2><em>Contact</em></h2>
+    <div class="links">
+      <a href="mailto:ben.dornyei@gmail.com">ben.dornyei@gmail.com</a>
+      <a href="https://www.linkedin.com/in/ben-dornyei/" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+<div class="fine"><div class="wrap"><span>© 2026 Bendegúz Dörnyei</span><a href="/" style="text-decoration:none;">← Home</a></div></div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; e.target.classList.add('in');
+    if (e.target.id === 'epi') $$('#epi-bar div').forEach(d => d.style.width = d.dataset.w + '%');
+    if (e.target.id === 'lsms') growLsms();
+    if (e.target.id === 'egov') $('.v-egov').classList.add('go');
+    io.unobserve(e.target); }), {threshold:0, rootMargin:'0px 0px -10% 0px'}) : null;
+
+  /* LSMS: papers per FY (bars) and share with an African-institution author (line), from the tracker's data.json */
+  const FLOW = [['FY09',168,.060],['FY10',160,.075],['FY11',174,.052],['FY12',174,.092],['FY13',199,.095],['FY14',237,.114],['FY15',326,.141],['FY16',336,.179],['FY17',375,.157],['FY18',419,.177],['FY19',453,.199],['FY20',477,.254],['FY21',575,.337],['FY22',564,.374],['FY23',628,.398],['FY24',574,.448],['FY25',606,.444],['FY26',828,.440],['FY27',293,.474]];
+  const lc = $('#lsms-chart'), X0 = 34, X1 = 486, Y0 = 18, Y1 = 226, MAX = 900, bw = (X1 - X0) / FLOW.length;
+  const yv = v => Y1 - v / MAX * (Y1 - Y0), ys = s => Y1 - s / .5 * (Y1 - Y0);
+  let lg = '';
+  [0, 300, 600, 900].forEach(v => lg += `<line x1="${X0}" x2="${X1}" y1="${yv(v)}" y2="${yv(v)}" stroke="rgba(27,36,32,.1)"/><text x="${X0 - 6}" y="${yv(v) + 3}" text-anchor="end">${v}</text>`);
+  [0, .25, .5].forEach(s => lg += `<text x="${X1 + 6}" y="${ys(s) + 3}" fill="#C1440E" style="fill:#C1440E">${s * 100}%</text>`);
+  FLOW.forEach(([fy, n, s], i) => { const x = X0 + i * bw + 2;
+    lg += `<rect class="bar${fy === 'FY27' ? ' part' : ''}" x="${x.toFixed(1)}" width="${(bw - 4).toFixed(1)}" y="${Y1}" height="0" data-y="${yv(n).toFixed(1)}" data-h="${(Y1 - yv(n)).toFixed(1)}" style="transition-delay:${i * 40}ms"><title>${fy}: ${n} papers, ${Math.round(s * 100)}% with an African-institution author</title></rect>`;
+    if (i % 3 === 0 || fy === 'FY27') lg += `<text x="${(x + (bw - 4) / 2).toFixed(1)}" y="${Y1 + 14}" text-anchor="middle">${fy}</text>`; });
+  lg += `<path class="share" d="${FLOW.map(([, , s], i) => `${i ? 'L' : 'M'}${(X0 + i * bw + bw / 2).toFixed(1)},${ys(s).toFixed(1)}`).join(' ')}"/>`;
+  lg += `<text x="${(X0 + 17 * bw + bw / 2).toFixed(1)}" y="${(yv(828) - 6).toFixed(1)}" text-anchor="middle" style="fill:#1B2420; font-size:11px;">828</text>`;
+  lc.innerHTML = lg;
+  function growLsms(){ $('.v-lsms').classList.add('go'); $$('#lsms-chart .bar').forEach(r => { r.setAttribute('y', r.dataset.y); r.setAttribute('height', r.dataset.h); }); }
+
+  /* UN EGDI 2024: 193 member states, ranked */
+  const EGDI = [["Denmark",0.9847],["Estonia",0.9727],["Singapore",0.9691],["Republic of Korea",0.9679],["Iceland",0.9671],["Saudi Arabia",0.9602],["United Kingdom of Great Britain and Northern Ireland",0.9577],["Australia",0.9577],["Finland",0.9575],["Netherlands",0.9538],["United Arab Emirates",0.9533],["Germany",0.9382],["Japan",0.9351],["Sweden",0.9326],["Norway",0.9315],["New Zealand",0.9265],["Spain",0.9206],["Bahrain",0.9196],["United States of America",0.9195],["Ireland",0.9138],["Lithuania",0.911],["Austria",0.9065],["Israel",0.9014],["Kazakhstan",0.9009],["Uruguay",0.9006],["Switzerland",0.9004],["Türkiye",0.8913],["Malta",0.8886],["Latvia",0.8852],["Ukraine",0.8841],["Chile",0.8827],["Croatia",0.8818],["Slovenia",0.8759],["France",0.8744],["China",0.8718],["Greece",0.8674],["Poland",0.8648],["Cyprus",0.8619],["Serbia",0.8618],["South Africa",0.8616],["Oman",0.8576],["Argentina",0.8573],["Russian Federation",0.8533],["Liechtenstein",0.8528],["Luxembourg",0.8466],["Mongolia",0.8457],["Canada",0.8452],["Armenia",0.8422],["Portugal",0.8415],["Brazil",0.8403],["Italy",0.8356],["Thailand",0.8351],["Qatar",0.8244],["Czech Republic",0.8239],["Bulgaria",0.8145],["Belgium",0.8121],["Malaysia",0.8111],["Peru",0.807],["Hungary",0.8043],["Slovakia",0.8021],["Costa Rica",0.8009],["Albania",0.8],["Uzbekistan",0.7999],["Indonesia",0.7991],["Mexico",0.785],["Kuwait",0.7812],["Ecuador",0.78],["Colombia",0.7793],["Georgia (Country)",0.7792],["Republic of Moldova",0.772],["Viet Nam",0.7709],["Romania",0.7636],["Philippines",0.7621],["Azerbaijan",0.7607],["Brunei Darussalam",0.7554],["Mauritius",0.7506],["Belarus",0.7445],["Kyrgyzstan",0.7316],["Panama",0.7298],["Paraguay",0.7251],["Montenegro",0.7211],["Monaco",0.7175],["Bahamas",0.7143],["North Macedonia",0.707],["Dominican Republic",0.7013],["Trinidad and Tobago",0.6973],["Tunisia",0.6935],["Andorra",0.6893],["Jordan",0.6849],["Morocco",0.6841],["Barbados",0.6815],["Seychelles",0.6773],["Fiji",0.6754],["Maldives",0.6745],["Egypt",0.6699],["Jamaica",0.6678],["India",0.6678],["Sri Lanka",0.6667],["Bolivia",0.6651],["Bangladesh",0.657],["Iran (Islamic Republic of)",0.6564],["San Marino",0.6551],["Bhutan",0.6511],["Grenada",0.6458],["Antigua and Barbuda",0.6428],["Suriname",0.6366],["Bosnia and Herzegovina",0.6329],["Ghana",0.6317],["Kenya",0.6314],["Saint Kitts and Nevis",0.6305],["Cabo Verde",0.6238],["Botswana",0.6118],["Eswatini",0.6081],["Namibia",0.6007],["El Salvador",0.5988],["Algeria",0.5956],["Saint Vincent and the Grenadines",0.5876],["Rwanda",0.5799],["Nepal",0.5781],["Cambodia",0.5754],["Gabon",0.5741],["Guatemala",0.5738],["Tajikistan",0.5606],["Côte d'Ivoire",0.5587],["Libya",0.5466],["Lebanon",0.5449],["Dominica",0.5445],["Guyana",0.5443],["Vanuatu",0.5427],["Zambia",0.5424],["Venezuela",0.536],["Nicaragua",0.5318],["Saint Lucia",0.5255],["Tonga",0.5164],["Senegal",0.5163],["Pakistan",0.5096],["Palau",0.5072],["Myanmar",0.5001],["Cuba",0.4921],["Samoa",0.4899],["Belize",0.4872],["Honduras",0.4856],["Marshall Islands",0.4823],["Nigeria",0.4815],["Turkmenistan",0.4757],["Benin",0.4578],["Kiribati",0.4572],["Iraq",0.4572],["Zimbabwe",0.4481],["Uganda",0.4464],["Nauru",0.4454],["Lao People's Democratic Republic",0.4404],["United Republic of Tanzania",0.4327],["Sao Tome and Principe",0.4308],["Cameroon",0.4294],["Angola",0.4149],["Lesotho",0.4123],["Tuvalu",0.4043],["Timor-Leste",0.402],["Guinea",0.4006],["Togo",0.392],["Syrian Arab Republic",0.3888],["Malawi",0.3753],["Solomon Islands",0.3681],["Mauritania",0.3491],["Congo",0.3391],["Micronesia (Federated States of)",0.3235],["Madagascar",0.3235],["Ethiopia",0.3111],["Guinea-Bissau",0.3083],["Papua New Guinea",0.3076],["Sierra Leone",0.3042],["Mali",0.3005],["Djibouti",0.2911],["Burkina Faso",0.2895],["Equatorial Guinea",0.2855],["Mozambique",0.2848],["Sudan",0.2759],["Democratic Republic of the Congo",0.2715],["Comoros",0.2586],["Gambia",0.2552],["Liberia",0.2513],["Burundi",0.2481],["Democratic People's Republic of Korea",0.232],["Yemen",0.2318],["Haiti",0.2117],["Niger",0.2116],["Afghanistan",0.2083],["Chad",0.1785],["Eritrea",0.1576],["Somalia",0.1468],["South Sudan",0.1191],["Central African Republic",0.0947]];
+  const grpC = v => v >= .75 ? '#2F6B48' : v >= .5 ? '#7FA35A' : v >= .25 ? '#D3A43A' : '#B5321A';
+  const strip = $('#egov-strip');
+  strip.innerHTML = EGDI.map(([n, v], i) => `<i data-i="${i}" class="${n === 'Hungary' ? 'hu' : ''}" style="background:${grpC(v)}; transition-delay:${Math.min(i * 6, 1100)}ms" title="${n}: ${v.toFixed(4)} (rank ${i + 1})"></i>`).join('');
+  const nm = $('#egov-name'), vl = $('#egov-val');
+  const show = i => { const [n, v] = EGDI[i]; nm.textContent = n.replace(' of Great Britain and Northern Ireland', ''); vl.textContent = `#${i + 1} of 193 · EGDI ${v.toFixed(3)}`; };
+  strip.addEventListener('pointerover', e => { const i = e.target.dataset?.i; if (i != null) show(+i); });
+  strip.addEventListener('pointerleave', () => show(EGDI.findIndex(r => r[0] === 'Hungary')));
+  show(EGDI.findIndex(r => r[0] === 'Hungary'));
+
+  $$('.reveal').forEach(el => io ? io.observe(el) : el.classList.add('in'));
+  if (!io){ $$('#epi-bar div').forEach(d => d.style.width = d.dataset.w + '%'); growLsms(); $('.v-egov').classList.add('go'); }
+
+  /* mini hemicycle: same seat data as the thesis page */
+  const COL = {MSZP:'#E0473C',SZDSZ:'#4C8BE0',Fidesz:'#F28C28',FK:'#F28C28',MDF:'#3FA36B',KDNP:'#E9C46A',FKGP:'#9DB35A',MIEP:'#8B6A52',Jobbik:'#A0815F',LMP:'#77D08A',DK:'#6FB3EE',Egy:'#A89BEA',MP:'#E8705F',MS:'#F09A8F',Alli:'#D95550',UfH:'#A97BDB',Mi:'#6FAE5C',Tisza:'#3FA9F5',Ind:'#8A928D',Ger:'#C9C2B2'};
+  const P = [
+    [1990,'Antall · Boross',[['MSZP',33],['SZDSZ',94],['Fidesz',22],['Ind',8],['MDF',164],['KDNP',21],['FKGP',44]]],
+    [1994,'Horn',[['MSZP',209],['SZDSZ',70],['Fidesz',20],['Ind',1],['MDF',38],['KDNP',22],['FKGP',26]]],
+    [1998,'Orbán I',[['MSZP',134],['SZDSZ',24],['Ind',1],['MDF',17],['Fidesz',148],['FKGP',48],['MIEP',14]]],
+    [2002,'Medgyessy · Gyurcsány I',[['MSZP',178],['SZDSZ',20],['MDF',24],['Fidesz',164]]],
+    [2006,'Gyurcsány II · Bajnai',[['MSZP',186],['MS',6],['SZDSZ',18],['Ind',1],['MDF',11],['FK',164]]],
+    [2010,'Orbán II',[['MSZP',59],['LMP',16],['Ind',1],['FK',263],['Jobbik',47]]],
+    [2014,'Orbán III',[['Alli',38],['LMP',5],['FK',133],['Jobbik',23]]],
+    [2018,'Orbán IV',[['MP',20],['DK',9],['Egy',1],['LMP',8],['Ind',1],['Ger',1],['FK',133],['Jobbik',26]]],
+    [2022,'Orbán V',[['UfH',57],['Ger',1],['FK',135],['Mi',6]]],
+    [2026,'Magyar',[['Tisza',141],['FK',52],['Mi',6]]],
+  ];
+  const svg = $('#mini'), NS = 'http://www.w3.org/2000/svg', CX = 500, CY = 505, R = 490, cache = {};
+  function lay(n){ if (cache[n]) return cache[n]; const rows = n > 300 ? 10 : 7, r0 = .4;
+    const rad = Array.from({length:rows}, (_, i) => r0 + (1 - r0) * i / (rows - 1)), tot = rad.reduce((a, b) => a + b, 0);
+    const per = rad.map(r => Math.round(n * r / tot)); per[rows - 1] += n - per.reduce((a, b) => a + b, 0);
+    const pts = []; rad.forEach((r, i) => { for (let j = 0; j < per[i]; j++){ const t = Math.PI - j / (per[i] - 1) * Math.PI; pts.push({x:CX + R * r * Math.cos(t), y:CY - R * r * Math.sin(t), t}); } });
+    pts.sort((a, b) => b.t - a.t); const dot = Math.min(R * (1 - r0) / (rows - 1) * .38, Math.PI * R * tot / n * .4); return cache[n] = {pts, dot}; }
+  let g = null, curN = 0, i = 0;
+  function draw(k){ const [y, gov, s] = P[k], n = s.reduce((a, [, v]) => a + v, 0), L = lay(n), cols = [];
+    s.forEach(([p, v]) => { for (let m = 0; m < v; m++) cols.push(COL[p]); });
+    if (n !== curN){ if (g) g.remove(); g = document.createElementNS(NS, 'g');
+      L.pts.forEach(p => { const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', p.x.toFixed(1)); c.setAttribute('cy', p.y.toFixed(1)); c.setAttribute('r', L.dot.toFixed(1)); c.setAttribute('fill', '#2a3a33'); c.style.transitionDelay = reduce ? '0ms' : Math.round((1 - p.t / Math.PI) * 600) + 'ms'; g.appendChild(c); });
+      svg.appendChild(g); curN = n; g.getBoundingClientRect(); }
+    [...g.children].forEach((c, m) => c.setAttribute('fill', cols[m]));
+    $('#mini-yr').textContent = y; $('#mini-gv').textContent = gov; }
+  draw(0);
+  if (!reduce){ let t = setInterval(() => draw(i = (i + 1) % P.length), 2400);
+    document.addEventListener('visibilitychange', () => { clearInterval(t); if (!document.hidden) t = setInterval(() => draw(i = (i + 1) % P.length), 2400); }); }
+})();
+</script>
+<script>
+/* the constellation: projects (bright stars) linked to the themes they share (small stars) */
+(() => {
+  const sky = document.getElementById('sky'); if (!sky) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const svg = document.getElementById('sky-svg'), cv = document.getElementById('sky-stars'), ctx = cv.getContext('2d');
+  const TH = {
+    hu:{n:'Hungary', x:300, y:205}, data:{n:'Data pipelines', x:505, y:150}, meas:{n:'Measurement', x:640, y:268},
+    multi:{n:'Multilaterals', x:520, y:330}, gov:{n:'Governance', x:395, y:300}, env:{n:'Environment & health', x:735, y:395}, found:{n:'Founding', x:260, y:388},
+  };
+  const PR = [
+    {id:'thesis', n:'Parliament NLP', yr:'featured research', x:150, y:118, big:true, t:['hu','data','gov'], p:'A hybrid NLP pipeline for 36 years of Hungarian parliamentary transcripts.'},
+    {id:'lsms', n:'LSMS tracker', yr:'World Bank · 2026', x:560, y:62, t:['data','multi'], p:'An OpenAlex pipeline that has confirmed 7,566 papers using the World Bank’s household surveys.'},
+    {id:'egov', n:'UN Data Center', yr:'UN DESA · 2025', x:812, y:150, t:['multi','meas','gov'], p:'The UN’s public e-government database for 193 member states, plus an analysis of their digital-capacity gaps.'},
+    {id:'epi', n:'EPI 2026', yr:'Yale CELP', x:880, y:300, t:['meas','env'], p:'The Yale–Columbia scorecard ranking 177 countries on 47 environmental indicators.'},
+    {id:'pandemic', n:'Pandemic risk', yr:'UN Foundation · 2025', x:735, y:478, t:['multi','meas','env'], p:'A review of eleven risk tools, ending in twelve design principles for the next assessment.'},
+    {id:'sterling', n:'Sterling', yr:'founder · 2026', x:470, y:486, t:['found'], p:'1:1 mentoring for applicants to top US universities, on a platform I built myself.'},
+    {id:'maffia', n:'Startup Maffia', yr:'president · 2021–22', x:110, y:330, t:['hu','found'], p:'43 free events for Hungary’s young founders, run by volunteers.'},
+  ];
+  const NS = 'http://www.w3.org/2000/svg', el = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+  const defs = el('defs', {}); defs.innerHTML = '<radialGradient id="glow"><stop offset="0" stop-color="rgba(255,236,200,.85)"/><stop offset=".35" stop-color="rgba(255,200,150,.25)"/><stop offset="1" stop-color="rgba(255,200,150,0)"/></radialGradient>';
+  const root = el('g', {}), links = el('g', {}), ths = el('g', {}), prs = el('g', {});
+  svg.appendChild(defs); svg.appendChild(root); root.appendChild(links); root.appendChild(ths); root.appendChild(prs);
+  PR.forEach(p => p.t.forEach(t => { const a = TH[t], mx = (p.x + a.x) / 2, my = (p.y + a.y) / 2 - 18;
+    links.appendChild(el('path', {class:'lk', 'data-p':p.id, 'data-t':t, d:`M${p.x},${p.y} Q${mx},${my} ${a.x},${a.y}`})); }));
+  for (const [k, t] of Object.entries(TH)){ const g = el('g', {class:'th', 'data-t':k}); g.appendChild(el('circle', {cx:t.x, cy:t.y, r:3.2}));
+    const tx = el('text', {x:t.x, y:t.y + 20, 'text-anchor':'middle'}); tx.textContent = t.n; g.appendChild(tx); ths.appendChild(g); }
+  PR.forEach(p => { const g = el('g', {class:'pr', 'data-p':p.id, tabindex:0, role:'link', 'aria-label':p.n + ': ' + p.p});
+    if (p.big) g.classList.add('big');
+    g.appendChild(el('circle', {class:'halo', cx:p.x, cy:p.y, r:p.big ? 54 : 30})); g.appendChild(el('circle', {class:'core', cx:p.x, cy:p.y, r:p.big ? 9 : 5.5}));
+    const right = p.x < 500, tx = el('text', {x:p.x + (right ? 16 : -16), y:p.y + 6, 'text-anchor':right ? 'start' : 'end'}); tx.textContent = p.n;
+    const yr = el('text', {class:'yr', x:p.x + (right ? 16 : -16), y:p.y + 22, 'text-anchor':right ? 'start' : 'end'}); yr.textContent = p.yr;
+    g.appendChild(tx); g.appendChild(yr); prs.appendChild(g); });
+  const K = document.getElementById('sky-k'), P = document.getElementById('sky-p'), K0 = K.textContent, P0 = P.textContent;
+  const light = (pid, tid) => { sky.classList.add('focus');
+    const ps = pid ? [pid] : PR.filter(p => p.t.includes(tid)).map(p => p.id), ts = tid ? [tid] : PR.find(p => p.id === pid).t;
+    svg.querySelectorAll('.lk').forEach(l => l.classList.toggle('hot', ps.includes(l.dataset.p) && ts.includes(l.dataset.t)));
+    svg.querySelectorAll('.pr').forEach(g => { g.classList.toggle('hot', ps.includes(g.dataset.p)); g.querySelector('.halo').setAttribute('r', ps.includes(g.dataset.p) ? (g.classList.contains('big') ? 66 : 44) : (g.classList.contains('big') ? 54 : 30)); });
+    svg.querySelectorAll('.th').forEach(g => g.classList.toggle('hot', ts.includes(g.dataset.t)));
+    if (pid){ const p = PR.find(q => q.id === pid); K.textContent = p.n; P.textContent = p.p; }
+    else { K.textContent = TH[tid].n; P.textContent = ps.map(id => PR.find(q => q.id === id).n).join(' · '); } };
+  const dark = () => { sky.classList.remove('focus'); svg.querySelectorAll('.hot').forEach(e => e.classList.remove('hot')); svg.querySelectorAll('.pr').forEach(g => g.querySelector('.halo').setAttribute('r', g.classList.contains('big') ? 54 : 30)); K.textContent = K0; P.textContent = P0; };
+  const go = id => { const t = document.getElementById(id); if (t) t.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'}); };
+  svg.querySelectorAll('.pr').forEach(g => { const id = g.dataset.p;
+    g.addEventListener('mouseenter', () => light(id)); g.addEventListener('focus', () => light(id));
+    g.addEventListener('mouseleave', dark); g.addEventListener('blur', dark);
+    g.addEventListener('click', () => go(id)); g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(id); } }); });
+  svg.querySelectorAll('.th').forEach(g => { g.style.cursor = 'default'; g.addEventListener('mouseenter', () => light(null, g.dataset.t)); g.addEventListener('mouseleave', dark); });
+
+  // a slow sky behind it: twinkling stars, the constellation drifting with the pointer
+  let W, H, stars = [], raf, vis = false, tx = 0, ty = 0, cx = 0, cy = 0;
+  const size = () => { const r = devicePixelRatio || 1; W = cv.clientWidth; H = cv.clientHeight; cv.width = W * r; cv.height = H * r; ctx.setTransform(r, 0, 0, r, 0, 0);
+    stars = Array.from({length:Math.round(W * H / 2600)}, () => ({x:Math.random() * W, y:Math.random() * H, r:Math.random() * 1.2 + .2, p:Math.random() * 6.28, s:.4 + Math.random() * 1.6})); };
+  const frame = t => { ctx.clearRect(0, 0, W, H);
+    for (const s of stars){ const a = reduce ? .6 : .35 + .45 * (Math.sin(t / 900 * s.s + s.p) + 1) / 2; ctx.fillStyle = `rgba(230,236,250,${a})`; ctx.beginPath(); ctx.arc(s.x + cx * s.r * 6, s.y + cy * s.r * 6, s.r, 0, 6.283); ctx.fill(); }
+    cx += (tx - cx) * .05; cy += (ty - cy) * .05; root.setAttribute('transform', `translate(${(cx * 10).toFixed(2)} ${(cy * 8).toFixed(2)})`);
+    if (vis && !reduce) raf = requestAnimationFrame(frame); };
+  size(); frame(0); addEventListener('resize', () => { size(); frame(0); });
+  sky.addEventListener('pointermove', e => { const r = sky.getBoundingClientRect(); tx = (e.clientX - r.left) / r.width - .5; ty = (e.clientY - r.top) / r.height - .5; });
+  sky.addEventListener('pointerleave', () => { tx = ty = 0; });
+  new IntersectionObserver(([e]) => { vis = e.isIntersecting; cancelAnimationFrame(raf); if (vis && !reduce) raf = requestAnimationFrame(frame); }).observe(sky);
+})();
+</script>
+<script>
+/* intro art: moving the pointer over the framed painting pans the view across it */
+(() => {
+  const fig = document.getElementById('intro-art'); if (!fig) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const frame = fig.querySelector('.frame'), pic = frame && frame.querySelector('img'); if (!pic) return;
+  frame.addEventListener('pointermove', e => { const r = frame.getBoundingClientRect();
+    const fx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), fy = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+    pic.style.objectPosition = `${(fx * 100).toFixed(1)}% ${(30 + fy * 60).toFixed(1)}%`; });
+  frame.addEventListener('pointerleave', () => { pic.style.objectPosition = ''; });
+})();
+</script>
+</body>
+</html>

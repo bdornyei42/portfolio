@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bendegúz Dörnyei — Coming soon</title>
-<meta name="description" content="Bendegúz (“Ben”) Dörnyei — a new version of my site is on the way.">
+<meta name="description" content="Bendegúz (“Ben”) Dörnyei bridges data and policy for evidence-based decision-making, and supports scientific innovation. The full site is in progress.">
 <!-- Keep the unfinished site OUT of search results while it's in coming-soon
      mode. Google drops the page on its next crawl, so it stops ranking under
      your name. The real index.html has no such tag, so when you switch back to
@@ -43,7 +43,7 @@
   }
   a{color:inherit;}
 
-  /* split: words on paper, Szinyei Merse Pál's Léggömb (1878, public domain) beside them */
+  /* split: words on paper, Pál Szinyei Merse's Léggömb (1878, public domain) beside them */
   main{ flex:1; display:grid; grid-template-columns:minmax(0, 1.05fr) minmax(0, 1fr); min-height:100vh; }
   .text-side{ display:flex; flex-direction:column; justify-content:center; padding:72px 64px 56px; position:relative; }
   .inner{max-width:560px; width:100%; position:relative; z-index:2; margin:auto 0;}
@@ -103,6 +103,16 @@
     font-size:19px;
     color:var(--ink);
   }
+  /* the painted window (painted-window.js): the way into the workshop while the rest of the site is being built */
+  .invite{ margin-top:34px; display:grid; grid-template-columns:minmax(0, 200px) minmax(0, 1fr); gap:28px; align-items:center; }
+  .invite-win{ width:100%; }
+  .invite-text p{ margin:0 0 16px; font-size:15.5px; color:var(--slate); max-width:300px; }
+  .invite-cta{ display:inline-flex; align-items:center; gap:9px; padding:11px 18px; background:#A8321E; color:#FBF3E4; text-decoration:none;
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:.05em; text-transform:uppercase; transition:background .2s ease; }
+  .invite-cta:hover, .invite-cta:focus-visible{ background:#8A2618; }
+  .invite-cta .arrow{ transition:transform .25s ease; } .invite-cta:hover .arrow{ transform:translateX(4px); }
+  @media (max-width:520px){ .invite{ grid-template-columns:1fr; justify-items:center; text-align:center; } .invite-win{ width:min(250px, 76vw); } .invite-text p{ margin-inline:auto; } }
+
   .contact{
     margin-top:40px;
     display:flex;
@@ -152,17 +162,31 @@
 
   a:focus-visible{outline:2px solid var(--paprika); outline-offset:3px;}
 </style>
+<!-- seo-head -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#3B67B5">
+<!-- /seo-head -->
 </head>
 <body>
 
 <main>
   <div class="text-side">
   <div class="inner">
-    <div class="eyebrow">Making messy data behave — for better policy</div>
     <h1>Bendegúz <span class="ben">“Ben”</span><br><em>Dörnyei</em></h1>
     <div class="status"><span class="dot"></span> Site coming soon</div>
-    <p class="lede">A new version of my site is on the way — with a few of the tools I build, open for you to try.</p>
+    <p class="lede">I bridge data and policy for evidence-based decision-making, and support scientific innovation. I am a World Bank LSMS fellow and a Yale M.P.P. candidate. The rest of the site is in progress. My projects are online now.</p>
+    <div class="invite">
+      <a class="invite-win" id="studio-window" href="/#gallery" data-painted-window aria-label="Open my projects"></a>
+      <div class="invite-text">
+        <p>They include a thesis on 36 years of Hungarian parliamentary debate, a UN pandemic-risk framework, data work for the World Bank and the UN, and communities I built.</p>
+        <a class="invite-cta" href="/#gallery" data-pw-target="#studio-window">See my projects <span class="arrow">→</span></a>
+      </div>
+    </div>
     <div class="contact">
+      <a href="/#gallery" style="color:var(--paprika); border-color:var(--paprika);">Selected work →</a>
       <a href="mailto:ben.dornyei@gmail.com">ben.dornyei@gmail.com</a>
       <a href="https://www.linkedin.com/in/ben-dornyei/" target="_blank" rel="noopener">LinkedIn ↗</a>
     </div>
@@ -170,10 +194,11 @@
     <footer>© 2026 Bendegúz Dörnyei</footer>
   </div>
   <figure class="art-side">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Szinyei_Merse%2C_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" alt="Szinyei Merse Pál, Léggömb (The Balloon), 1878: a red-and-cream striped hot-air balloon drifting through a deep blue sky above a low horizon" referrerpolicy="no-referrer" decoding="async">
-    <figcaption>Szinyei Merse Pál · <a href="https://commons.wikimedia.org/wiki/File:Szinyei_Merse,_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" target="_blank" rel="noopener noreferrer"><em>Léggömb</em></a>, 1878 · Hungarian National Gallery</figcaption>
+    <img src="media/art/balloon.webp" alt="Pál Szinyei Merse, Léggömb (The Balloon), 1878: a red-and-cream striped balloon in a blue sky above a low horizon" referrerpolicy="no-referrer" decoding="async">
+    <figcaption>Pál Szinyei Merse · <a href="https://commons.wikimedia.org/wiki/File:Szinyei_Merse,_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" target="_blank" rel="noopener noreferrer"><em>Léggömb</em></a>, 1878 · Hungarian National Gallery</figcaption>
   </figure>
 </main>
 
+<script src="painted-window.js" defer></script>
 </body>
 </html>

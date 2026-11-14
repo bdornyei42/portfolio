@@ -21,6 +21,18 @@ copy /y public\dashboard.html  site\ >nul
 copy /y public\connections.html site\ >nul
 copy /y public\planner-demo.html site\ >nul
 copy /y public\workshop.html  site\ >nul
+REM Project pages (link-able from applications): /projects, /thesis, /pandemic-risk.
+REM Their figures live in public\media\ and the downloadable PDFs in public\files\.
+copy /y public\projects.html  site\ >nul
+copy /y public\thesis.html    site\ >nul
+copy /y public\pandemic-risk.html site\ >nul
+copy /y public\startup-maffia.html site\ >nul
+REM Jackson Coffee Buddies (/jackson-coffee-buddies): page only; its data lives in the CoffeeClub Durable Object.
+copy /y public\jackson-coffee-buddies.html site\ >nul
+REM paper.css: the painted-masthead look shared by the project pages; paintings live in media\art\
+copy /y public\paper.css      site\ >nul
+xcopy /e /i /y /q public\media site\media >nul
+xcopy /e /i /y /q public\files site\files >nul
 REM Whole admin/ folder (hub + budget + rejections + planner) goes
 REM behind Basic Auth. Only .html + .js (cards.js, the budget page's card
 REM engine) are copied, so no stray files leak.
@@ -30,6 +42,19 @@ REM The shared tool-page ribbon (public\frame.js) serves both the public demos
 REM and the private tools, so it goes next to each.
 copy /y public\frame.js        site\ >nul
 copy /y public\frame.js        site\admin\ >nul
+REM The painted window (home, coming-soon and workshop pages) is drawn in the
+REM browser by this one script, so no image files to ship.
+copy /y public\painted-window.js site\ >nul
+REM Browser icons (balloon), web manifest, and the files search engines read.
+copy /y public\favicon.ico       site\ >nul
+copy /y public\favicon.svg       site\ >nul
+copy /y public\favicon-32.png    site\ >nul
+copy /y public\apple-touch-icon.png site\ >nul
+copy /y public\icon-192.png      site\ >nul
+copy /y public\icon-512.png      site\ >nul
+copy /y public\site.webmanifest  site\ >nul
+copy /y public\robots.txt        site\ >nul
+copy /y public\sitemap.xml       site\ >nul
 REM Shared, public, no-auth static libs (served from /vendor). Currently just
 REM pdf.js, lazy-loaded by the planner's syllabus PDF importer. Same-origin so
 REM both the admin planner and the public demo use it without any CDN.

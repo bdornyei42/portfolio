@@ -4,6 +4,8 @@
   // The worker name below is what shows up in your Cloudflare dashboard and in
   // the *.workers.dev URL (bdornyei42.<your-subdomain>.workers.dev).
   "name": "bdornyei42",
+  // The personal Cloudflare account (moved out of Sterling Admissions LLC).
+  "account_id": "3e4e9686548f3a3e25fc8cb8bf27092d",
   "compatibility_date": "2025-08-22",
 
   // src/worker.js runs on every request: it Basic-Auth-gates /admin/* using
@@ -14,6 +16,12 @@
   // served (credentials.json, categorized-transactions.json, sync scripts)
   // ever ends up in the deployed bundle.
   "main": "src/worker.js",
+
+  // The site's domains (custom domains: Cloudflare manages their DNS records).
+  "routes": [
+    { "pattern": "bendornyei.com", "custom_domain": true },
+    { "pattern": "dornyei.com", "custom_domain": true }
+  ],
 
   // Workers KV: server-side store for the PRIVATE year planner (/admin/planner).
   // The worker exposes /admin/api/planner (GET/PUT) behind the same Basic Auth
@@ -36,10 +44,18 @@
   // Created with:
   //   npx wrangler kv namespace create BUDGET_KV
   "kv_namespaces": [
-    { "binding": "PLANNER_KV", "id": "5888c98ee99947a5a06f29ee25778437" },
-    { "binding": "CONNECTIONS_KV", "id": "73d6dc3d5bca4c668df82f56edfdb7c0" },
-    { "binding": "BUDGET_KV", "id": "96dfdfacb8cb4fa98eaa0b4bd267108e" }
+    { "binding": "PLANNER_KV", "id": "853fe5d34edf47298f2a367d3906d88d" },
+    { "binding": "CONNECTIONS_KV", "id": "a9b242fc44624ccfa041f083e69eec76" },
+    { "binding": "BUDGET_KV", "id": "1c45c30b87144e24a5bed6f841f5b064" }
   ],
+
+  // Jackson Coffee Buddies (/jackson-coffee-buddies): one SQLite-backed Durable
+  // Object holds members, weekly groups, check-offs and photos (src/coffee.js).
+  // Its organizer key is the COFFEE_ADMIN_TOKEN secret.
+  "durable_objects": {
+    "bindings": [{ "name": "COFFEE", "class_name": "CoffeeClub" }]
+  },
+  "migrations": [{ "tag": "coffee-v1", "new_sqlite_classes": ["CoffeeClub"] }],
 
   "assets": {
     "directory": "./site",
@@ -48,6 +64,6 @@
     // only falls back to the Worker for paths with no asset match — which
     // would let /admin/* bypass the Basic Auth check entirely. Routing
     // these paths through the Worker first is what makes the gate real.
-    "run_worker_first": ["/admin", "/admin/*"]
+    "run_worker_first": ["/admin", "/admin/*", "/api/*"]
   }
 }

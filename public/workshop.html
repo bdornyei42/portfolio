@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer">
-<title>The workshop — Bendegúz Dörnyei</title>
-<meta name="description" content="The tools Ben Dörnyei builds and uses every day — a year planner, a budget, and a map of people — open to try with sample data, right in your browser.">
+<title>Life-management tools · Bendegúz Dörnyei</title>
+<meta name="description" content="Ben Dörnyei's life-management tools: a year planner, a budget dashboard and a map of people. Try them in your browser with sample data.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,39 +29,17 @@
   .topbar nav{ display:flex; gap:24px; font-size:14px; }
   .topbar nav a{ text-decoration:none; color:var(--slate); } .topbar nav a:hover{ color:var(--paprika); }
 
-  /* the same tuscan wall as the home page, now with the shutters thrown open */
-  .entry{ position:relative; overflow:hidden;
-    background:
-      radial-gradient(420px 260px at 12% 20%, rgba(255,236,200,.5), transparent 70%),
-      radial-gradient(380px 240px at 88% 80%, rgba(170,98,44,.2), transparent 70%),
-      radial-gradient(300px 200px at 60% 10%, rgba(196,120,60,.16), transparent 70%),
-      linear-gradient(160deg, #E7B77C, #D99A5B 55%, #C9874A); }
+  /* light warm paper behind the hero, so the painting reads as a painting */
+  .entry{ position:relative; overflow:hidden; background:linear-gradient(180deg, #EFE8D8, var(--paper)); }
   .entry .wrap{ display:grid; grid-template-columns:minmax(0, 360px) minmax(0, 1fr); gap:48px; align-items:center; padding-top:64px; padding-bottom:64px; }
   .entry h1{ font-size:clamp(40px, 7vw, 66px); line-height:1; color:#2b1a12; }
   .entry h1 em{ font-style:italic; font-weight:400; color:var(--red); }
   .entry .eyebrow{ color:#6B2A16; margin-bottom:16px; display:block; }
   .entry p{ font-size:18px; color:#3a2417; max-width:540px; margin:20px 0 0; }
-  /* the window sits in the middle of its column so the thrown-open shutters stay out of the text */
-  .win{ position:relative; width:200px; margin:0 auto; }
-  .win .surround{ padding:11px; background:linear-gradient(180deg, #EFE6D2, #DCCDAE); border-radius:120px 120px 6px 6px / 78px 78px 6px 6px; box-shadow:0 2px 0 rgba(90,55,25,.25); }
-  .win .opening{ position:relative; height:270px; overflow:visible; border-radius:110px 110px 3px 3px / 70px 70px 3px 3px;
-    background:radial-gradient(150px 120px at 50% 30%, #FFE7AE 0%, #F2B868 40%, #B9733C 72%, #6B3F22 100%); }
-  .win .opening::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(180deg, #5A321A, #3a2010); box-shadow:0 -2px 0 #7A4A28; }
-  .win .lamp{ position:absolute; left:50%; top:22px; width:44px; height:20px; margin-left:-22px; border-radius:40px 40px 4px 4px; background:#2F4A3D; box-shadow:0 18px 40px 16px rgba(255,226,150,.6); }
-  .win .shutter{ position:absolute; top:4px; bottom:4px; width:44%;
-    background:linear-gradient(180deg, transparent 47%, #8A2618 47% 53%, transparent 53%), repeating-linear-gradient(180deg, #7E2416 0 2px, #B23A22 2px 8px, #C54A2C 8px 10px);
-    box-shadow:inset 0 0 0 7px #9C2F1C; }
-  .win .shutter.l{ left:-41%; transform:perspective(600px) rotateY(-28deg); transform-origin:100% 50%; }
-  .win .shutter.r{ right:-41%; transform:perspective(600px) rotateY(28deg); transform-origin:0 50%; }
-  .win .sill{ height:12px; margin:0 -10px; background:linear-gradient(180deg, #EFE6D2, #CDBB98); box-shadow:0 3px 0 rgba(90,55,25,.3); }
-  .win .planter{ position:relative; height:28px; margin:14px 6px 0; background:linear-gradient(180deg, #7A4526, #5B311A); }
-  .win .planter::before{ content:""; position:absolute; left:-6px; right:-6px; top:-22px; height:30px;
-    background:radial-gradient(circle at 8% 60%, #D62E2E 5px, transparent 6px), radial-gradient(circle at 20% 35%, #E8453C 6px, transparent 7px), radial-gradient(circle at 34% 62%, #C21F2B 5px, transparent 6px),
-      radial-gradient(circle at 48% 30%, #E8453C 6px, transparent 7px), radial-gradient(circle at 62% 58%, #D62E2E 6px, transparent 7px), radial-gradient(circle at 76% 33%, #F05A4B 5px, transparent 6px),
-      radial-gradient(circle at 90% 58%, #C21F2B 6px, transparent 7px), radial-gradient(ellipse 14px 8px at 14% 86%, #3E6B3A 90%, transparent), radial-gradient(ellipse 14px 8px at 42% 88%, #4E7D45 90%, transparent),
-      radial-gradient(ellipse 14px 8px at 70% 86%, #3E6B3A 90%, transparent), radial-gradient(ellipse 14px 8px at 94% 88%, #4E7D45 90%, transparent); }
+  /* the painted window (painted-window.js), shutters thrown open now that you're in */
+  .win{ width:270px; margin:0 auto; }
   .entry .stripe{ position:absolute; left:0; right:0; bottom:0; height:4px; background:repeating-linear-gradient(90deg, var(--red) 0 14px, #EFE6CF 14px 28px); }
-  @media (max-width:760px){ .entry .wrap{ grid-template-columns:1fr; gap:34px; padding-top:44px; } .win{ width:150px; } .win .opening{ height:190px; } }
+  @media (max-width:760px){ .entry .wrap{ grid-template-columns:1fr; gap:34px; padding-top:44px; } .win{ width:min(220px, 64vw); } }
 
   /* the tools */
   section{ padding:64px 0 24px; }
@@ -87,6 +65,24 @@
   footer{ padding:40px 0 48px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--slate); border-top:1px solid var(--line); margin-top:56px; }
   footer a{ text-decoration:none; } footer a:hover{ color:var(--paprika); }
 </style>
+<!-- seo-head -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#3B67B5">
+<link rel="canonical" href="https://bdornyei42.ben-dornyei.workers.dev/workshop">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bendegúz Dörnyei">
+<meta property="og:url" content="https://bdornyei42.ben-dornyei.workers.dev/workshop">
+<meta property="og:title" content="Life-management tools · Bendegúz Dörnyei">
+<meta property="og:description" content="Ben Dörnyei's life-management tools: a year planner, a budget dashboard and a map of people. Try them in your browser with sample data.">
+<meta property="og:image" content="https://bdornyei42.ben-dornyei.workers.dev/media/og/home.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bendegúz “Ben” Dörnyei">
+<meta name="twitter:card" content="summary_large_image">
+<!-- /seo-head -->
 </head>
 <body>
 <header class="topbar">
@@ -98,14 +94,10 @@
 
 <div class="entry">
   <div class="wrap">
-    <div class="win" aria-hidden="true">
-      <div class="surround"><div class="opening"><span class="lamp"></span><span class="shutter l"></span><span class="shutter r"></span></div></div>
-      <div class="sill"></div><div class="planter"></div>
-    </div>
+    <div class="win" data-painted-window="open" data-sign="Make yourself|at home"></div>
     <div>
-      <span class="eyebrow">The workshop</span>
-      <h1>Pull up a <em>chair</em>.</h1>
-      <p>These are the tools I built to run my own life and still use every week. The copies here run on sample data, entirely in your browser — click anything, change anything, nothing you do is saved or sent anywhere.</p>
+      <h1>Life-management tools</h1>
+      <p>I built these for myself and use them every week. The demos run in your browser on made-up sample data. Nothing you type leaves the browser.</p>
     </div>
   </div>
   <div class="stripe"></div>
@@ -128,9 +120,8 @@
           </svg>
         </span>
         <span class="body">
-          <span class="eyebrow">Planning</span>
           <h3>Year Planner</h3>
-          <p>A whole semester on one screen: courses on a grid, a weekly schedule, a calendar and every deadline in order. Paste a syllabus and it builds the term.</p>
+          <p>Puts a semester's course grid, weekly schedule, calendar and deadlines on one screen. Paste a syllabus to fill in the term.</p>
           <ul><li>semester grid</li><li>weekly schedule</li><li>deadlines</li><li>syllabus import</li></ul>
           <span class="go">Open the planner <span class="arrow">→</span></span>
         </span>
@@ -147,9 +138,8 @@
           </svg>
         </span>
         <span class="body">
-          <span class="eyebrow">Money</span>
           <h3>Budget</h3>
-          <p>Where the money actually went — by category, merchant and month — plus investments, recurring bills and a forecast of the months ahead.</p>
+          <p>Tracks spending by category, merchant and month, plus investments, recurring bills and a forecast.</p>
           <ul><li>spending by category</li><li>merchants</li><li>investments</li><li>recurring + forecast</li></ul>
           <span class="go">Open the budget <span class="arrow">→</span></span>
         </span>
@@ -164,9 +154,8 @@
           </svg>
         </span>
         <span class="body">
-          <span class="eyebrow">People</span>
           <h3>Connections</h3>
-          <p>A living map of the people I know and how they connect — with a radar of who I haven’t talked to in too long, birthdays, and where each person can help.</p>
+          <p>Maps the people I know and how they connect. A radar shows who I haven’t talked to in a while. It also tracks birthdays and who can help with what.</p>
           <ul><li>relationship map</li><li>radar</li><li>groups</li><li>notes import</li></ul>
           <span class="go">Open connections <span class="arrow">→</span></span>
         </span>
@@ -174,9 +163,9 @@
     </div>
 
     <div class="how">
-      <div><b>Runs in your browser</b><span>No account, no server. Close the tab and it’s gone.</span></div>
-      <div><b>Sample data</b><span>Made-up courses, money and people, so you can see it working.</span></div>
-      <div><b>The real ones</b><span>My private versions sync to my own Cloudflare account and track the real thing.</span></div>
+      <div><b>Runs in your browser</b><span>You don't need an account. Your edits stay on your device.</span></div>
+      <div><b>Sample data</b><span>The demos use made-up courses, money and people.</span></div>
+      <div><b>Private versions</b><span>My own copies hold real data and sync to my Cloudflare account.</span></div>
     </div>
   </section>
 
@@ -185,5 +174,6 @@
     <span><a href="./">← Back home</a> · <a href="mailto:ben.dornyei@gmail.com">ben.dornyei@gmail.com</a></span>
   </footer>
 </div>
+<script src="painted-window.js" defer></script>
 </body>
 </html>

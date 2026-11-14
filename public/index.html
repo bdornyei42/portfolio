@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer">
-<title>Bendegúz Dörnyei</title>
-<meta name="description" content="Bendegúz (“Ben”) Dörnyei — quantitative policy researcher. Statistics, data science, and AI applied to global affairs, from democratic backsliding in Hungary to the World Bank's household surveys.">
+<title>Bendegúz “Ben” Dörnyei · Data and policy</title>
+<meta name="description" content="Bendegúz “Ben” Dörnyei bridges data and policy for evidence-based decision-making, and supports scientific innovation. World Bank LSMS fellow, Yale M.P.P. candidate.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -122,15 +122,15 @@
   @keyframes draw{ to{ stroke-dashoffset:0; } }
   @media (max-width:760px){ .thread-svg{display:none;} }
 
-  /* hero band: Szinyei Merse Pál, "Léggömb" (1878, public domain), fading into the paper */
-  .hero-art{ position:relative; overflow:hidden; min-height:86vh; display:flex; align-items:center; background:linear-gradient(to bottom, #3f6dbd, #8aa6d6 70%, var(--paper)); }
+  /* hero band: Pál Szinyei Merse, "Léggömb" (1878, public domain), fading into the paper */
+  .hero-art{ position:relative; overflow:hidden; min-height:62vh; display:flex; align-items:center; background:linear-gradient(to bottom, #3f6dbd, #8aa6d6 70%, var(--paper)); }
   /* painting wider than the band and anchored right, so the balloon floats beside the name, not behind it */
   .hero-paint{ position:absolute; top:0; bottom:0; left:0; width:145%; height:100%; object-fit:cover; object-position:50% 16%; display:block; }
   .hero-art::before{ content:""; position:absolute; inset:0; pointer-events:none;
     background:linear-gradient(90deg, rgba(25,50,110,.34) 0%, rgba(25,50,110,.16) 42%, rgba(25,50,110,0) 66%); }
   .hero-art::after{ content:""; position:absolute; inset:0; pointer-events:none;
     background:linear-gradient(to bottom, rgba(231,234,225,0) 0%, rgba(231,234,225,0) 62%, rgba(231,234,225,.72) 88%, var(--paper) 100%); }
-  .hero.hero-top{ position:relative; z-index:1; width:100%; padding:96px 28px 150px; color:#F6F2E6; text-shadow:0 1px 16px rgba(20,35,70,.5); }
+  .hero.hero-top{ position:relative; z-index:1; width:100%; padding:110px 28px 96px; color:#F6F2E6; text-shadow:0 1px 16px rgba(20,35,70,.5); }
   .hero.hero-top .eyebrow, .hero.hero-top h1, .hero.hero-top h1 em{ color:#F6F2E6; }
   .hero h1 .ben{ font-style:italic; font-weight:400; color:var(--paprika); white-space:nowrap; }
   .hero.hero-top h1 .ben{ color:#F7B98A; }
@@ -166,7 +166,9 @@
   }
   .demos-note .dot{width:7px; height:7px; border-radius:50%; background:var(--paprika); flex:none;}
   .demo-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
-  @media (max-width:820px){ .demo-grid{grid-template-columns:1fr;} }
+  .demo-grid.work-grid{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:980px){ .demo-grid.work-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:820px){ .demo-grid, .demo-grid.work-grid{grid-template-columns:1fr;} }
   .demo-card{
     background:var(--card); padding:28px 26px 24px;
     display:flex; flex-direction:column; min-height:230px;
@@ -184,61 +186,10 @@
   .demo-card:hover .open .arrow{ transform:translateX(4px); }
   .demo-card .open .arrow{ transition:transform .25s ease; }
 
-  /* ===== studio window: stucco wall, travertine surround, red louvered shutters, geraniums ===== */
-  .studio{ display:grid; grid-template-columns:minmax(0, 330px) minmax(0, 1fr); gap:48px; align-items:center; margin-top:48px; }
-  @media (max-width:760px){ .studio{ grid-template-columns:1fr; gap:28px; justify-items:center; } .studio-text{ justify-self:stretch; } }
-  .tuscan{ display:block; width:100%; max-width:330px; text-decoration:none; cursor:pointer; }
-  .tuscan .wall{ display:block; position:relative; padding:34px 38px 30px;
-    background:
-      radial-gradient(120px 80px at 18% 22%, rgba(255,236,200,.55), transparent 70%),
-      radial-gradient(140px 90px at 82% 70%, rgba(170,98,44,.22), transparent 70%),
-      radial-gradient(90px 60px at 70% 12%, rgba(196,120,60,.18), transparent 70%),
-      radial-gradient(160px 110px at 30% 88%, rgba(255,226,180,.35), transparent 70%),
-      linear-gradient(160deg, #E7B77C, #D99A5B 55%, #C9874A);
-    box-shadow:inset 0 0 0 1px rgba(110,60,25,.18); }
-  .tuscan .surround{ display:block; padding:12px; background:linear-gradient(180deg, #EFE6D2, #DCCDAE);
-    border-radius:132px 132px 6px 6px / 86px 86px 6px 6px; box-shadow:0 2px 0 rgba(90,55,25,.25), inset 0 0 0 1px rgba(120,90,50,.25); }
-  .tuscan .opening{ display:block; position:relative; height:300px; overflow:hidden; perspective:900px;
-    border-radius:120px 120px 3px 3px / 76px 76px 3px 3px; background:#3a2417; }
-  /* the room you see once the shutters swing: lamp-lit, three framed tools on the wall */
-  .tuscan .room{ position:absolute; inset:0; display:block;
-    background:radial-gradient(160px 130px at 50% 28%, #FFE7AE 0%, #F2B868 38%, #B9733C 70%, #6B3F22 100%); }
-  .tuscan .lamp{ position:absolute; left:50%; top:22px; width:46px; height:22px; margin-left:-23px; border-radius:40px 40px 4px 4px; background:#2F4A3D; box-shadow:0 18px 40px 16px rgba(255,226,150,.65); }
-  .tuscan .minis{ position:absolute; left:14px; right:14px; top:96px; display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
-  .tuscan .minis span{ display:grid; justify-items:center; gap:4px; padding:7px 4px 6px; background:#F6F0E2; border:3px solid #7A4A28;
-    font:italic 400 12px 'Newsreader', Georgia, serif; color:#3a2417; }
-  .tuscan .minis i{ display:block; width:34px; height:24px; }
-  .tuscan .g-grid{ background:repeating-linear-gradient(90deg, #C1440E 0 6px, transparent 6px 9px), repeating-linear-gradient(0deg, #2F4A3D 0 5px, transparent 5px 8px); background-blend-mode:multiply; opacity:.8; }
-  .tuscan .g-bars{ background:linear-gradient(to top, #3b6fc0 70%, transparent 70%) 2px 100% / 6px 100% no-repeat, linear-gradient(to top, #3b6fc0 45%, transparent 45%) 11px 100% / 6px 100% no-repeat,
-    linear-gradient(to top, #C1440E 85%, transparent 85%) 20px 100% / 6px 100% no-repeat, linear-gradient(to top, #3b6fc0 30%, transparent 30%) 29px 100% / 5px 100% no-repeat; }
-  .tuscan .g-net{ background:radial-gradient(circle at 20% 30%, #C1440E 3px, transparent 4px), radial-gradient(circle at 75% 25%, #2F4A3D 3px, transparent 4px),
-    radial-gradient(circle at 50% 75%, #3b6fc0 3px, transparent 4px), linear-gradient(28deg, transparent 47%, #7A4A28 48% 52%, transparent 53%), linear-gradient(-35deg, transparent 47%, #7A4A28 48% 52%, transparent 53%); }
-  .tuscan .desk{ position:absolute; left:0; right:0; bottom:0; height:62px; background:linear-gradient(180deg, #5A321A, #3a2010); box-shadow:0 -2px 0 #7A4A28; }
-  /* shutters: louvers + stiles + a mid rail, hinged at the outer edges */
-  .tuscan .shutter{ position:absolute; top:0; bottom:0; width:50%; display:block; transition:transform .95s cubic-bezier(.2,.75,.25,1); backface-visibility:hidden;
-    background:
-      linear-gradient(180deg, transparent 47%, #8A2618 47% 53%, transparent 53%),
-      repeating-linear-gradient(180deg, #7E2416 0 2px, #B23A22 2px 8px, #C54A2C 8px 10px);
-    box-shadow:inset 0 0 0 7px #9C2F1C, inset 0 0 0 8px rgba(0,0,0,.25); }
-  .tuscan .shutter.l{ left:0; transform-origin:0 50%; }
-  .tuscan .shutter.r{ right:0; transform-origin:100% 50%; }
-  .tuscan .shutter::before, .tuscan .shutter::after{ content:""; position:absolute; width:12px; height:6px; background:#2b1a12; }
-  .tuscan .shutter.l::before{ left:-2px; top:22%; } .tuscan .shutter.l::after{ left:-2px; bottom:18%; }
-  .tuscan .shutter.r::before{ right:-2px; top:22%; } .tuscan .shutter.r::after{ right:-2px; bottom:18%; }
-  .tuscan:hover .shutter.l, .tuscan:focus-visible .shutter.l{ transform:rotateY(-32deg); }
-  .tuscan:hover .shutter.r, .tuscan:focus-visible .shutter.r{ transform:rotateY(32deg); }
-  .tuscan.open .shutter.l{ transform:rotateY(-118deg); } .tuscan.open .shutter.r{ transform:rotateY(118deg); }
-  .tuscan .sill{ display:block; height:12px; margin:0 -10px; background:linear-gradient(180deg, #EFE6D2, #CDBB98); box-shadow:0 3px 0 rgba(90,55,25,.3); }
-  /* window box of red geraniums */
-  .tuscan .planter{ display:block; position:relative; height:30px; margin:14px 6px 0; background:linear-gradient(180deg, #7A4526, #5B311A); border-radius:2px; }
-  .tuscan .blooms{ position:absolute; left:-6px; right:-6px; top:-22px; height:30px; display:block;
-    background:
-      radial-gradient(circle at 8% 60%, #D62E2E 5px, transparent 6px), radial-gradient(circle at 18% 35%, #E8453C 6px, transparent 7px),
-      radial-gradient(circle at 30% 62%, #C21F2B 5px, transparent 6px), radial-gradient(circle at 42% 30%, #E8453C 6px, transparent 7px),
-      radial-gradient(circle at 55% 58%, #D62E2E 6px, transparent 7px), radial-gradient(circle at 67% 33%, #F05A4B 5px, transparent 6px),
-      radial-gradient(circle at 79% 60%, #C21F2B 6px, transparent 7px), radial-gradient(circle at 91% 36%, #E8453C 5px, transparent 6px),
-      radial-gradient(ellipse 14px 8px at 13% 85%, #3E6B3A 90%, transparent), radial-gradient(ellipse 14px 8px at 36% 88%, #4E7D45 90%, transparent),
-      radial-gradient(ellipse 14px 8px at 61% 85%, #3E6B3A 90%, transparent), radial-gradient(ellipse 14px 8px at 86% 88%, #4E7D45 90%, transparent); }
+  /* ===== studio window: painted stroke by stroke by painted-window.js; click steps through into the workshop ===== */
+  .studio{ display:grid; grid-template-columns:minmax(0, 320px) minmax(0, 1fr); gap:52px; align-items:center; }
+  @media (max-width:760px){ .studio{ grid-template-columns:1fr; gap:24px; justify-items:center; } .studio-win{ width:min(300px, 82vw); } .studio-text{ justify-self:stretch; } }
+  .studio-win{ width:100%; }
   .studio-text h3{ font-size:clamp(28px, 4vw, 36px); line-height:1.1; margin:10px 0 14px; }
   .studio-text h3 em{ font-style:italic; font-weight:400; color:var(--paprika); }
   .studio-text p{ color:var(--ink); font-size:16.5px; max-width:520px; margin:0 0 22px; }
@@ -335,224 +286,629 @@
   .fine a:hover, .fine a:focus-visible{color:var(--paprika);}
 
   a:focus-visible, button:focus-visible{outline:2px solid var(--paprika); outline-offset:3px;}
+
+  /* ===== hiring-team first pass: CTAs, proof, impact ===== */
+  nav.top-nav .nav-cta{color:var(--ink); border:1px solid var(--ink); padding:3px 10px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.04em;}
+  nav.top-nav .nav-cta:hover{color:#FBF3E4; background:var(--ink);}
+  .hero-rest .lede b{font-weight:600;}
+  .hero-cta{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px;}
+  .btn-solid, .btn-line{display:inline-flex; align-items:center; gap:8px; padding:11px 16px; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.04em; transition:background .2s, color .2s;}
+  .btn-solid{background:#A8321E; color:#FBF3E4;} .btn-solid:hover{background:#8A2618;}
+  .btn-line{border:1px solid var(--ink); color:var(--ink);} .btn-line:hover{background:var(--ink); color:var(--paper);}
+  .proof{max-width:1040px; margin:0 auto; padding:18px 28px; display:flex; flex-wrap:wrap; align-items:center; gap:10px 28px; border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    font-family:'Newsreader',Georgia,serif; font-size:19px; color:var(--forest);}
+  .proof .proof-k{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--slate);}
+  .impact{max-width:1040px; margin:28px auto 0; padding:0 28px; display:grid; grid-template-columns:repeat(4,1fr); gap:1px;}
+  .impact div{background:var(--card); padding:20px 18px; border:1px solid var(--line); margin:-1px 0 0 -1px;}
+  .impact b{display:block; font-family:'Newsreader',Georgia,serif; font-weight:500; font-size:clamp(30px,3.6vw,42px); line-height:1; color:var(--paprika);}
+  .impact span{display:block; margin-top:8px; font-size:13.5px; color:var(--slate); line-height:1.45;}
+  @media (max-width:820px){ .impact{grid-template-columns:1fr 1fr;} }
+  @media (max-width:640px){ .proof{font-size:16px; gap:6px 18px;} }
+
+  /* featured work */
+  .feat-work{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); background:#14201B; color:#F3EEDF; text-decoration:none; margin-bottom:28px; border:1px solid #14201B; overflow:hidden; transition:transform .25s, box-shadow .25s;}
+  .feat-work:hover, .feat-work:focus-visible{transform:translateY(-2px); box-shadow:0 26px 44px -30px rgba(27,36,32,.7);}
+  .feat-work .fw-txt{padding:36px 36px 32px; display:flex; flex-direction:column;}
+  .feat-work .eyebrow{color:#F0A27A; margin-bottom:12px;}
+  .feat-work h3{font-size:clamp(26px,3vw,36px); line-height:1.08; margin-bottom:12px;}
+  .feat-work h3 em{font-style:italic; font-weight:400; color:#F0A27A;}
+  .feat-work p{color:rgba(243,238,223,.72); font-size:15.5px; margin:0;}
+  .fw-kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(243,238,223,.14); border:1px solid rgba(243,238,223,.14); margin:22px 0 22px;}
+  .fw-kpis div{background:#14201B; padding:10px 12px;} .fw-kpis b{display:block; font-family:'Newsreader',Georgia,serif; font-weight:500; font-size:22px;} .fw-kpis span{font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:rgba(243,238,223,.6);}
+  .feat-work .open{margin-top:auto; font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.04em; color:#F0A27A; display:inline-flex; gap:7px;}
+  .feat-work .fw-img{background:#0E1612; display:flex; align-items:center; justify-content:center; padding:26px;}
+  .feat-work .fw-img img{width:100%; box-shadow:0 20px 40px -20px rgba(0,0,0,.8); transform:rotate(1.2deg); transition:transform .4s ease;}
+  .feat-work:hover .fw-img img{transform:rotate(0) scale(1.02);}
+  @media (max-width:820px){ .feat-work{grid-template-columns:1fr;} .feat-work .fw-txt{padding:28px 22px;} }
+
+  /* ventures */
+  .ventures{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-top:36px;}
+  @media (max-width:900px){ .ventures{grid-template-columns:1fr 1fr;} }
+  @media (max-width:600px){ .ventures{grid-template-columns:1fr;} }
+  .v-card{background:var(--card); padding:22px 22px 20px; display:flex; flex-direction:column; text-decoration:none; color:var(--ink); transition:background .2s;}
+  a.v-card:hover, a.v-card:focus-visible{background:#EDEFE7;}
+  .v-when{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--paprika); letter-spacing:.03em;}
+  .v-card h3{font-size:21px; margin:6px 0 8px;}
+  .v-card p{margin:0 0 14px; color:var(--slate); font-size:14.5px;}
+  .v-stat{margin-top:auto; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--forest); border-top:1px solid var(--line); padding-top:10px;}
+
+  /* education facts */
+  .facts{display:grid; grid-template-columns:repeat(3,1fr); gap:32px; margin-top:44px;}
+  @media (max-width:820px){ .facts{grid-template-columns:1fr; gap:24px;} }
+  .facts h4{font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--slate); margin:0 0 14px;}
+  .facts .honors-list{gap:12px;} .facts .honors-list li{font-size:14.5px;}
+
+  /* quiet studio */
+  .studio-quiet .studio{grid-template-columns:minmax(0,190px) minmax(0,1fr); gap:36px;}
+  .studio-quiet .studio-text h3{font-size:clamp(24px,3vw,30px);}
+  .studio-quiet .studio-text p{font-size:15px; color:var(--slate);}
+  .studio-link{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--paprika); text-decoration:none; letter-spacing:.04em;}
+  .studio-link:hover{text-decoration:underline;}
+  @media (max-width:760px){ .studio-quiet .studio{grid-template-columns:1fr;} .studio-quiet .studio-win{width:min(200px, 60vw);} }
+
+
+  /* experience timeline (the old voyage chart was removed) */
+  .exp-grid{ margin-top:48px; }
+  .t-item.here .t-dot{ background:var(--paprika); border-color:var(--paprika); box-shadow:0 0 0 5px rgba(193,68,14,.16); }
+
+  /* ===== thesis spotlight ===== */
+  .spot-thesis{ position:relative; background:radial-gradient(110% 90% at 80% 100%, #1d2c25 0%, #101915 62%); color:#F3EEDF; overflow:hidden; }
+  .spot-thesis::before{ content:""; position:absolute; inset:0; pointer-events:none; opacity:.45; background-image:radial-gradient(rgba(243,238,223,.06) 1px, transparent 1px); background-size:22px 22px; }
+  .spot-thesis .tricolor{ position:absolute; left:0; right:0; top:0; height:4px; display:flex; } .spot-thesis .tricolor i{ flex:1; }
+  .spot-thesis .tricolor i:nth-child(1){ background:#B5321A; } .spot-thesis .tricolor i:nth-child(2){ background:#F3EEDF; } .spot-thesis .tricolor i:nth-child(3){ background:#2F6B48; }
+  .spot-inner{ position:relative; max-width:1180px; margin:0 auto; padding:78px 28px 70px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:48px; align-items:center; }
+  .spot-k{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:#F0A27A; }
+  .spot-copy h2{ font-family:'Newsreader', Georgia, serif; font-weight:500; font-size:clamp(34px,4.6vw,62px); line-height:1.02; margin:16px 0 0; color:#F3EEDF; }
+  .spot-copy h2 em{ font-style:italic; font-weight:400; color:#F0A27A; }
+  .spot-copy p{ color:rgba(243,238,223,.72); font-size:16.5px; margin:18px 0 0; max-width:560px; }
+  .spot-kpis{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(243,238,223,.14); border:1px solid rgba(243,238,223,.14); margin:26px 0 0; }
+  .spot-kpis div{ background:#121c17; padding:14px 14px; }
+  .spot-kpis b{ display:block; font-family:'Newsreader', Georgia, serif; font-weight:500; font-size:clamp(22px,2.4vw,30px); line-height:1.05; }
+  .spot-kpis span{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; color:rgba(243,238,223,.6); }
+  .spot-cta{ display:flex; flex-wrap:wrap; gap:10px 22px; align-items:center; margin-top:28px; }
+  .spot-btn{ display:inline-flex; align-items:center; gap:9px; padding:13px 20px; background:#A8321E; color:#FBF3E4; text-decoration:none; font-family:'IBM Plex Mono', monospace; font-size:13px; letter-spacing:.05em; text-transform:uppercase; transition:background .2s; }
+  .spot-btn:hover{ background:#8A2618; } .spot-btn .arrow{ transition:transform .25s; } .spot-btn:hover .arrow{ transform:translateX(4px); }
+  .spot-line{ color:#F3EEDF; font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:.04em; text-decoration:none; border-bottom:1px solid rgba(243,238,223,.4); padding-bottom:2px; }
+  .spot-line:hover{ color:#F0A27A; border-color:#F0A27A; }
+  .spot-viz{ position:relative; display:block; text-decoration:none; color:inherit; container-type:inline-size; }
+  .spot-viz svg{ width:100%; height:auto; display:block; overflow:visible; }
+  .spot-viz circle{ transition:fill .7s ease; }
+  .spot-yr{ position:absolute; left:50%; bottom:6%; transform:translateX(-50%); font-family:'Newsreader', Georgia, serif; font-size:clamp(30px, 12cqw, 104px); line-height:.9; }
+  .spot-gov{ position:absolute; left:50%; bottom:0; transform:translateX(-50%); white-space:nowrap; font-family:'IBM Plex Mono', monospace; font-size:clamp(9px, 1.5cqw, 12.5px); letter-spacing:.08em; text-transform:uppercase; color:rgba(243,238,223,.65); }
+  .spot-viz:hover .spot-yr{ color:#F0A27A; }
+  @media (max-width:880px){ .spot-inner{ grid-template-columns:1fr; padding:56px 20px 50px; gap:28px; } .spot-viz{ order:-1; } }
+  @media (max-width:520px){ .spot-kpis{ grid-template-columns:1fr; } }
+  /* ===== the window as the doorway to the projects ===== */
+  .studio-door .studio-text h3 em{ color:var(--paprika); }
+
+  /* =================== overhaul: the window, then one room per project =================== */
+  html{ scroll-behavior:smooth; }
+  header.topbar{ position:fixed; left:0; right:0; top:0; background:transparent; border-bottom-color:transparent; transition:background .3s, border-color .3s; }
+  header.topbar.solid{ background:rgba(231,234,225,.9); border-bottom-color:var(--line); }
+  header.topbar.dark{ background:rgba(12,16,14,.75); border-bottom-color:rgba(243,238,223,.12); }
+  header.topbar.dark .mark, header.topbar.dark nav.top-nav a{ color:#F3EEDF; } header.topbar.dark .nav-cta{ border-color:#F3EEDF; }
+
+  .door{ min-height:100vh; display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); }
+  .door-text{ display:flex; flex-direction:column; justify-content:center; align-items:center; padding:96px 60px 48px; }
+  .door-text > *{ width:min(100%,640px); }
+  .door-text h1{ font-size:clamp(46px,6.4vw,88px); line-height:.96; margin-top:16px; }
+  .door-text h1 em{ font-style:italic; font-weight:400; color:var(--forest); }
+  .door-text h1 .ben{ font-style:italic; font-weight:400; color:var(--paprika); white-space:nowrap; }
+  .status{ margin-top:18px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--slate); display:inline-flex; align-items:center; gap:8px; }
+  .status .dot{ width:8px; height:8px; border-radius:50%; background:var(--paprika); box-shadow:0 0 0 0 rgba(193,68,14,.5); animation:ping 2s infinite; }
+  @keyframes ping{ 70%{ box-shadow:0 0 0 9px rgba(193,68,14,0); } 100%{ box-shadow:0 0 0 0 rgba(193,68,14,0); } }
+  .lede{ font-size:19px; max-width:520px; margin:18px 0 0; }
+  .door-invite{ margin-top:30px; display:grid; grid-template-columns:minmax(0,clamp(170px,33vh,320px)) minmax(0,1fr); gap:34px; align-items:center; }
+  .door-win{ width:100%; }
+  .door-how p{ margin:0 0 14px; font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:21px; line-height:1.3; }
+  .door-cta{ display:inline-flex; align-items:center; gap:9px; padding:12px 18px; background:#A8321E; color:#FBF3E4; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.05em; text-transform:uppercase; transition:background .2s; }
+  .door-cta:hover{ background:#8A2618; } .door-cta .arrow{ transition:transform .25s; } .door-cta:hover .arrow{ transform:translateX(4px); }
+  .door-skip{ display:block; margin-top:12px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--slate); text-decoration:none; }
+  .door-contact{ display:flex; gap:22px; flex-wrap:wrap; margin-top:30px; }
+  .door-contact a{ text-decoration:none; font-size:15px; border-bottom:1px solid var(--line); } .door-contact a:hover{ color:var(--paprika); border-color:var(--paprika); }
+  .door-art{ margin:0; position:relative; overflow:hidden; background:linear-gradient(to bottom,#3f6dbd,#8aa6d6 60%,#c9c9b8); }
+  .door-art img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 30%; }
+  .door-art::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:5px; z-index:1; background:repeating-linear-gradient(to bottom,#C1440E 0 14px,#F3EEDF 14px 28px); }
+  .door-art figcaption{ position:absolute; left:24px; bottom:16px; z-index:1; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#F6F2E6; text-shadow:0 1px 10px rgba(20,35,70,.65); }
+  .door-art figcaption em{ font-family:'Newsreader',Georgia,serif; font-size:14px; }
+  @media (max-width:860px){ .door{ grid-template-columns:1fr; } .door-art{ order:-1; height:34vh; min-height:220px; } .door-text{ padding:36px 22px 40px; }
+    .door-invite{ grid-template-columns:1fr; justify-items:center; text-align:center; } .door-win{ width:min(260px,70vw); } }
+
+  .gate{ min-height:72vh; display:flex; align-items:center; background:linear-gradient(to bottom,#3f6dbd 0%,#7b98c9 45%,#101915 100%); color:#F3EEDF; }
+  .gate-in{ max-width:1100px; margin:0 auto; padding:110px 28px 90px; width:100%; }
+  .gate .eyebrow{ color:#FBE2C8; }
+  .gate h2{ font-size:clamp(40px,6.4vw,92px); line-height:.98; margin-top:12px; color:#FBF7EC; }
+  .gate h2 em{ font-style:italic; font-weight:400; color:#F7B98A; }
+  .gate-list{ list-style:none; margin:36px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:10px; }
+  .gate-list a{ display:inline-flex; gap:8px; align-items:baseline; padding:8px 13px; border:1px solid rgba(243,238,223,.4); color:#F3EEDF; text-decoration:none; font-size:14px; transition:background .2s, color .2s; }
+  .gate-list a:hover{ background:#F3EEDF; color:#101915; } .gate-list b{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:#F7B98A; font-weight:500; }
+
+  .room{ position:relative; min-height:100vh; display:flex; align-items:center; overflow:hidden; scroll-margin-top:0; }
+  .room-in{ position:relative; z-index:1; width:100%; max-width:1220px; margin:0 auto; padding:110px 32px 80px; display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:56px; align-items:center; }
+  .room-no{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; }
+  .room h2{ font-size:clamp(34px,4.6vw,64px); line-height:1.02; margin:14px 0 0; }
+  .room h2 em{ font-style:italic; font-weight:400; }
+  .room-copy p{ font-size:17.5px; line-height:1.6; margin:18px 0 0; max-width:520px; }
+  .room-facts{ list-style:none; margin:24px 0 0; padding:0; display:grid; grid-template-columns:repeat(3,1fr); gap:1px; }
+  .room-facts li{ padding:12px 12px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; }
+  .room-facts b{ display:block; font-family:'Newsreader',Georgia,serif; font-weight:500; font-size:clamp(22px,2.4vw,30px); letter-spacing:0; text-transform:none; margin-bottom:2px; }
+  .room-cta{ display:flex; flex-wrap:wrap; gap:12px 22px; align-items:center; margin-top:28px; }
+  .rbtn{ display:inline-flex; align-items:center; gap:9px; padding:13px 20px; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.05em; text-transform:uppercase; transition:transform .2s, background .2s; }
+  .rbtn .arrow{ transition:transform .25s; } .rbtn:hover .arrow{ transform:translateX(4px); }
+  .rline{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; text-decoration:none; border-bottom:1px solid currentColor; padding-bottom:2px; opacity:.85; }
+  .room-viz{ position:relative; display:block; text-decoration:none; color:inherit; }
+  .viz-cap{ margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:11px; opacity:.7; }
+  .js .room .room-copy, .js .room .room-viz, .js .room .room-cover{ opacity:0; transform:translateY(30px); transition:opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
+  .js .room .room-viz, .js .room .room-cover{ transition-delay:.15s; }
+  .js .room.seen .room-copy, .js .room.seen .room-viz, .js .room.seen .room-cover{ opacity:1; transform:none; }
+  @media (max-width:900px){ .room-in{ grid-template-columns:1fr; gap:34px; padding:90px 20px 64px; } .room{ min-height:auto; } }
+
+  .room-dots{ position:fixed; right:18px; top:50%; transform:translateY(-50%); z-index:30; display:flex; flex-direction:column; gap:12px; opacity:0; pointer-events:none; transition:opacity .4s; }
+  .room-dots.on{ opacity:1; pointer-events:auto; }
+  .room-dots a{ position:relative; width:10px; height:10px; border-radius:50%; border:1.5px solid currentColor; color:var(--dotc,#1B2420); display:block; transition:background .2s, transform .2s; }
+  .room-dots a.on{ background:currentColor; transform:scale(1.25); }
+  .room-dots a span{ position:absolute; right:20px; top:50%; transform:translateY(-50%); white-space:nowrap; font-family:'IBM Plex Mono',monospace; font-size:11px; opacity:0; transition:opacity .2s; pointer-events:none; }
+  .room-dots a:hover span, .room-dots a.on span{ opacity:1; }
+  @media (max-width:900px){ .room-dots{ display:none; } }
+
+  /* 01 thesis: the chamber at night */
+  .r-thesis{ background:radial-gradient(110% 90% at 80% 100%,#1d2c25 0%,#101915 62%); color:#F3EEDF; }
+  .r-thesis::before{ content:""; position:absolute; inset:0; opacity:.45; background-image:radial-gradient(rgba(243,238,223,.06) 1px,transparent 1px); background-size:22px 22px; }
+  .r-thesis .tricolor{ position:absolute; left:0; right:0; top:0; height:4px; display:flex; z-index:2; } .r-thesis .tricolor i{ flex:1; }
+  .r-thesis .tricolor i:nth-child(1){ background:#B5321A; } .r-thesis .tricolor i:nth-child(2){ background:#F3EEDF; } .r-thesis .tricolor i:nth-child(3){ background:#2F6B48; }
+  .r-thesis .room-no, .r-thesis h2 em{ color:#F0A27A; } .r-thesis .room-copy p{ color:rgba(243,238,223,.75); }
+  .r-thesis .room-facts{ background:rgba(243,238,223,.14); border:1px solid rgba(243,238,223,.14); } .r-thesis .room-facts li{ background:#121c17; color:rgba(243,238,223,.6); } .r-thesis .room-facts b{ color:#F3EEDF; }
+  .r-thesis .rbtn{ background:#A8321E; color:#FBF3E4; } .r-thesis .rbtn:hover{ background:#8A2618; }
+  .spot-viz{ container-type:inline-size; } .spot-viz svg{ width:100%; height:auto; display:block; overflow:visible; } .spot-viz circle{ transition:fill .7s ease; }
+  .spot-yr{ position:absolute; left:50%; bottom:6%; transform:translateX(-50%); font-family:'Newsreader',Georgia,serif; font-size:clamp(30px,12cqw,110px); line-height:.9; }
+  .spot-gov{ position:absolute; left:50%; bottom:0; transform:translateX(-50%); white-space:nowrap; font-family:'IBM Plex Mono',monospace; font-size:clamp(9px,1.5cqw,12.5px); letter-spacing:.08em; text-transform:uppercase; color:rgba(243,238,223,.65); }
+  .spot-viz:hover .spot-yr{ color:#F0A27A; }
+
+  /* 02 pandemic: an outbreak in the dark blue */
+  .r-pandemic{ background:radial-gradient(90% 70% at 85% 30%,#24507A 0%,#16304B 45%,#0F2338 100%); color:#F1F4F7; cursor:crosshair; }
+  .r-pandemic canvas#sim{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .r-pandemic .room-no{ color:#7FB8E8; } .r-pandemic h2 em{ color:#B9D8F2; } .r-pandemic .room-copy p{ color:rgba(241,244,247,.78); }
+  .r-pandemic .rbtn{ background:#A8321E; color:#FBF3E4; cursor:pointer; } .r-pandemic a{ cursor:pointer; }
+  .room-cover{ justify-self:center; width:min(360px,80%); transform:rotate(2.5deg); box-shadow:0 40px 70px -30px rgba(0,0,0,.7); transition:transform .5s; }
+  .js .r-pandemic.seen .room-cover{ transform:rotate(2.5deg); } .r-pandemic .room-cover:hover{ transform:rotate(0) translateY(-4px) !important; }
+  .room-cover img{ width:100%; display:block; }
+  .hud{ margin-top:26px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:rgba(241,244,247,.7); } .hud b{ color:#F37A5A; font-weight:500; } .hud span{ color:#F37A5A; text-transform:uppercase; letter-spacing:.06em; } .hud small{ font-size:10.5px; opacity:.75; }
+
+  /* 03 lsms: a reading room */
+  .r-lsms{ background:#F1EAD9; color:#1B2420; }
+  .r-lsms::before{ content:""; position:absolute; inset:0; background-image:repeating-linear-gradient(to bottom, transparent 0 31px, rgba(110,80,40,.08) 31px 32px); }
+  .r-lsms .room-no{ color:#9A5B12; } .r-lsms h2 em{ color:#2F6B48; }
+  .bignum{ display:block; font-size:clamp(70px,10vw,150px); line-height:.9; color:#9A5B12; letter-spacing:-.02em; }
+  .r-lsms .rbtn{ background:#1B2420; color:#F1EAD9; } .r-lsms .rbtn:hover{ background:#2F4A3D; }
+  .r-lsms svg{ width:100%; height:auto; display:block; overflow:visible; } .r-lsms svg text{ font-family:'IBM Plex Mono',monospace; font-size:10px; fill:#6b5b45; }
+  .r-lsms .bar{ fill:#2F6B48; transition:height .9s cubic-bezier(.2,.8,.2,1), y .9s cubic-bezier(.2,.8,.2,1); } .r-lsms .bar.part{ fill:#9DB89F; }
+  .r-lsms .share{ fill:none; stroke:#C1440E; stroke-width:2.2; stroke-dasharray:900; stroke-dashoffset:900; transition:stroke-dashoffset 1.6s ease .5s; } .r-lsms.seen .share{ stroke-dashoffset:0; }
+
+  /* 04 un: the atlas */
+  .r-egov{ background:#E9EEF2; color:#1B2420; }
+  .r-egov .room-no{ color:#2B5C8A; } .r-egov h2 em{ color:#2B5C8A; }
+  .r-egov .rbtn{ background:#2B5C8A; color:#fff; } .r-egov .rbtn:hover{ background:#1f4466; }
+  .egov-head{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; min-height:52px; }
+  .egov-head b{ font-family:'Newsreader',Georgia,serif; font-weight:500; font-size:clamp(24px,3vw,36px); } .egov-head span{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:#55625C; }
+  .egov-strip{ display:grid; grid-template-columns:repeat(20,minmax(0,1fr)); gap:4px; width:100%; }
+  .egov-strip i{ display:block; width:100%; aspect-ratio:1; border-radius:50%; transform:scale(0); transition:transform .45s cubic-bezier(.3,1.6,.5,1); outline:2px solid transparent; outline-offset:1px; cursor:pointer; }
+  .r-egov.seen .egov-strip i{ transform:scale(1); } .egov-strip i.hu{ outline-color:#1B2420; } .egov-strip i:hover{ outline-color:#C1440E; }
+
+  /* 05 epi: the scorecard in green */
+  .r-epi{ background:#1F3A2C; color:#EEF0E4; }
+  .r-epi::before{ content:""; position:absolute; inset:0; background:radial-gradient(60% 60% at 80% 30%, rgba(152,196,120,.18), transparent 70%); }
+  .r-epi .room-no{ color:#B9D69A; } .r-epi h2 em{ color:#B9D69A; } .r-epi .room-copy p{ color:rgba(238,240,228,.78); }
+  .r-epi .rbtn{ background:#B9D69A; color:#1F3A2C; } .r-epi .rbtn:hover{ background:#d2e6bb; }
+  .epi-nums{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:rgba(238,240,228,.7); }
+  .epi-nums b{ display:block; font-family:'Newsreader',Georgia,serif; font-weight:500; font-size:clamp(56px,7vw,104px); line-height:.95; color:#EEF0E4; letter-spacing:-.02em; text-transform:none; }
+  .epi-bar{ display:flex; margin-top:30px; height:70px; }
+  .epi-bar span{ width:0; overflow:hidden; display:flex; align-items:flex-end; padding:8px 10px; font-family:'IBM Plex Mono',monospace; font-size:11px; white-space:nowrap; transition:width 1.2s cubic-bezier(.2,.8,.2,1); }
+  .r-epi.seen .epi-bar span{ width:var(--w); }
+  .epi-bar span:nth-child(1){ background:#4E8A3A; } .epi-bar span:nth-child(2){ background:#3E6F9E; } .epi-bar span:nth-child(3){ background:#B98A1F; transition-delay:.15s; }
+
+  /* 06 maffia: the poster wall */
+  .r-maffia{ background:#18191c; color:#F4F2EC; }
+  .r-maffia::before{ content:""; position:absolute; inset:0; opacity:.35; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .r-maffia .room-no{ color:#7FD6E8; } .r-maffia h2{ font-family:'Public Sans',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:-.02em; } .r-maffia h2 em{ font-style:normal; -webkit-text-stroke:1.5px #F4F2EC; color:transparent; }
+  .r-maffia .room-copy p{ color:rgba(244,242,236,.75); }
+  .r-maffia .rbtn{ background:#FF5C7A; color:#18191c; } .r-maffia .rbtn:hover{ background:#ff7f97; }
+  .posters{ display:grid; grid-template-columns:1fr 1fr; gap:26px; padding:20px 0; }
+  .pstr{ position:relative; display:flex; flex-direction:column; min-height:330px; padding:30px 22px 22px; background:#0c0d0f; border:1px solid rgba(255,255,255,.08); box-shadow:0 34px 60px -28px rgba(0,0,0,.95); transition:transform .45s cubic-bezier(.2,.8,.2,1); }
+  .pstr.p1{ transform:rotate(-3deg); } .pstr.p2{ transform:rotate(2.4deg) translateY(30px); background:#141519; }
+  .posters:hover .pstr{ transform:rotate(0) translateY(0); }
+  .pstr .tape{ position:absolute; top:-12px; left:50%; width:96px; height:24px; transform:translateX(-50%) rotate(-4deg); background:rgba(236,226,198,.75); box-shadow:0 1px 3px rgba(0,0,0,.35); }
+  .pstr small{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#7FD6E8; }
+  .pstr b{ font-family:'Public Sans',sans-serif; font-weight:700; text-transform:uppercase; font-size:clamp(28px,3.2vw,44px); line-height:.95; margin-top:14px; }
+  .pstr i{ margin-top:auto; font-family:'IBM Plex Mono',monospace; font-style:normal; font-size:11px; background:#F4F2EC; color:#0c0d0f; padding:4px 8px; align-self:flex-start; }
+
+  /* 07 sterling: navy and brass */
+  .r-sterling{ background:linear-gradient(160deg,#24304A 0%,#121a2b 100%); color:#EEF1F6; }
+  .r-sterling .room-no{ color:#D9B26A; } .r-sterling h2 em{ color:#D9B26A; } .r-sterling .room-copy p{ color:rgba(238,241,246,.78); }
+  .r-sterling .rbtn{ background:#D9B26A; color:#121a2b; } .r-sterling .rbtn:hover{ background:#e8c789; }
+  .portals{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .portals div{ border:1px solid rgba(238,241,246,.22); padding:22px 16px 60px; background:rgba(255,255,255,.03); transition:transform .4s, background .4s; }
+  .portals div:nth-child(2){ transform:translateY(-22px); } .r-sterling:hover .portals div{ background:rgba(255,255,255,.07); }
+  .portals b{ display:block; font-family:'Newsreader',Georgia,serif; font-weight:500; font-size:24px; } .portals span{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:rgba(238,241,246,.65); }
+
+  .about-in{ max-width:1040px; margin:0 auto; padding:120px 28px 10px; }
+  .about-in h2{ font-size:clamp(40px,6vw,76px); line-height:1; margin-top:12px; } .about-in h2 em{ font-style:italic; font-weight:400; color:var(--forest); }
+  .about-in p{ font-size:19px; max-width:560px; }
+
+  /* =================== full-bleed screens: the generic section box (max-width 1040px, padding) was capping them =================== */
+  .door, .gate, .room, .wall{ max-width:none; margin:0; padding:0; border-top:none; }
+
+  /* top bar: Projects · Thesis · Experience, then Email and LinkedIn */
+  nav.top-nav{ align-items:center; }
+  nav.top-nav .nav-ext{ display:flex; gap:8px; margin-left:6px; }
+  nav.top-nav .nav-cta{ padding:3px 9px; }
+  header.topbar.dark nav.top-nav .nav-cta:hover{ background:#F3EEDF; color:#101915; }
+  @media (max-width:520px){ nav.top-nav .hide-xs{ display:none; } nav.top-nav{ gap:16px; } }
+
+  /* door painting follows the pointer a little */
+
+  /* ===== projects gate: a sky the visitor rises through; balloon and clouds are cut from Léggömb ===== */
+  .gate{ position:relative; overflow:hidden; min-height:100vh; background:linear-gradient(to bottom,#3f6dbd 0%,#5b82c6 30%,#86a0cc 55%,#3a4a52 82%,#101915 100%); }
+  .gate-in{ position:relative; z-index:2; }
+  .gate-in > *{ max-width:640px; }
+  .gate h2{ text-shadow:0 2px 24px rgba(20,35,70,.35); }
+  .gate-sky{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+  .gate-cloud{ position:absolute; display:block; background-image:url(media/art/balloon.webp); background-repeat:no-repeat; will-change:transform;
+    -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, #000 25%, transparent 100%); mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, #000 25%, transparent 100%); }
+  .gc1{ left:-8%; top:4%; width:58vw; aspect-ratio:680/210; background-size:250% auto; background-position:86.3% 7.6%; opacity:.85; }
+  .gc2{ right:-12%; top:30%; width:42vw; aspect-ratio:320/200; background-size:531.25% auto; background-position:0 11.9%; opacity:.7; }
+  .gc3{ left:14%; top:46%; width:46vw; aspect-ratio:520/200; background-size:326.9% auto; background-position:0 35%; opacity:.45; }
+  .gate-balloon{ position:absolute; z-index:1; right:9%; top:12%; width:clamp(150px,24vw,360px); aspect-ratio:730/970; display:block; will-change:transform; }
+  .gb-img{ position:absolute; inset:0; display:block; background:url(media/art/balloon.webp) 48.45% 35% / 232.9% auto no-repeat;
+    -webkit-mask-image:radial-gradient(ellipse 50% 38.5% at 50% 36.6%, #000 84%, transparent 100%), radial-gradient(ellipse 17% 22% at 50% 84%, #000 58%, transparent 100%);
+    mask-image:radial-gradient(ellipse 50% 38.5% at 50% 36.6%, #000 84%, transparent 100%), radial-gradient(ellipse 17% 22% at 50% 84%, #000 58%, transparent 100%);
+    animation:gbBob 7s ease-in-out infinite; transition:filter .3s; }
+  .gate-balloon:hover .gb-img, .gate-balloon:focus-visible .gb-img{ filter:brightness(1.08) saturate(1.15); }
+  .gate-balloon:focus-visible{ outline-offset:-8px; }
+  @keyframes gbBob{ 0%,100%{ transform:translateY(0) rotate(-1.2deg); } 50%{ transform:translateY(-14px) rotate(1.2deg); } }
+  @keyframes gbRise{ from{ transform:translateY(75vh) scale(.5); opacity:0; } 20%{ opacity:1; } to{ transform:none; } }
+  .art-cap{ margin:44px 0 0; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.03em; line-height:1.5; color:rgba(243,238,223,.72); }
+  .art-cap em{ font-family:'Newsreader',Georgia,serif; font-size:13.5px; letter-spacing:0; }
+  @media (max-width:760px){
+    .gate{ min-height:auto; }
+    .gate-in{ padding:96px 20px 64px; }
+    .gate-balloon{ width:30vw; right:6%; top:64px; }
+    .gc1{ width:90vw; } .gc2{ width:60vw; } .gc3{ width:70vw; }
+  }
+
+
+  footer#contact{ border-top:1px solid var(--line); }
+
+  /* ===== top bar spans the full width; readable over the painting ===== */
+  header.topbar .wrap{ max-width:none; padding-left:32px; padding-right:32px; }
+  @media (max-width:640px){ header.topbar .wrap{ padding-left:18px; padding-right:18px; } }
+  header.topbar:not(.solid):not(.dark) nav.top-nav{ background:rgba(243,238,223,.9); padding:6px 8px 6px 16px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); box-shadow:0 6px 20px -12px rgba(20,35,70,.5); }
+  header.topbar:not(.solid):not(.dark) nav.top-nav a{ color:#1B2420; }
+
+  /* ===== the drawn balloon ===== */
+  .gate-balloon{ width:clamp(170px,19vw,300px); aspect-ratio:220/330; right:12%; top:9%; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .gate-balloon .gb-img{ display:none; }
+  .gb-svg{ width:100%; height:100%; display:block; overflow:visible; filter:drop-shadow(0 26px 30px rgba(15,30,60,.28)); }
+  .gb-hang{ transform-origin:110px 214px; transform-box:view-box; }
+  .gb-flame{ transform-origin:110px 252px; transform-box:view-box; animation:gbFlick .22s ease-in-out infinite alternate; opacity:.75; }
+  .gb-glow{ opacity:.35; transition:opacity .3s; }
+  .gate-balloon:hover .gb-flame{ opacity:1; animation-duration:.12s; } .gate-balloon:hover .gb-glow{ opacity:.8; }
+  .gate-balloon.burn .gb-flame{ animation:gbBurn .9s ease-out; opacity:1; } .gate-balloon.burn .gb-glow{ opacity:1; }
+  @keyframes gbFlick{ from{ transform:scale(.9,.85); } to{ transform:scale(1.05,1.12); } }
+  @keyframes gbBurn{ 0%{ transform:scale(1,1); } 15%{ transform:scale(1.5,2.6); } 60%{ transform:scale(1.25,1.9); } 100%{ transform:scale(1,1); } }
+  .gb-bag{ cursor:pointer; } .gb-bag:hover circle{ fill:#d9c08f; }
+  @media (prefers-reduced-motion: reduce){ .gb-flame{ animation:none; } }
+  @media (max-width:760px){ .gate-balloon{ width:34vw; right:5%; top:56px; } }
+
+  /* ===== more coming soon ===== */
+  section.soon{ max-width:none; margin:0; padding:0; }
+  .soon{ position:relative; overflow:hidden; background:radial-gradient(90% 120% at 50% 0%, #1d2c25 0%, #101915 70%); color:#F3EEDF; text-align:center; }
+  .soon-in{ max-width:900px; margin:0 auto; padding:120px 24px 130px; }
+  .soon h2{ font-family:'Newsreader',Georgia,serif; font-weight:500; font-size:clamp(48px,9vw,128px); line-height:.95; letter-spacing:-.02em; color:#F3EEDF; }
+  .soon-dots i{ font-style:normal; color:#F0A27A; display:inline-block; animation:soonDot 1.4s ease-in-out infinite; }
+  .soon-dots i:nth-child(2){ animation-delay:.2s; } .soon-dots i:nth-child(3){ animation-delay:.4s; }
+  @keyframes soonDot{ 0%,60%,100%{ transform:translateY(0); opacity:.35; } 30%{ transform:translateY(-.18em); opacity:1; } }
+  .soon p{ margin:22px auto 0; max-width:520px; font-size:18px; color:rgba(243,238,223,.72); }
+  .soon-frames{ display:flex; justify-content:center; gap:18px; margin-bottom:44px; }
+  .soon-frames span{ width:clamp(70px,11vw,130px); aspect-ratio:4/3; border:1.5px dashed rgba(243,238,223,.35); position:relative; overflow:hidden; }
+  .soon-frames span::after{ content:""; position:absolute; inset:0; background:linear-gradient(100deg, transparent 30%, rgba(240,162,122,.28) 50%, transparent 70%); transform:translateX(-100%); animation:soonSheen 2.8s ease-in-out infinite; }
+  .soon-frames span:nth-child(2)::after{ animation-delay:.35s; } .soon-frames span:nth-child(3)::after{ animation-delay:.7s; }
+  @keyframes soonSheen{ to{ transform:translateX(100%); } }
+  @media (prefers-reduced-motion: reduce){ .soon-dots i, .soon-frames span::after{ animation:none; } }
+  .soon-meadow{ height:clamp(150px,22vw,300px); background:url(media/art/poppies.webp) 60% 78%/cover no-repeat;
+    -webkit-mask-image:linear-gradient(to bottom, transparent 0%, #000 55%); mask-image:linear-gradient(to bottom, transparent 0%, #000 55%); margin-top:-40px; }
+  .soon-credit{ position:absolute; right:18px; bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:rgba(255,255,255,.85); text-shadow:0 1px 8px rgba(0,0,0,.7); text-align:right; max-width:calc(100% - 36px); }
+  .soon-credit em{ font-family:'Newsreader',Georgia,serif; font-size:12.5px; }
+  .soon .soon-in{ padding-bottom:60px; }
+
+  /* ===== photo prints: taped snapshots; hover straightens one, click brings it to the front ===== */
+  .prints{ position:relative; margin-top:40px; max-width:520px; }
+  .print{ margin:0; position:relative; z-index:1; background:#FBF8F0; padding:8px 8px 9px; box-shadow:0 22px 34px -18px rgba(0,0,0,.6), 0 1px 0 rgba(0,0,0,.08);
+    transform:rotate(var(--r,0deg)); transition:transform .55s cubic-bezier(.2,.8,.2,1), box-shadow .55s; cursor:pointer; }
+  .print img{ display:block; width:100%; height:auto; }
+  .print figcaption{ margin-top:8px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; line-height:1.35; color:#4b4a40; }
+  .print::before{ content:""; position:absolute; top:-10px; left:50%; width:74px; height:20px; transform:translateX(-50%) rotate(-4deg); z-index:2;
+    background:rgba(236,226,196,.82); box-shadow:0 1px 2px rgba(0,0,0,.12); }
+  .print:hover, .print:focus-visible{ transform:rotate(0deg) translateY(-8px) scale(1.025); box-shadow:0 34px 48px -22px rgba(0,0,0,.65); }
+  .print.front{ z-index:3; }
+  .prints-two .pr-a{ width:70%; }
+  .prints-two .pr-b{ position:absolute; right:0; top:22%; width:38%; z-index:2; }
+  .prints-one .pr-a{ width:min(240px,58%); margin-left:auto; margin-right:6%; }
+  @media (max-width:900px){ .prints{ margin-top:34px; } .prints-one .pr-a{ margin-left:0; } }
+  @media (prefers-reduced-motion: reduce){ .print{ transition:none; } }
+
+  /* ===== Sterling: the real site in a browser window that scrolls itself ===== */
+  .site-shot{ display:block; perspective:1400px; text-decoration:none; }
+  .bw{ display:block; background:#F4F1E8; border:1px solid rgba(238,241,246,.25); box-shadow:0 50px 90px -40px rgba(0,0,0,.85), 0 0 0 1px rgba(0,0,0,.2);
+    transform:rotateY(-14deg) rotateX(4deg); transform-origin:left center; transition:transform .8s cubic-bezier(.2,.8,.2,1); }
+  .site-shot:hover .bw, .site-shot:focus-visible .bw{ transform:rotateY(0) rotateX(0); }
+  .bw-bar{ display:flex; align-items:center; gap:10px; padding:9px 12px; background:#e7e2d4; border-bottom:1px solid rgba(0,0,0,.08); }
+  .bw-bar i{ width:9px; height:9px; border-radius:50%; background:#D9B26A; flex:none; }
+  .bw-url{ flex:1; background:#fff; border-radius:999px; padding:4px 12px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#3a3a3a; }
+  .bw-view{ display:block; position:relative; aspect-ratio:16/10.5; overflow:hidden; container-type:size; }
+  .bw-view img{ position:absolute; left:0; top:0; width:100%; height:auto; display:block; }
+  .r-sterling.seen .bw-view img{ animation:siteScroll 22s cubic-bezier(.45,0,.55,1) 1s infinite; }
+  .site-shot:hover .bw-view img{ animation-play-state:paused; }
+  @keyframes siteScroll{ 0%,10%{ transform:translateY(0); } 45%,55%{ transform:translateY(calc(-100% + 100cqh)); } 90%,100%{ transform:translateY(0); } }
+  .site-shot .viz-cap{ display:block; color:rgba(238,241,246,.6); }
+  @media (max-width:900px){ .bw{ transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .r-sterling.seen .bw-view img{ animation:none; } .bw{ transform:none; } }
+
+  /* EPI: the report itself */
+  .epi-viz{ display:grid; grid-template-columns:minmax(0,200px) minmax(0,1fr); gap:30px 34px; align-items:center; }
+  .epi-viz .epi-bar{ grid-column:1 / -1; }
+  .epi-doc{ grid-row:span 1; display:block; text-decoration:none; color:rgba(238,240,228,.7); transform:rotate(-2.5deg); transition:transform .4s cubic-bezier(.2,.8,.2,1); }
+  .epi-doc img{ width:100%; display:block; box-shadow:0 30px 50px -24px rgba(0,0,0,.75); outline:1px solid rgba(255,255,255,.12); }
+  .epi-doc span{ display:block; margin-top:12px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; line-height:1.4; }
+  .epi-doc:hover{ transform:rotate(0) translateY(-4px); }
+  .epi-viz .epi-nums{ grid-template-columns:1fr; gap:14px; }
+  .epi-viz .epi-nums b{ font-size:clamp(44px,5vw,76px); }
+  @media (max-width:560px){ .epi-viz{ grid-template-columns:1fr; } .epi-doc{ max-width:200px; } .epi-viz .epi-nums{ grid-template-columns:repeat(3,1fr); } }
 </style>
+<!-- seo-head -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#3B67B5">
+<link rel="canonical" href="https://bdornyei42.ben-dornyei.workers.dev/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bendegúz Dörnyei">
+<meta property="og:url" content="https://bdornyei42.ben-dornyei.workers.dev/">
+<meta property="og:title" content="Bendegúz “Ben” Dörnyei">
+<meta property="og:description" content="I bridge data and policy for evidence-based decision-making, and support scientific innovation. Projects: NLP on 36 years of Hungarian parliamentary debate, pandemic risk for the UN Foundation, the World Bank LSMS research tracker and the 2026 Environmental Performance Index.">
+<meta property="og:image" content="https://bdornyei42.ben-dornyei.workers.dev/media/og/home.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bendegúz “Ben” Dörnyei, beside Pál Szinyei Merse’s painting Léggömb">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Person", "@id": "https://bdornyei42.ben-dornyei.workers.dev/#person", "name": "Bendegúz Dörnyei", "alternateName": ["Ben Dörnyei", "Ben Dornyei", "Bendeguz Dornyei", "Bendegúz Barna Dörnyei"], "url": "https://bdornyei42.ben-dornyei.workers.dev/", "image": "https://bdornyei42.ben-dornyei.workers.dev/media/og/home.jpg", "description": "I bridge data and policy for evidence-based decision-making, and support scientific innovation.", "jobTitle": "World Bank LSMS fellow", "sameAs": ["https://www.linkedin.com/in/ben-dornyei/"], "knowsAbout": ["Natural language processing", "Public policy", "Data science", "Hungarian politics", "Pandemic risk assessment", "Household surveys"]}, {"@type": "WebSite", "@id": "https://bdornyei42.ben-dornyei.workers.dev/#website", "url": "https://bdornyei42.ben-dornyei.workers.dev/", "name": "Bendegúz Dörnyei", "publisher": {"@id": "https://bdornyei42.ben-dornyei.workers.dev/#person"}, "inLanguage": "en"}]}</script>
+<!-- /seo-head -->
 </head>
 <body>
 
-<header class="topbar">
+<header class="topbar" id="topbar">
   <div class="wrap">
-    <div class="mark">B. DÖRNYEI</div>
-    <nav class="top-nav">
-      <a href="#experience">Experience</a>
-      <a href="#tools">Tools</a>
-      <a href="#education" class="hide-sm">Education</a>
-      <a href="#contact">Contact</a>
+    <a class="mark" href="#door" style="text-decoration:none;">B. DÖRNYEI</a>
+    <nav class="top-nav" aria-label="Main">
+      <a href="#gallery">Projects</a>
+      <a href="thesis" class="hide-xs">Thesis</a>
+      <a href="https://www.linkedin.com/in/ben-dornyei/" target="_blank" rel="noopener" class="hide-sm">Experience</a>
+      <span class="nav-ext">
+        <a href="mailto:ben.dornyei@gmail.com" class="nav-cta">Email</a>
+        <a href="https://www.linkedin.com/in/ben-dornyei/" target="_blank" rel="noopener" class="nav-cta hide-xs">LinkedIn</a>
+      </span>
     </nav>
   </div>
 </header>
 
-<div class="hero-art">
-  <img class="hero-paint" src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Szinyei_Merse%2C_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" alt="" referrerpolicy="no-referrer" decoding="async" onerror="this.remove()">
-  <div class="hero hero-top">
-    <div class="eyebrow">Making messy data behave — for better policy</div>
+<section class="door" id="door">
+  <div class="door-text">
     <h1>Bendegúz <span class="ben">“Ben”</span><br><em>Dörnyei</em></h1>
-    <div class="art-credit">Szinyei Merse Pál · <a href="https://commons.wikimedia.org/wiki/File:Szinyei_Merse,_P%C3%A1l_-_The_Balloon_-_Google_Art_Project.jpg" target="_blank" rel="noopener noreferrer"><em>Léggömb</em></a>, 1878 · Hungarian National Gallery</div>
+    <div class="status"><span class="dot"></span> This website is new, and more will be added soon.</div>
+    <p class="lede">I bridge data and policy for evidence-based decision-making, and support scientific innovation. World Bank LSMS fellow, Yale M.P.P. candidate.</p>
+    <div class="door-invite">
+      <a class="door-win" id="door-window" href="#gallery" data-painted-window aria-label="Open the window to the projects"></a>
+      <div class="door-how">
+        <p>Open the window to see the projects.</p>
+        <a class="door-cta" href="#gallery" data-pw-target="#door-window">See the projects <span class="arrow">→</span></a>
+      </div>
+    </div>
+    <div class="door-contact">
+      <a href="mailto:ben.dornyei@gmail.com">ben.dornyei@gmail.com</a>
+      <a href="https://www.linkedin.com/in/ben-dornyei/" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
   </div>
-</div>
-<div class="hero hero-rest">
-  <p class="lede">I use statistics, data science, and a bit of AI to understand how institutions actually behave — from democratic backsliding in Hungary to the World Bank's household surveys. Currently an LSMS Survey Innovation Fellow at the World Bank and an M.P.P. candidate at Yale's Jackson School.</p>
-  <div class="meta-row">
-    <span>NEW HAVEN, CT</span>
-    <span>WASHINGTON, D.C.</span>
-    <span>YALE MPP ’27 · GEORGIA TECH MS ’28</span>
-  </div>
-  <svg class="thread-svg" viewBox="0 0 150 150" aria-hidden="true">
-    <path d="M10,110 C40,110 30,60 60,60 C85,60 75,20 100,20 C115,20 118,35 132,32" />
-  </svg>
-</div>
-
-<section id="experience">
-  <div class="section-head reveal">
-    <h2>Where I've <span class="serif-italic">worked</span></h2>
-    <span class="count">2022 — now</span>
-  </div>
-  <p class="lead-p reveal">Research and analyst roles across development, environment, and governance — the common thread is turning messy real-world data into something a decision-maker can act on.</p>
-
-  <div class="timeline" style="margin-top:48px;">
-
-    <div class="t-item now reveal">
-      <div class="t-dot"></div>
-      <span class="t-date">Aug 2026 — present</span>
-      <h3>Founder</h3>
-      <div class="org">Sterling Admissions · sterlingadmissions.com</div>
-      <p>Founded a mentoring company that pairs students applying to top US universities with recent admits for weekly 1:1 guidance — application strategy, essays, activity lists, and school selection. Built from my own experience getting into Yale from Hungary without a college counselor.</p>
-      <a class="proj-link" href="https://sterlingadmissions.com" target="_blank" rel="noopener">Visit sterlingadmissions.com <span class="arrow">↗</span></a>
-    </div>
-
-    <div class="t-item now reveal">
-      <div class="t-dot"></div>
-      <span class="t-date">Jun 2026 — present</span>
-      <h3>LSMS Survey Innovation Fellow</h3>
-      <div class="org">The World Bank Group · Development Data Group, Survey Unit · Washington, D.C.</div>
-      <p>Built an automated Python pipeline tracking the research impact of LSMS household surveys across publications, books, and articles; supported the launch of an internal Community of Practice for Data; produced analysis and visualizations on survey outcomes, including the Nigerian Household Business Indicators.</p>
-      <a class="proj-link" href="https://bdornyei42.github.io/WBG_LSMS_Impact/" target="_blank" rel="noopener">See the live LSMS impact dashboard <span class="arrow">↗</span></a>
-    </div>
-
-    <div class="t-item reveal">
-      <div class="t-dot"></div>
-      <span class="t-date">Jun — Aug 2025</span>
-      <h3>Public Administration Intern</h3>
-      <div class="org">United Nations · Dept. of Economic and Social Affairs (UN DESA) · New York, NY</div>
-      <p>Analyzed the UN e-government survey and quantified digital-capacity gaps across 193 countries with an R pipeline; produced reports and policy dashboards used by ministers during the UN High-Level Political Forum; attended General Assembly and Security Council sessions and prepared briefs for senior leadership.</p>
-    </div>
-
-    <div class="t-item reveal">
-      <div class="t-dot"></div>
-      <span class="t-date">Aug 2024 — Oct 2025</span>
-      <h3>Research Assistant</h3>
-      <div class="org">Yale Institution for Social and Policy Studies · New Haven, CT</div>
-      <p>Built an interim U.S. Senate position-tracker tool to support federal-oversight and policy research; ran quantitative field research on Hungary's electoral incentives and EU integration.</p>
-    </div>
-
-    <div class="t-item reveal">
-      <div class="t-dot"></div>
-      <span class="t-date">Aug 2024 — Jun 2025</span>
-      <h3>Research Assistant</h3>
-      <div class="org">Yale Center for Environmental Law &amp; Policy · New Haven, CT</div>
-      <p>Contributed to the 2026 Environmental Performance Index — a report used by the UN and governments worldwide — using R, Python, and SQL to analyze climate and trade data informing sustainability and economic policy.</p>
-    </div>
-
-    <div class="t-item reveal">
-      <div class="t-dot"></div>
-      <span class="t-date">May — Aug 2024</span>
-      <h3>Service Quality Management Analyst</h3>
-      <div class="org">UNICEF · Global Shared Services Centre · Budapest, Hungary</div>
-      <p>Developed and validated an R-based financial risk model that recovered over $100,000 and improved oversight of an $8.9B fund; briefed senior officials, who adopted it long-term; built a Power BI dashboard for real-time performance tracking.</p>
-    </div>
-
-  </div>
+  <figure class="door-art">
+    <img src="media/art/balloon.webp" alt="Pál Szinyei Merse, Léggömb (The Balloon), 1878: a red-and-cream striped balloon in a deep blue sky" decoding="async">
+    <figcaption>Pál Szinyei Merse · <em>Léggömb</em>, 1878 · Hungarian National Gallery</figcaption>
+  </figure>
 </section>
 
-<section id="tools">
-  <div class="section-head reveal">
-    <h2>Things I've <span class="serif-italic">built</span></h2>
-    <span class="count">01 venture · 03 tools</span>
+<section class="gate" id="gallery">
+  <div class="gate-sky" aria-hidden="true">
+    <span class="gate-cloud gc1" data-drift="70"></span>
+    <span class="gate-cloud gc2" data-drift="-90"></span>
+    <span class="gate-cloud gc3" data-drift="50"></span>
   </div>
-  <p class="demos-intro reveal">A company I founded, and the small apps I built to run my own life.</p>
-
-  <a class="feature-card reveal" href="https://sterlingadmissions.com" target="_blank" rel="noopener">
-    <div class="fc-main">
-      <div class="eyebrow">Company · Education</div>
-      <h3>Sterling Admissions</h3>
-      <p>1:1 mentoring for students applying to elite US universities, from anywhere. I pair applicants with recent admits from top-15 schools for weekly guidance on strategy, essays, and school lists — the counseling I wish I'd had applying from Hungary.</p>
-    </div>
-    <span class="visit">sterlingadmissions.com <span class="arrow">↗</span></span>
+  <a class="gate-balloon" href="#room-thesis" aria-label="Fire the burner and fly to the first project, Parliament NLP">
+    <svg class="gb-svg" viewBox="0 0 220 330" aria-hidden="true">
+      <defs>
+        <clipPath id="gb-env"><path id="gb-env-path" d=""/></clipPath>
+        <radialGradient id="gb-shade" cx="34%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset=".78" stop-color="#2a1608" stop-opacity=".18"/><stop offset="1" stop-color="#2a1608" stop-opacity=".42"/></radialGradient>
+        <radialGradient id="gb-fire" cx="50%" cy="70%" r="60%"><stop offset="0" stop-color="#fff6c8"/><stop offset=".35" stop-color="#ffc24a"/><stop offset=".75" stop-color="#ff6a1a" stop-opacity=".8"/><stop offset="1" stop-color="#ff3a00" stop-opacity="0"/></radialGradient>
+        <radialGradient id="gb-glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffb347" stop-opacity=".55"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
+        <pattern id="gb-wicker" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#8a5a2b"/><path d="M0 3h6M3 0v6" stroke="#5e3a17" stroke-width="1"/></pattern>
+      </defs>
+      <g class="gb-env">
+        <g clip-path="url(#gb-env)"><g id="gb-gores"></g><rect x="0" y="0" width="220" height="250" fill="url(#gb-shade)"/></g>
+        <use href="#gb-env-path" fill="none" stroke="#5a3418" stroke-width="1.3"/>
+      </g>
+      <g class="gb-hang">
+        <g id="gb-ropes" stroke="#4a2c14" stroke-width=".9" fill="none"></g>
+        <circle class="gb-glow" cx="110" cy="244" r="26" fill="url(#gb-glow)"/>
+        <path class="gb-flame" d="M110 228 C104 238 103 246 110 252 C117 246 116 238 110 228Z" fill="url(#gb-fire)"/>
+        <rect x="96" y="256" width="28" height="22" rx="2" fill="url(#gb-wicker)" stroke="#4a2c14" stroke-width="1"/>
+        <rect x="94" y="254" width="32" height="4" rx="1.5" fill="#6b4322" stroke="#4a2c14" stroke-width=".8"/>
+        <g id="gb-bags"></g>
+      </g>
+    </svg>
   </a>
+  <div class="gate-in">
+    <h2>Selected projects</h2>
+    <ol class="gate-list">
+      <li><a href="#room-thesis"><b>1</b>Parliament NLP</a></li><li><a href="#room-pandemic"><b>2</b>Pandemic risk</a></li><li><a href="#room-lsms"><b>3</b>LSMS tracker</a></li>
+      <li><a href="#room-egov"><b>4</b>UN e-government</a></li><li><a href="#room-epi"><b>5</b>EPI 2026</a></li><li><a href="#room-maffia"><b>6</b>Startup Maffia</a></li><li><a href="#room-sterling"><b>7</b>Sterling Admissions</a></li>
+    </ol>
+    <p class="art-cap">Clouds: details from Pál Szinyei Merse, <em>Léggömb</em> (The Balloon), 1878, Hungarian National Gallery. The balloon is drawn after the painting: click it, or drop its sandbags.</p>
+  </div>
+</section>
 
-  <!-- the studio window: red shutters on a tuscan wall. click swings them open, then into the workshop -->
-  <div class="studio reveal">
-    <a class="tuscan" id="tuscan" href="workshop.html" aria-label="Open the window and step into my workshop">
-      <span class="wall">
-        <span class="surround">
-          <span class="opening">
-            <span class="room" aria-hidden="true">
-              <span class="lamp"></span>
-              <span class="minis"><span><i class="g-grid"></i>Planner</span><span><i class="g-bars"></i>Budget</span><span><i class="g-net"></i>People</span></span>
-              <span class="desk"></span>
-            </span>
-            <span class="shutter l" aria-hidden="true"></span>
-            <span class="shutter r" aria-hidden="true"></span>
-          </span>
-        </span>
-        <span class="sill" aria-hidden="true"></span>
-        <span class="planter" aria-hidden="true"><span class="blooms"></span></span>
-      </span>
+<nav class="room-dots" id="room-dots" aria-label="Projects"></nav>
+
+<section class="room r-thesis" id="room-thesis" data-name="Parliament NLP">
+  <div class="tricolor" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="room-in">
+    <div class="room-copy">
+      <h2>Measuring parliamentary discourse in Hungary</h2>
+      <p>Hungary publishes each sitting of parliament as a PDF. I built an NLP pipeline that combines rules with a language model to extract speakers and their parties, attacks, interruptions and votes.</p>
+      <ul class="room-facts"><li><b>82–91%</b>accuracy vs. hand-coding</li><li><b>~87,000</b>pages of transcripts</li><li><b>36 years</b>10 parliaments</li></ul>
+      <div class="room-cta"><a class="rbtn" href="thesis">Read the thesis <span class="arrow">→</span></a><a class="rline" href="files/dornyei-thesis-hungarian-parliamentary-discourse.pdf" target="_blank" rel="noopener">PDF</a></div>
+      <div class="prints prints-one">
+        <figure class="print pr-a" style="--r:2deg"><img src="media/thesis/poster-session.webp" alt="Ben presenting the research poster" width="1000" height="1147" loading="lazy" decoding="async"><figcaption>Presenting the poster</figcaption></figure>
+      </div>
+    </div>
+    <a class="room-viz spot-viz" href="thesis" aria-label="Open the thesis">
+      <svg id="spot-hemi" viewBox="0 0 1000 520" aria-hidden="true"></svg>
+      <div class="spot-yr" id="spot-yr">1990</div>
+      <div class="spot-gov" id="spot-gov">Antall · Boross</div>
     </a>
-    <div class="studio-text">
-      <div class="eyebrow">Open studio</div>
-      <h3>Come in — the <em>window’s</em> open.</h3>
-      <p>Behind those shutters is my workshop: the planner that runs my semesters, the budget that keeps me honest, and a map of the people I don’t want to lose touch with. They’re the same tools I use every day, filled with sample data so you can poke around and break things.</p>
-      <a class="studio-cta" href="workshop.html" onclick="return openWindow(event)">Open the window <span class="arrow">→</span></a>
-      <div class="demos-note" style="margin:18px 0 0;"><span class="dot"></span> 3 tools · no sign-up · nothing you type leaves your browser</div>
+  </div>
+</section>
+
+<section class="room r-pandemic" id="room-pandemic" data-name="Pandemic risk">
+  <canvas id="sim" aria-hidden="true"></canvas>
+  <div class="room-in">
+    <div class="room-copy">
+      <div class="room-no">Policy report, 2025</div>
+      <h2>A global framework for pandemic risk assessment</h2>
+      <p>Co-authored report for the UN Foundation and Yale Jackson. It reviews 11 risk tools, draws on 27 expert consultations and sets out 12 design principles. Presented at the WHO, UN Headquarters, Columbia and Mount Sinai.</p>
+      <div class="room-cta"><a class="rbtn" href="pandemic-risk">Read the report <span class="arrow">→</span></a></div>
+      <div class="hud"><span id="hud-day">day 0</span> · <b id="hud-i">0</b> infected · <b id="hud-r">0</b> recovered<br><small>Illustrative simulation. Click to start a new outbreak.</small></div>
+    </div>
+    <a class="room-cover" href="pandemic-risk" aria-label="Open the pandemic risk report"><img src="media/pandemic/cover.webp" alt="Report cover: Advancing a Global Framework for Pandemic Risk Assessment" loading="lazy"></a>
+  </div>
+</section>
+
+<section class="room r-lsms" id="room-lsms" data-name="LSMS tracker">
+  <div class="room-in">
+    <div class="room-copy">
+      <div class="room-no">World Bank, 2026</div>
+      <h2><span class="bignum">7,566</span> papers in the LSMS research tracker</h2>
+      <p>I built a pipeline that searches OpenAlex for research on the World Bank’s household surveys and keeps only papers that used LSMS data. It updates automatically and feeds a public dashboard.</p>
+      <div class="room-cta"><a class="rbtn" href="https://bdornyei42.github.io/WBG_LSMS_Impact/" target="_blank" rel="noopener">Open the dashboard <span class="arrow">↗</span></a></div>
+      <div class="prints prints-two">
+        <figure class="print pr-a" style="--r:-2.5deg"><img src="media/lsms/team.webp" alt="Ben with the team in the World Bank atrium" width="1400" height="1050" loading="lazy" decoding="async"><figcaption>With the team at the World Bank</figcaption></figure>
+        <figure class="print pr-b" style="--r:3.5deg"><img src="media/lsms/staircase.webp" alt="Ben on a staircase in a World Bank atrium with a moss wall behind him" width="900" height="1116" loading="lazy" decoding="async"><figcaption>World Bank</figcaption></figure>
+      </div>
+    </div>
+    <div class="room-viz"><svg id="lsms-chart" viewBox="0 0 520 260" role="img" aria-label="Papers per fiscal year, from 168 in FY09 to 828 in FY26"></svg><div class="viz-cap">Papers per fiscal year. Line: share with an author at an African institution.</div></div>
+  </div>
+</section>
+
+<section class="room r-egov" id="room-egov" data-name="UN e-government">
+  <div class="room-in">
+    <div class="room-copy">
+      <div class="room-no">UN DESA, 2025</div>
+      <h2>UN E-Government Data Center</h2>
+      <p>I helped build the UN’s public e-government database and measured digital-capacity gaps for all 193 member states. Ministers used the reports at the High-Level Political Forum.</p>
+      <div class="room-cta"><a class="rbtn" href="https://publicadministration.un.org/egovkb/Data-Center" target="_blank" rel="noopener">Open the Data Center <span class="arrow">↗</span></a></div>
+    </div>
+    <div class="room-viz"><div class="egov-head"><b id="egov-name">Hungary</b><span id="egov-val">#59 of 193</span></div><div class="egov-strip" id="egov-strip"></div><div class="viz-cap">2024 E-Government Development Index, ranked. Hover a country.</div></div>
+  </div>
+</section>
+
+<section class="room r-epi" id="room-epi" data-name="EPI 2026">
+  <div class="room-in">
+    <div class="room-copy">
+      <div class="room-no">Contributing author · Yale Center for Environmental Law &amp; Policy</div>
+      <h2>2026 Environmental Performance Index</h2>
+      <p>Yale and Columbia’s scorecard of 177 countries’ progress toward environmental targets. I analyzed climate and trade data for it and am listed among the report’s contributors (writing, research and production).</p>
+      <div class="room-cta"><a class="rbtn" href="https://epi.yale.edu/2026/welcome" target="_blank" rel="noopener">Open the EPI <span class="arrow">↗</span></a><a class="rline" href="https://epi.yale.edu/sites/default/files/2026-11/EPI2026_Report_20261106.pdf" target="_blank" rel="noopener">Report (PDF)</a><a class="rline" href="https://epi.yale.edu/2026/2026-epi-team" target="_blank" rel="noopener">Team credits</a></div>
+    </div>
+    <div class="room-viz epi-viz">
+      <a class="epi-doc" href="https://epi.yale.edu/sites/default/files/2026-11/EPI2026_Report_20261106.pdf" target="_blank" rel="noopener" aria-label="Open the 2026 EPI report (PDF, Yale)"><img src="media/epi/cover.webp" alt="Cover of the 2026 Environmental Performance Index report" loading="lazy"><span>2026 EPI report · 374 pages · I am listed on p. 5</span></a>
+      <div class="epi-nums"><div><b>177</b>countries</div><div><b>47</b>indicators</div><div><b>12</b>issue categories</div></div>
+      <div class="epi-bar"><span style="--w:45%">Ecosystem vitality · 45%</span><span style="--w:30%">Climate · 30%</span><span style="--w:25%">Health · 25%</span></div>
     </div>
   </div>
 </section>
 
-<section id="education">
-  <div class="section-head reveal">
-    <h2><span class="serif-italic">Education</span> &amp; honors</h2>
+<section class="room r-maffia" id="room-maffia" data-name="Startup Maffia">
+  <div class="room-in">
+    <div class="room-copy">
+      <div class="room-no">President, 2021–2022</div>
+      <h2>Startup Maffia</h2>
+      <p>Volunteer-run nonprofit with free expert evenings for young Hungarian founders. 43 events, 650+ key members, hundreds of partner organizations and startups, thousands of founders. 165,000+ people reached through hybrid, livestreamed events. Raised $85,000 in sponsorship value.</p>
+      <div class="room-cta"><a class="rbtn" href="startup-maffia">See the events <span class="arrow">→</span></a></div>
+      <div class="prints prints-two">
+        <figure class="print pr-a" style="--r:-2deg"><img src="media/maffia/floor.webp" alt="Startup Piknik seen from above: startup and organization tables across the HUB55 hall" width="1600" height="1066" loading="lazy" decoding="async"><figcaption>Startup Piknik, HUB55</figcaption></figure>
+        <figure class="print pr-b" style="--r:3.5deg"><img src="media/maffia/welcome.webp" alt="Ben opening Startup Piknik with a microphone" width="640" height="960" loading="lazy" decoding="async"><figcaption>Opening the event</figcaption></figure>
+      </div>
+    </div>
+    <a class="room-viz posters" href="startup-maffia" aria-label="See the Startup Maffia events">
+      <span class="pstr p1"><span class="tape"></span><small>Startup Maffia #41</small><b>Magyarok<br>az űrben</b><i>Hungarians in Space · 2022.02.23</i></span>
+      <span class="pstr p2"><span class="tape"></span><small>Startup Maffia presents</small><b>Startup<br>Piknik</b><i>381 RSVPs · HUB55 · 2021</i></span>
+    </a>
   </div>
+</section>
 
-  <div class="reveal">
-    <div class="ed-item">
-      <div class="row">
-        <h3>Georgia Institute of Technology — College of Computing</h3>
-        <span class="yrs">2026–2028</span>
-      </div>
-      <p>M.S. in Computer Science, specialization in Artificial Intelligence.</p>
+<section class="room r-sterling" id="room-sterling" data-name="Sterling">
+  <div class="room-in">
+    <div class="room-copy">
+      <div class="room-no">Founder, 2026</div>
+      <h2>Sterling Admissions</h2>
+      <p>1:1 mentoring from recent admits for applicants to top US universities. I built the platform. Selected for Claude for Startups and Stripe Startups.</p>
+      <div class="room-cta"><a class="rbtn" href="https://sterlingadmissions.com" target="_blank" rel="noopener">sterlingadmissions.com <span class="arrow">↗</span></a></div>
     </div>
-    <div class="ed-item">
-      <div class="row">
-        <h3>Yale University — Jackson School of Global Affairs</h3>
-        <span class="yrs">2025–2027</span>
-      </div>
-      <p>M.P.P. in Global Affairs (accelerated joint-degree track).</p>
-    </div>
-    <div class="ed-item">
-      <div class="row">
-        <h3>Yale College</h3>
-        <span class="yrs">2022–2026</span>
-      </div>
-      <p>B.A. in Global Affairs and Statistics &amp; Data Science. Elected Senator on the Yale College Council (academic and financial policy for 6,600+ students) and a member of the Yale Executive Committee.</p>
-    </div>
-    <div class="ed-item">
-      <div class="row">
-        <h3>University of Cambridge — Pembroke College</h3>
-        <span class="yrs">2023</span>
-      </div>
-      <p>Yale study-abroad program in Development Economics, on full scholarship.</p>
-    </div>
+    <a class="room-viz site-shot" href="https://sterlingadmissions.com" target="_blank" rel="noopener" aria-label="Open sterlingadmissions.com">
+      <span class="bw">
+        <span class="bw-bar"><i></i><span class="bw-url">sterlingadmissions.com</span></span>
+        <span class="bw-view"><img src="media/sterling/site.webp" alt="The Sterling Admissions homepage: Apply with someone who has been through it" loading="lazy"></span>
+      </span>
+      <span class="viz-cap">The live site, screenshot</span>
+    </a>
   </div>
+</section>
 
-  <ul class="honors-list reveal" style="margin-top:48px;">
-    <li>Dwight Hall Fellow (2025); Leitner Fellow (2024, 2025); Blue Center Research Fellow (2025); Yale Richardson Scholar (2024)</li>
-    <li>Member, American Statistical Association (2024–) &amp; Mensa HungarIQa (2022–)</li>
-    <li>10 Young Talents of Hungary (2022); National Innovation Award (2021)</li>
-    <li>Templeton Fellow — selected from 20,000+ applicants (2017)</li>
-    <li>Featured on the Friderikusz Podcast (1.5M+ plays) and at the VIBE, DeepDive, and BrainBar festivals</li>
-  </ul>
+<section class="soon" id="soon" aria-label="More projects coming soon">
+  <div class="soon-in">
+    <div class="soon-frames" aria-hidden="true"><span></span><span></span><span></span></div>
+    <h2>More coming soon<span class="soon-dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></h2>
+    <p>This website is new. More projects will be added here.</p>
+  </div>
+  <div class="soon-meadow" aria-hidden="true"></div>
+  <div class="soon-credit">Paintings: Pál Szinyei Merse, <em>Léggömb</em> (1878) and <em>Pipacsos mező</em> (1902), Hungarian National Gallery</div>
 </section>
 
 <footer id="contact">
-  <h2>Let's <span class="serif-italic">talk.</span></h2>
+  <h2>Contact</h2>
   <div class="footer-links">
     <a href="mailto:ben.dornyei@gmail.com">ben.dornyei@gmail.com</a>
     <a href="https://www.linkedin.com/in/ben-dornyei/" target="_blank" rel="noopener">LinkedIn ↗</a>
+    <a href="#gallery">Projects ↑</a>
   </div>
 </footer>
 <div class="fine">
   <span>© 2026 Bendegúz Dörnyei</span>
   <span style="display:flex; gap:18px; flex-wrap:wrap;">
-    <a href="workshop.html">The workshop</a>
-    <a href="planner-demo.html">Year planner</a>
-    <a href="dashboard.html">Budget</a>
-    <a href="connections.html">Connections</a>
+    <a href="workshop.html">Life-management tools</a>
+    <a href="thesis">Thesis</a>
+    <a href="pandemic-risk">Pandemic risk</a>
+    <a href="startup-maffia">Startup Maffia</a>
+    <a href="#gallery">Projects</a>
   </span>
 </div>
-
 <script>
-  // the studio window: swing the shutters, then step in (straight through if motion is reduced or a new tab was asked for)
-  function openWindow(e){
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return true;
-    const w = document.getElementById('tuscan'), href = w.getAttribute('href');
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return true;
-    e.preventDefault();
-    w.classList.add('open');
-    setTimeout(() => { location.href = href; }, 950);
-    return false;
-  }
-  document.getElementById('tuscan').addEventListener('click', openWindow);
-
   const els = document.querySelectorAll('.reveal');
   if('IntersectionObserver' in window){
     const io = new IntersectionObserver((entries)=>{
@@ -563,6 +919,221 @@
     els.forEach(el=>el.classList.add('in'));
   }
 </script>
+<script>
+/* thesis spotlight: every Hungarian parliament since 1990, cycling */
+(() => {
+  const svg = document.getElementById('spot-hemi'); if (!svg) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COL = {MSZP:'#E0473C',SZDSZ:'#4C8BE0',Fidesz:'#F28C28',FK:'#F28C28',MDF:'#3FA36B',KDNP:'#E9C46A',FKGP:'#9DB35A',MIEP:'#8B6A52',Jobbik:'#A0815F',LMP:'#77D08A',DK:'#6FB3EE',Egy:'#A89BEA',MP:'#E8705F',MS:'#F09A8F',Alli:'#D95550',UfH:'#A97BDB',Mi:'#6FAE5C',Tisza:'#3FA9F5',Ind:'#8A928D',Ger:'#C9C2B2'};
+  const P = [
+    [1990,'Antall · Boross',[['MSZP',33],['SZDSZ',94],['Fidesz',22],['Ind',8],['MDF',164],['KDNP',21],['FKGP',44]]],
+    [1994,'Horn',[['MSZP',209],['SZDSZ',70],['Fidesz',20],['Ind',1],['MDF',38],['KDNP',22],['FKGP',26]]],
+    [1998,'Orbán I',[['MSZP',134],['SZDSZ',24],['Ind',1],['MDF',17],['Fidesz',148],['FKGP',48],['MIEP',14]]],
+    [2002,'Medgyessy · Gyurcsány I',[['MSZP',178],['SZDSZ',20],['MDF',24],['Fidesz',164]]],
+    [2006,'Gyurcsány II · Bajnai',[['MSZP',186],['MS',6],['SZDSZ',18],['Ind',1],['MDF',11],['FK',164]]],
+    [2010,'Orbán II',[['MSZP',59],['LMP',16],['Ind',1],['FK',263],['Jobbik',47]]],
+    [2014,'Orbán III',[['Alli',38],['LMP',5],['FK',133],['Jobbik',23]]],
+    [2018,'Orbán IV',[['MP',20],['DK',9],['Egy',1],['LMP',8],['Ind',1],['Ger',1],['FK',133],['Jobbik',26]]],
+    [2022,'Orbán V',[['UfH',57],['Ger',1],['FK',135],['Mi',6]]],
+    [2026,'Magyar',[['Tisza',141],['FK',52],['Mi',6]]],
+  ];
+  const NS = 'http://www.w3.org/2000/svg', CX = 500, CY = 505, R = 490, cache = {};
+  const lay = n => { if (cache[n]) return cache[n]; const rows = n > 300 ? 10 : 7, r0 = .4;
+    const rad = Array.from({length:rows}, (_, i) => r0 + (1 - r0) * i / (rows - 1)), tot = rad.reduce((a, b) => a + b, 0);
+    const per = rad.map(r => Math.round(n * r / tot)); per[rows - 1] += n - per.reduce((a, b) => a + b, 0);
+    const pts = []; rad.forEach((r, i) => { for (let j = 0; j < per[i]; j++){ const t = Math.PI - j / (per[i] - 1) * Math.PI; pts.push({x:CX + R * r * Math.cos(t), y:CY - R * r * Math.sin(t), t}); } });
+    pts.sort((a, b) => b.t - a.t); return cache[n] = {pts, dot:Math.min(R * (1 - r0) / (rows - 1) * .38, Math.PI * R * tot / n * .4)}; };
+  let g = null, curN = 0, i = 0, first = true;
+  const draw = k => { const [y, gov, seats] = P[k], n = seats.reduce((a, [, v]) => a + v, 0), L = lay(n), cols = [];
+    seats.forEach(([p, v]) => { for (let m = 0; m < v; m++) cols.push(COL[p]); });
+    if (n !== curN){ if (g) g.remove(); g = document.createElementNS(NS, 'g');
+      L.pts.forEach(p => { const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', p.x.toFixed(1)); c.setAttribute('cy', p.y.toFixed(1)); c.setAttribute('r', L.dot.toFixed(1)); c.setAttribute('fill', '#2a3a33'); c.style.transitionDelay = reduce ? '0ms' : Math.round((1 - p.t / Math.PI) * 600) + 'ms'; g.appendChild(c); });
+      svg.appendChild(g); curN = n; g.getBoundingClientRect();
+      if (first && !reduce && g.children[0].animate){ first = false; [...g.children].forEach(c => c.animate([{transform:`translateY(${-200 - Math.random() * 300}px)`, opacity:0}, {transform:'translateY(0)', opacity:1}], {duration:900 + Math.random() * 400, delay:Math.random() * 800, easing:'cubic-bezier(.2,.9,.25,1.15)', fill:'backwards'})); } }
+    [...g.children].forEach((c, m) => c.setAttribute('fill', cols[m]));
+    document.getElementById('spot-yr').textContent = y; document.getElementById('spot-gov').textContent = gov; };
+  let started = false, timer;
+  const start = () => { if (started) return; started = true; draw(0); if (!reduce) timer = setInterval(() => draw(i = (i + 1) % P.length), 2300); };
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) start(); }, {threshold:.2}).observe(svg);
+  document.addEventListener('visibilitychange', () => { if (!started || reduce) return; clearInterval(timer); if (!document.hidden) timer = setInterval(() => draw(i = (i + 1) % P.length), 2300); });
+})();
+</script>
+<script>
+document.documentElement.classList.add('js');
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (q, r = document) => r.querySelector(q), $$ = (q, r = document) => [...r.querySelectorAll(q)];
+  const rooms = $$('.room');
 
+  /* top bar: clear over the window, dark over dark rooms */
+  const bar = $('#topbar');
+  const darkRooms = new Set(['room-thesis','room-pandemic','room-epi','room-maffia','room-sterling']);
+  const onScroll = () => { const y = innerHeight * .08; let over = null;
+    for (const r of [$('#gallery'), ...rooms]){ const b = r.getBoundingClientRect(); if (b.top <= y && b.bottom > y){ over = r; break; } }
+    bar.classList.toggle('dark', !!over && (over.id === 'gallery' || darkRooms.has(over.id)));
+    bar.classList.toggle('solid', !over && scrollY > innerHeight * .6); };
+  addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  /* room dots */
+  const dots = $('#room-dots');
+  dots.innerHTML = rooms.map(r => `<a href="#${r.id}" aria-label="${r.dataset.name}"><span>${r.dataset.name}</span></a>`).join('');
+  const dotA = $$('a', dots);
+  const lightOn = { 'room-lsms':'#1B2420', 'room-egov':'#1B2420' };
+  const dotIO = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const i = rooms.indexOf(e.target);
+    dotA.forEach((a, k) => a.classList.toggle('on', k === i)); dots.style.setProperty('--dotc', lightOn[e.target.id] || '#F3EEDF'); }), {rootMargin:'-45% 0px -45% 0px'});
+  rooms.forEach(r => dotIO.observe(r));
+  const dotVis = () => { const top = rooms[0].getBoundingClientRect().top, end = rooms[rooms.length - 1].getBoundingClientRect().bottom; dots.classList.toggle('on', top < innerHeight * .5 && end > innerHeight * .5); };
+  addEventListener('scroll', dotVis, {passive:true}); dotVis();
+
+  /* rooms appear as you arrive */
+  const hooks = {};
+  const seen = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; e.target.classList.add('seen'); (hooks[e.target.id] || (() => {}))(); delete hooks[e.target.id]; seen.unobserve(e.target); }), {rootMargin:'0px 0px -25% 0px'});
+  rooms.forEach(r => seen.observe(r));
+
+  /* 03 LSMS */
+  const FLOW = [['FY09',168,.060],['FY10',160,.075],['FY11',174,.052],['FY12',174,.092],['FY13',199,.095],['FY14',237,.114],['FY15',326,.141],['FY16',336,.179],['FY17',375,.157],['FY18',419,.177],['FY19',453,.199],['FY20',477,.254],['FY21',575,.337],['FY22',564,.374],['FY23',628,.398],['FY24',574,.448],['FY25',606,.444],['FY26',828,.440],['FY27',293,.474]];
+  const lc = $('#lsms-chart'), X0 = 34, X1 = 486, Y0 = 18, Y1 = 226, MAX = 900, bw = (X1 - X0) / FLOW.length;
+  const yv = v => Y1 - v / MAX * (Y1 - Y0), ys = q => Y1 - q / .5 * (Y1 - Y0);
+  let lg = '';
+  [0, 300, 600, 900].forEach(v => lg += `<line x1="${X0}" x2="${X1}" y1="${yv(v)}" y2="${yv(v)}" stroke="rgba(110,80,40,.15)"/><text x="${X0 - 6}" y="${yv(v) + 3}" text-anchor="end">${v}</text>`);
+  [0, .25, .5].forEach(q => lg += `<text x="${X1 + 6}" y="${ys(q) + 3}" style="fill:#C1440E">${q * 100}%</text>`);
+  FLOW.forEach(([fy, n, sh], i) => { const x = X0 + i * bw + 2;
+    lg += `<rect class="bar${fy === 'FY27' ? ' part' : ''}" x="${x.toFixed(1)}" width="${(bw - 4).toFixed(1)}" y="${Y1}" height="0" data-y="${yv(n).toFixed(1)}" data-h="${(Y1 - yv(n)).toFixed(1)}" style="transition-delay:${i * 40}ms"><title>${fy}: ${n} papers, ${Math.round(sh * 100)}% with an African-institution author</title></rect>`;
+    if (i % 3 === 0 || fy === 'FY27') lg += `<text x="${(x + (bw - 4) / 2).toFixed(1)}" y="${Y1 + 14}" text-anchor="middle">${fy}</text>`; });
+  lg += `<path class="share" d="${FLOW.map(([, , sh], i) => `${i ? 'L' : 'M'}${(X0 + i * bw + bw / 2).toFixed(1)},${ys(sh).toFixed(1)}`).join(' ')}"/>`;
+  lc.innerHTML = lg;
+  hooks['room-lsms'] = () => $$('#lsms-chart .bar').forEach(r => { r.setAttribute('y', r.dataset.y); r.setAttribute('height', r.dataset.h); });
+
+  /* 04 UN EGDI */
+  const EGDI = [["Denmark",0.9847],["Estonia",0.9727],["Singapore",0.9691],["Republic of Korea",0.9679],["Iceland",0.9671],["Saudi Arabia",0.9602],["United Kingdom of Great Britain and Northern Ireland",0.9577],["Australia",0.9577],["Finland",0.9575],["Netherlands",0.9538],["United Arab Emirates",0.9533],["Germany",0.9382],["Japan",0.9351],["Sweden",0.9326],["Norway",0.9315],["New Zealand",0.9265],["Spain",0.9206],["Bahrain",0.9196],["United States of America",0.9195],["Ireland",0.9138],["Lithuania",0.911],["Austria",0.9065],["Israel",0.9014],["Kazakhstan",0.9009],["Uruguay",0.9006],["Switzerland",0.9004],["Türkiye",0.8913],["Malta",0.8886],["Latvia",0.8852],["Ukraine",0.8841],["Chile",0.8827],["Croatia",0.8818],["Slovenia",0.8759],["France",0.8744],["China",0.8718],["Greece",0.8674],["Poland",0.8648],["Cyprus",0.8619],["Serbia",0.8618],["South Africa",0.8616],["Oman",0.8576],["Argentina",0.8573],["Russian Federation",0.8533],["Liechtenstein",0.8528],["Luxembourg",0.8466],["Mongolia",0.8457],["Canada",0.8452],["Armenia",0.8422],["Portugal",0.8415],["Brazil",0.8403],["Italy",0.8356],["Thailand",0.8351],["Qatar",0.8244],["Czech Republic",0.8239],["Bulgaria",0.8145],["Belgium",0.8121],["Malaysia",0.8111],["Peru",0.807],["Hungary",0.8043],["Slovakia",0.8021],["Costa Rica",0.8009],["Albania",0.8],["Uzbekistan",0.7999],["Indonesia",0.7991],["Mexico",0.785],["Kuwait",0.7812],["Ecuador",0.78],["Colombia",0.7793],["Georgia (Country)",0.7792],["Republic of Moldova",0.772],["Viet Nam",0.7709],["Romania",0.7636],["Philippines",0.7621],["Azerbaijan",0.7607],["Brunei Darussalam",0.7554],["Mauritius",0.7506],["Belarus",0.7445],["Kyrgyzstan",0.7316],["Panama",0.7298],["Paraguay",0.7251],["Montenegro",0.7211],["Monaco",0.7175],["Bahamas",0.7143],["North Macedonia",0.707],["Dominican Republic",0.7013],["Trinidad and Tobago",0.6973],["Tunisia",0.6935],["Andorra",0.6893],["Jordan",0.6849],["Morocco",0.6841],["Barbados",0.6815],["Seychelles",0.6773],["Fiji",0.6754],["Maldives",0.6745],["Egypt",0.6699],["Jamaica",0.6678],["India",0.6678],["Sri Lanka",0.6667],["Bolivia",0.6651],["Bangladesh",0.657],["Iran (Islamic Republic of)",0.6564],["San Marino",0.6551],["Bhutan",0.6511],["Grenada",0.6458],["Antigua and Barbuda",0.6428],["Suriname",0.6366],["Bosnia and Herzegovina",0.6329],["Ghana",0.6317],["Kenya",0.6314],["Saint Kitts and Nevis",0.6305],["Cabo Verde",0.6238],["Botswana",0.6118],["Eswatini",0.6081],["Namibia",0.6007],["El Salvador",0.5988],["Algeria",0.5956],["Saint Vincent and the Grenadines",0.5876],["Rwanda",0.5799],["Nepal",0.5781],["Cambodia",0.5754],["Gabon",0.5741],["Guatemala",0.5738],["Tajikistan",0.5606],["Côte d'Ivoire",0.5587],["Libya",0.5466],["Lebanon",0.5449],["Dominica",0.5445],["Guyana",0.5443],["Vanuatu",0.5427],["Zambia",0.5424],["Venezuela",0.536],["Nicaragua",0.5318],["Saint Lucia",0.5255],["Tonga",0.5164],["Senegal",0.5163],["Pakistan",0.5096],["Palau",0.5072],["Myanmar",0.5001],["Cuba",0.4921],["Samoa",0.4899],["Belize",0.4872],["Honduras",0.4856],["Marshall Islands",0.4823],["Nigeria",0.4815],["Turkmenistan",0.4757],["Benin",0.4578],["Kiribati",0.4572],["Iraq",0.4572],["Zimbabwe",0.4481],["Uganda",0.4464],["Nauru",0.4454],["Lao People's Democratic Republic",0.4404],["United Republic of Tanzania",0.4327],["Sao Tome and Principe",0.4308],["Cameroon",0.4294],["Angola",0.4149],["Lesotho",0.4123],["Tuvalu",0.4043],["Timor-Leste",0.402],["Guinea",0.4006],["Togo",0.392],["Syrian Arab Republic",0.3888],["Malawi",0.3753],["Solomon Islands",0.3681],["Mauritania",0.3491],["Congo",0.3391],["Micronesia (Federated States of)",0.3235],["Madagascar",0.3235],["Ethiopia",0.3111],["Guinea-Bissau",0.3083],["Papua New Guinea",0.3076],["Sierra Leone",0.3042],["Mali",0.3005],["Djibouti",0.2911],["Burkina Faso",0.2895],["Equatorial Guinea",0.2855],["Mozambique",0.2848],["Sudan",0.2759],["Democratic Republic of the Congo",0.2715],["Comoros",0.2586],["Gambia",0.2552],["Liberia",0.2513],["Burundi",0.2481],["Democratic People's Republic of Korea",0.232],["Yemen",0.2318],["Haiti",0.2117],["Niger",0.2116],["Afghanistan",0.2083],["Chad",0.1785],["Eritrea",0.1576],["Somalia",0.1468],["South Sudan",0.1191],["Central African Republic",0.0947]];
+  const grpC = v => v >= .75 ? '#2F6B48' : v >= .5 ? '#7FA35A' : v >= .25 ? '#D3A43A' : '#B5321A';
+  const strip = $('#egov-strip'), hu = EGDI.findIndex(r => r[0] === 'Hungary');
+  strip.innerHTML = EGDI.map(([n, v], i) => `<i data-i="${i}" class="${i === hu ? 'hu' : ''}" style="background:${grpC(v)}; transition-delay:${Math.min(i * 5, 1000)}ms" title="${n}: ${v.toFixed(3)} (rank ${i + 1})"></i>`).join('');
+  const show = i => { const [n, v] = EGDI[i]; $('#egov-name').textContent = n.replace(' of Great Britain and Northern Ireland', ''); $('#egov-val').textContent = `#${i + 1} of 193 · EGDI ${v.toFixed(3)}`; };
+  strip.addEventListener('pointerover', e => { const i = e.target.dataset && e.target.dataset.i; if (i != null) show(+i); });
+  strip.addEventListener('pointerleave', () => show(hu)); show(hu);
+
+  /* 02 outbreak: SIR on a drifting contact network. Illustrative. */
+  (() => {
+    const room = $('#room-pandemic'), cv = $('#sim'), ctx = cv.getContext('2d');
+    const S = 0, I = 1, R = 2, LINK = 92, PI = .045, RMIN = 70, RMAX = 130;
+    let W, H, nodes = [], day = 0, tick = 0, idle = 0, raf, vis = false;
+    const seed = (x, y) => { nodes.forEach(n => { n.st = S; n.t = 0; }); day = 0; tick = 0; idle = 0;
+      let best = nodes[0], bd = 1e9; const tx = x ?? W * (.45 + Math.random() * .4), ty = y ?? H * (.25 + Math.random() * .5);
+      nodes.forEach(n => { const d = (n.x - tx) ** 2 + (n.y - ty) ** 2; if (d < bd){ bd = d; best = n; } }); best.st = I; best.t = RMIN + Math.random() * (RMAX - RMIN); };
+    const size = () => { const r = devicePixelRatio || 1; W = cv.clientWidth; H = cv.clientHeight; cv.width = W * r; cv.height = H * r; ctx.setTransform(r, 0, 0, r, 0, 0);
+      const n = Math.round(Math.min(260, Math.max(90, W * H / 6500)));
+      nodes = Array.from({length:n}, () => ({x:Math.random() * W, y:Math.random() * H, vx:(Math.random() - .5) * .35, vy:(Math.random() - .5) * .35, st:S, t:0, ph:Math.random() * 6.28})); seed(); };
+    const step = () => { for (const a of nodes){ a.x += a.vx; a.y += a.vy; if (a.x < 0 || a.x > W) a.vx *= -1; if (a.y < 0 || a.y > H) a.vy *= -1; }
+      for (const a of nodes.filter(n => n.st === I)){ for (const b of nodes){ if (b.st !== S) continue; const d = Math.hypot(a.x - b.x, a.y - b.y); if (d < LINK && Math.random() < PI * (1 - d / LINK)){ b.st = I; b.t = RMIN + Math.random() * (RMAX - RMIN); } } if (--a.t <= 0) a.st = R; }
+      if (++tick % 6 === 0){ day++; const c = [0, 0, 0]; nodes.forEach(n => c[n.st]++); $('#hud-day').textContent = 'day ' + day; $('#hud-i').textContent = c[I]; $('#hud-r').textContent = c[R]; if (!c[I] && ++idle > 25) seed(); } };
+    const draw = t => { ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < nodes.length; i++){ const a = nodes[i]; for (let j = i + 1; j < nodes.length; j++){ const b = nodes[j], d = Math.hypot(a.x - b.x, a.y - b.y); if (d > LINK) continue;
+        const hot = (a.st === I && b.st !== R) || (b.st === I && a.st !== R); ctx.strokeStyle = hot ? `rgba(240,120,90,${(1 - d / LINK) * .55})` : `rgba(150,195,235,${(1 - d / LINK) * .13})`; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); } }
+      for (const n of nodes){ if (n.st === I){ const pu = (Math.sin(t / 260 + n.ph) + 1) / 2; ctx.fillStyle = `rgba(240,110,80,${.1 + pu * .18})`; ctx.beginPath(); ctx.arc(n.x, n.y, 7 + pu * 9, 0, 6.283); ctx.fill(); ctx.fillStyle = '#F37A5A'; ctx.beginPath(); ctx.arc(n.x, n.y, 3, 0, 6.283); ctx.fill(); }
+        else { ctx.fillStyle = n.st === R ? 'rgba(140,160,180,.45)' : 'rgba(190,220,245,.85)'; ctx.beginPath(); ctx.arc(n.x, n.y, n.st === R ? 1.8 : 2, 0, 6.283); ctx.fill(); } } };
+    const loop = t => { if (!reduce) step(); draw(t); if (vis && !reduce) raf = requestAnimationFrame(loop); };
+    size(); if (reduce){ for (let k = 0; k < 260; k++) step(); } loop(0);
+    addEventListener('resize', () => { size(); loop(0); });
+    room.addEventListener('click', e => { if (e.target.closest('a')) return; const r = cv.getBoundingClientRect(); seed(e.clientX - r.left, e.clientY - r.top); if (reduce){ for (let k = 0; k < 120; k++) step(); loop(0); } });
+    new IntersectionObserver(([e]) => { vis = e.isIntersecting; cancelAnimationFrame(raf); if (vis && !reduce) raf = requestAnimationFrame(loop); }).observe(room);
+  })();
+})();
+</script>
+<script>
+/* art: balloon and clouds in the projects sky */
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  const gate = document.getElementById('gallery'), balloon = gate && gate.querySelector('.gate-balloon');
+  if (!gate || !balloon) return;
+  const clouds = [...gate.querySelectorAll('.gate-cloud')];
+  const NS = 'http://www.w3.org/2000/svg', el = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+
+  /* the envelope: a teardrop drawn from its half-width at each height, with curved gores in Léggömb's red and cream */
+  const CX = 110, TOP = 10, BOT = 214, R = 92;
+  const half = y => { const t = (y - TOP) / (BOT - TOP);                      // 0 at the crown, 1 at the mouth
+    if (t < .45){ const u = t / .45; return R * Math.sqrt(Math.max(0, 1 - (1 - u) * (1 - u))); }
+    const u = (t - .45) / .55; return R * (1 - u) + 13 * u - R * .12 * Math.sin(u * Math.PI) * (1 - u); };
+  const ys = Array.from({length:61}, (_, i) => TOP + (BOT - TOP) * i / 60);
+  const outline = 'M' + ys.map(y => `${(CX + half(y)).toFixed(1)},${y.toFixed(1)}`).join(' L') + ' L' + ys.slice().reverse().map(y => `${(CX - half(y)).toFixed(1)},${y.toFixed(1)}`).join(' L') + 'Z';
+  document.getElementById('gb-env-path').setAttribute('d', outline);
+  const gores = document.getElementById('gb-gores'), N = 14;
+  const mer = k => ys.map(y => [CX + half(y) * Math.sin(-Math.PI / 2 + Math.PI * k / N), y]);
+  for (let k = 0; k < N; k++){
+    const a = mer(k), b2 = mer(k + 1).reverse();
+    gores.appendChild(el('path', {d:'M' + a.concat(b2).map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' L') + 'Z', fill:k % 2 ? '#F2E6CC' : '#C2462B'}));
+  }
+  for (let k = 1; k < N; k++){                                                   // seams with the painting's rows of dots
+    const m = mer(k);
+    gores.appendChild(el('path', {d:'M' + m.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' L'), fill:'none', stroke:'rgba(90,40,20,.45)', 'stroke-width':.7}));
+    for (let i = 4; i < m.length - 4; i += 4) gores.appendChild(el('circle', {cx:m[i][0].toFixed(1), cy:m[i][1].toFixed(1), r:.9, fill:'rgba(60,25,10,.55)'}));
+  }
+  const ropes = document.getElementById('gb-ropes');
+  [[CX - 13, 98], [CX - 5, 104], [CX + 5, 116], [CX + 13, 122]].forEach(([x0, x1]) => ropes.appendChild(el('path', {d:`M${x0},${BOT} L${x1},255`})));
+
+  /* sandbags: click one and it drops; the balloon rises */
+  const bagsG = document.getElementById('gb-bags'), bags = [];
+  [[93, 266], [127, 266], [110, 284]].forEach(([x, y], i) => { const g = el('g', {class:'gb-bag', 'data-i':i});
+    g.appendChild(el('path', {d:`M${x},${i === 2 ? 278 : 262} L${x},${y - 4}`, stroke:'#4a2c14', 'stroke-width':.8}));
+    g.appendChild(el('circle', {cx:x, cy:y, r:4.4, fill:'#c9ad78', stroke:'#6b4a22', 'stroke-width':.8}));
+    bagsG.appendChild(g); bags.push({g, x, y, dropped:false, vy:0, dy:0}); });
+
+  let lift = 0;                                                                  // extra altitude earned by burner and dropped bags
+  const burn = () => { balloon.classList.remove('burn'); void balloon.getBoundingClientRect(); balloon.classList.add('burn'); vy -= 7; lift = Math.min(lift + 40, 160); };
+  balloon.addEventListener('click', e => {
+    const bag = e.target.closest && e.target.closest('.gb-bag');
+    e.preventDefault();
+    if (bag){ const b = bags[+bag.dataset.i]; if (!b.dropped){ b.dropped = true; vy -= 5; lift = Math.min(lift + 55, 200); } return; }
+    burn(); setTimeout(() => { const t = document.getElementById('room-thesis'); if (t) t.scrollIntoView({behavior: reduce ? 'auto' : 'smooth'}); }, reduce ? 0 : 750);
+  });
+
+  /* arriving through the window: the balloon comes up from below */
+  let arrive = 0;
+  document.addEventListener('pw:arrived', e => { if (!e.detail || e.detail.href !== '#gallery') return; arrive = reduce ? 0 : 420; });
+  if (reduce) return;
+
+  /* physics: the balloon springs toward its target (cursor + scroll altitude); the basket swings on its ropes */
+  const hang = balloon.querySelector('.gb-hang');
+  let tx = 0, ty = 0, x = 0, y = 0, vx = 0, vy = 0, ang = 0, av = 0, px = 0, raf = 0, on = false, last = performance.now();
+  const tick = now => {
+    const dt = Math.min(2, (now - last) / 16.7); last = now;
+    const r = gate.getBoundingClientRect(), h = r.height, vh = innerHeight;
+    const prog = (vh - r.top) / (vh + h), p0 = vh / (vh + h), d = p0 - prog;     // 0 when the gate fills the screen
+    const scrollY0 = Math.min(d * h * .9, innerWidth < 760 ? 0 : h * .14);
+    arrive *= .93; lift *= .995;
+    const goalY = scrollY0 + ty - lift + arrive;
+    const ax = (tx - x) * .012 - vx * .12, ay = (goalY - y) * .02 - vy * .14;     // damped springs
+    vx += ax * dt; vy += ay * dt; x += vx * dt; y += vy * dt;
+    const aa = (-ax * 2.2) - ang * .06 - av * .1;                                 // the basket lags behind the envelope
+    av += aa * dt; ang += av * dt;
+    balloon.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${Math.max(-10, Math.min(10, vx * 1.6)).toFixed(2)}deg)`;
+    hang.style.transform = `rotate(${Math.max(-18, Math.min(18, ang)).toFixed(2)}deg)`;
+    bags.forEach(b => { if (!b.dropped || b.dy > 900) return; b.vy += .45 * dt; b.dy += b.vy * dt; b.g.setAttribute('transform', `translate(0 ${b.dy.toFixed(1)})`); b.g.style.opacity = Math.max(0, 1 - b.dy / 700); });
+    clouds.forEach((c, i) => { const k = +c.dataset.drift || 40;
+      c.style.transform = `translate3d(${(-d * k + px * k * .2).toFixed(1)}px, ${(-d * h * (.18 + i * .12)).toFixed(1)}px, 0)`; });
+    raf = on ? requestAnimationFrame(tick) : 0;
+  };
+  const kick = () => { if (!raf){ last = performance.now(); raf = requestAnimationFrame(tick); } };
+  new IntersectionObserver(([e]) => { on = e.isIntersecting; if (on){ kick(); } else { bags.forEach(b => { b.dropped = false; b.dy = 0; b.vy = 0; b.g.removeAttribute('transform'); b.g.style.opacity = ''; }); lift = 0; } }).observe(gate);
+  if (fine){
+    gate.addEventListener('pointermove', e => { const r = gate.getBoundingClientRect(); px = e.clientX / innerWidth - .5;
+      tx = (e.clientX / innerWidth - .78) * innerWidth * .5; ty = ((e.clientY - r.top) / r.height - .3) * r.height * .25; });
+    gate.addEventListener('pointerleave', () => { tx = 0; ty = 0; px = 0; });
+  }
+})();
+</script>
+<script src="painted-window.js" defer></script>
+
+<script>
+/* prints: click or Enter brings a photo to the front */
+document.querySelectorAll('.print').forEach(p => {
+  p.tabIndex = 0;
+  const go = () => { p.parentElement.querySelectorAll('.print').forEach(q => q.classList.toggle('front', q === p)); };
+  p.addEventListener('click', go);
+  p.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
+});
+</script>
 </body>
 </html>

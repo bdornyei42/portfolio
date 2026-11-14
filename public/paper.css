@@ -1,0 +1,50 @@
+/* paper.css: the look of the private tools (budget, applications), shared by the public project pages.
+   A public-domain painting sits behind a masthead; the page veils into paper as you scroll; a sticky bar
+   with a paprika/cream stripe carries the section links; surfaces are flat paper with hairlines. */
+:root{ --page-rgb:231 234 225; --cream:#F6F2E6; --hair:rgba(27,36,32,0.14); }
+html{ background:var(--paper, #E7EAE1); }
+body.paper{
+  background:linear-gradient(to bottom, rgb(var(--page-rgb) / 0) 0, rgb(var(--page-rgb) / 0) 380px, rgb(var(--page-rgb) / .82) 560px, rgb(var(--page-rgb) / .95) 700px, rgb(var(--page-rgb) / .97) 100%) !important;
+}
+.backdrop{ position:fixed; inset:0; z-index:-1; background:linear-gradient(to bottom, #6b7f9a, #b9c3c9 55%, #E7EAE1); }
+.backdrop img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+/* a soft shade behind the masthead lettering, so busy paintings stay readable */
+.backdrop::after{ content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(12,18,28,.42) 0, rgba(12,18,28,.3) 300px, rgba(12,18,28,0) 520px); }
+
+.masthead{ max-width:1120px; margin:0 auto; padding:26px 28px 40px; min-height:420px; display:flex; flex-direction:column; color:var(--cream); text-shadow:0 1px 14px rgba(10,16,26,.7), 0 0 2px rgba(10,16,26,.5); }
+@media (max-width:640px){ .masthead{ padding:20px 18px 30px; min-height:360px; } }
+.mh-top{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.mh-top .eyebrow{ color:var(--cream); opacity:.92; }
+.mh-actions{ display:flex; gap:16px; flex-wrap:wrap; }
+.mh-actions a{ color:var(--cream); font-size:12.5px; text-decoration:none; font-family:'IBM Plex Mono', monospace; letter-spacing:.04em; }
+.mh-actions a:hover{ text-decoration:underline; }
+.mh-actions a.boxed{ border:1px solid rgba(246,242,230,.6); padding:2px 9px; text-shadow:none; }
+.masthead h1{ color:var(--cream); font-family:'Newsreader', Georgia, serif; font-weight:500; font-size:clamp(40px, 6.6vw, 76px); line-height:1; letter-spacing:-.01em; margin:auto 0 0; padding-top:56px; max-width:900px; }
+.masthead h1 em{ font-style:italic; font-weight:400; }
+.mh-sub{ font-size:clamp(16.5px, 1.8vw, 19px); max-width:660px; margin:16px 0 0; line-height:1.5; }
+.mh-by{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.03em; margin-top:16px; opacity:.95; }
+.masthead .credit{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:.05em; opacity:.85; margin-top:14px; }
+.masthead .credit a{ color:inherit; text-decoration:none; } .masthead .credit a:hover{ text-decoration:underline; }
+.masthead .credit em{ font-family:'Newsreader', Georgia, serif; font-size:13px; letter-spacing:0; }
+
+.navbar{ position:sticky; top:0; z-index:40; background:rgb(var(--page-rgb) / .92); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+.navbar::after{ content:""; display:block; height:3px; background:repeating-linear-gradient(90deg, #C1440E 0 12px, var(--cream) 12px 24px); opacity:.85; }
+.navbar .tabs{ max-width:1120px; margin:0 auto; padding:0 28px; display:flex; gap:24px; overflow-x:auto; scrollbar-width:none; }
+.navbar .tabs::-webkit-scrollbar{ display:none; }
+.navbar .tabs a{ flex:none; white-space:nowrap; text-decoration:none; padding:14px 0 12px; font-size:14px; font-weight:500; color:#55625C; border-bottom:2px solid transparent; }
+.navbar .tabs a:hover{ color:#C1440E; }
+.navbar .tabs a.on{ color:#1B2420; border-bottom-color:#C1440E; }
+.navbar .tabs .push{ margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.04em; color:#C1440E; }
+@media (max-width:640px){ .navbar .tabs{ padding:0 18px; gap:18px; } }
+
+/* tiles in a 1px-gap grid, numbers in serif */
+.tiles{ display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:1px; background:var(--hair); border:1px solid var(--hair); }
+.tile{ background:#F3F5EF; padding:18px 18px 16px; }
+.tile .k{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:#55625C; }
+.tile .v{ font-family:'Newsreader', Georgia, serif; font-weight:500; font-size:clamp(28px,3.2vw,36px); line-height:1.05; margin-top:6px; color:#1B2420; }
+.tile .s{ font-size:13px; color:#55625C; margin-top:4px; }
+
+/* a figure that looks hung on the wall: thin frame, no glow */
+.framed{ background:#fff; padding:10px; border:1px solid var(--hair); box-shadow:0 1px 0 var(--hair); }
+
+.notice{ background:#F3F5EF; border:1px solid var(--hair); border-left:3px solid #C1440E; padding:14px 16px; font-size:14.5px; }

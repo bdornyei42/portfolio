@@ -4,6 +4,8 @@
 // `wrangler secret put`) — never hardcoded here, never committed anywhere.
 
 import Anthropic from "@anthropic-ai/sdk";
+// Jackson Coffee Buddies: the Durable Object class must be exported from the entry module.
+export { CoffeeClub } from "./coffee.js";
 
 function timingSafeEqual(a, b) {
   const enc = new TextEncoder();
@@ -104,6 +106,8 @@ const BUDGET_PLAN_KEY = "budget:plan";
 // Amazon orders + items + card charges, PUT by private/amazon/main.py (amazon-orders),
 // read by the budget page to split each Amazon charge into essential / non-essential items.
 const BUDGET_AMAZON_KEY = "budget:amazon";
+// taxes tab: income labels, estimated payments, settings, return-prep ticks
+const BUDGET_TAX_KEY = "budget:tax";
 
 // Applications tracker (admin/apply.html): your tracked applications, profile, story bank and
 // answers (written by the page), and opportunities found by private/apply/main.py (written by
@@ -121,7 +125,8 @@ async function handleDraft(request, env) {
   if (!env.ANTHROPIC_API_KEY) return json({ error: "no_key", message: "ANTHROPIC_API_KEY secret not set" }, 501);
   let body;
   try { body = await request.json(); } catch { return json({ error: "invalid JSON" }, 400); }
-  const { system, user } = body || {};
+  // quick: one-bullet rewrites and other short asks, answered fast at low effort
+  const { system, user, quick } = body || {};
   if (typeof system !== "string" || typeof user !== "string" || !user.trim()) return json({ error: "system and user text required" }, 400);
   if (system.length + user.length > DRAFT_MAX_CHARS) return json({ error: "too long" }, 413);
 
@@ -129,8 +134,8 @@ async function handleDraft(request, env) {
   try {
     const response = await client.beta.messages.create({
       model: "claude-opus-5-5",
-      max_tokens: 16000,
-      output_config: { effort: "high" },
+      max_tokens: quick ? 2000 : 16000,
+      output_config: { effort: quick ? "low" : "high" },
       // a policy decline re-runs on Anthropic's recommended fallback model instead of failing
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
@@ -204,11 +209,19 @@ export default {
       if (url.pathname === "/admin/api/budget/plan") return handleBudget(request, env, BUDGET_PLAN_KEY);
       // Amazon item data (PUT from private/amazon/main.py, GET from the budget page), own key.
       if (url.pathname === "/admin/api/budget/amazon") return handleBudget(request, env, BUDGET_AMAZON_KEY);
+      if (url.pathname === "/admin/api/budget/tax") return handleBudget(request, env, BUDGET_TAX_KEY);
       // Applications tracker state (page) and discovered opportunities (scraper), own keys.
       if (url.pathname === "/admin/api/apply") return handleBudget(request, env, APPLY_KEY);
       if (url.pathname === "/admin/api/apply/discover") return handleBudget(request, env, APPLY_DISCOVER_KEY);
       // Claude drafting for applications (POST only, needs ANTHROPIC_API_KEY).
       if (url.pathname === "/admin/api/apply/draft") return handleDraft(request, env);
+    }
+
+    // Jackson Coffee Buddies API (public page, its own phone-number sign-in): one
+    // Durable Object holds the whole club. See src/coffee.js.
+    if (url.pathname.startsWith("/api/coffee/")) {
+      if (!env.COFFEE) return json({ error: "coffee club not configured" }, 500);
+      return env.COFFEE.get(env.COFFEE.idFromName("jackson")).fetch(request);
     }
 
     return env.ASSETS.fetch(request);

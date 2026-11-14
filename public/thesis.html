@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Measuring Parliamentary Discourse in Hungary · Bendegúz Dörnyei</title>
+<meta name="description" content="Bendegúz Dörnyei built a reproducible hybrid NLP pipeline that turns Hungarian parliamentary transcripts from 1990–2026 into structured data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2420; --paper:#E7EAE1; --paper-2:#DCE0D3; --card:#F3F5EF;
+    --paprika:#C1440E; --brick:#A8321E; --gold:#B98A1F; --forest:#2F4A3D; --slate:#55625C;
+    --line:rgba(27,36,32,0.14);
+    --night:#101915; --night-2:#18241F; --night-line:rgba(243,238,223,.14);
+    --cream:#F3EEDF; --cream-dim:rgba(243,238,223,.66);
+    --neg:#B5321A; --pos:#2F7A4F;
+    --serif:'Newsreader', Georgia, serif; --mono:'IBM Plex Mono', ui-monospace, monospace; --sans:'Public Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  img{max-width:100%; display:block;}
+  h1,h2,h3{font-family:var(--serif); font-weight:500; margin:0; letter-spacing:-0.01em;}
+  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--paprika);}
+  .mono{font-family:var(--mono);}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 28px;}
+  @media (max-width:640px){ .wrap{padding:0 18px;} }
+  a:focus-visible, button:focus-visible{outline:2px solid var(--paprika); outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important; transition-delay:0ms !important;} }
+
+  /* progress + top bar */
+  .progress{position:fixed; top:0; left:0; height:2px; width:100%; transform-origin:0 50%; transform:scaleX(0); background:var(--paprika); z-index:60;}
+  header.topbar{position:fixed; top:0; left:0; right:0; z-index:50; transition:background .3s ease, border-color .3s ease, color .3s ease; border-bottom:1px solid transparent; color:var(--cream);}
+  header.topbar.scrolled{background:rgba(16,25,21,.86); backdrop-filter:blur(8px); border-bottom-color:var(--night-line);}
+  header.topbar.solid{background:rgba(231,234,225,.9); backdrop-filter:blur(8px); border-bottom-color:var(--line); color:var(--ink);}
+  .topbar .wrap{display:flex; align-items:center; justify-content:space-between; gap:18px; padding-top:14px; padding-bottom:14px;}
+  .mark{font-family:var(--mono); font-size:13px; letter-spacing:.05em; text-decoration:none;}
+  .top-nav{display:flex; gap:24px; font-size:13.5px; align-items:center;}
+  .top-nav a{text-decoration:none; opacity:.78;} .top-nav a:hover{opacity:1; color:var(--paprika);}
+  .top-nav .pdf{opacity:1; font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; border:1px solid currentColor; padding:5px 10px;}
+  @media (max-width:760px){ .top-nav .hide-sm{display:none;} .top-nav{gap:14px;} }
+
+  /* ===== HERO ===== */
+  .hero{position:relative; background:radial-gradient(120% 80% at 50% 100%, #1d2c25 0%, var(--night) 62%); color:var(--cream); overflow:hidden; padding:120px 0 40px;}
+  .hero::before{content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background-image:radial-gradient(rgba(243,238,223,.06) 1px, transparent 1px); background-size:22px 22px;}
+  .tricolor{position:absolute; left:0; right:0; top:0; height:4px; display:flex;} .tricolor i{flex:1;} .tricolor i:nth-child(1){background:#B5321A;} .tricolor i:nth-child(2){background:#F3EEDF;} .tricolor i:nth-child(3){background:#2F6B48;}
+  .hero .wrap{position:relative;}
+  .hero .eyebrow{color:#F0A27A;}
+  .hero h1{font-size:clamp(38px, 6.4vw, 78px); line-height:1.0; margin:16px 0 0; max-width:980px;}
+  .hero h1 em{font-style:italic; font-weight:400; color:#F0A27A;}
+  .hero .sub{font-size:clamp(17px,2vw,20px); color:var(--cream-dim); max-width:680px; margin:22px 0 0;}
+  .byline{display:flex; flex-wrap:wrap; gap:8px 22px; margin-top:22px; font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--cream-dim);}
+  .byline b{color:var(--cream); font-weight:500;}
+  .cta-row{display:flex; flex-wrap:wrap; gap:12px; margin-top:28px;}
+  .btn{display:inline-flex; align-items:center; gap:9px; padding:12px 18px; font-family:var(--mono); font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border:1px solid currentColor; background:none; color:inherit; cursor:pointer; transition:background .2s ease, color .2s ease, border-color .2s;}
+  .btn.primary{background:var(--brick); border-color:var(--brick); color:#FBF3E4;}
+  .btn.primary:hover{background:#8A2618; border-color:#8A2618;}
+  .btn.ghost:hover{background:rgba(243,238,223,.08);}
+  .btn .arrow{transition:transform .25s ease;} .btn:hover .arrow{transform:translateX(3px);}
+
+  .chamber{position:relative; margin:38px auto 0; max-width:900px;}
+  .chamber svg{width:100%; height:auto; display:block; overflow:visible;}
+  .chamber circle{transition:fill .7s ease, opacity .5s ease, transform .6s ease;}
+  .chamber .g-old{opacity:0; transition:opacity .45s ease;}
+  .arc-label{position:absolute; left:50%; bottom:2%; transform:translateX(-50%); text-align:center; pointer-events:none; width:46%;}
+  .arc-label .yr{font-family:var(--serif); font-size:clamp(40px,7vw,84px); line-height:.9; letter-spacing:-.02em;}
+  .arc-label .gov{font-family:var(--mono); font-size:clamp(10px,1.3vw,12.5px); letter-spacing:.08em; text-transform:uppercase; color:var(--cream-dim); margin-top:8px;}
+  .arc-label .seats{font-family:var(--mono); font-size:11px; color:var(--cream-dim); margin-top:3px;}
+  .supermaj{display:inline-block; margin-top:8px; font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#F0A27A; border:1px solid rgba(240,162,122,.5); padding:2px 7px; opacity:0; transition:opacity .4s ease;}
+  .supermaj.on{opacity:1;}
+  @media (max-width:640px){ .arc-label{position:static; transform:none; width:auto; margin-top:10px;} .chamber{margin-top:28px;} }
+  .legend{display:flex; flex-wrap:wrap; justify-content:center; gap:8px 18px; margin:22px auto 0; max-width:860px; min-height:52px; font-family:var(--mono); font-size:12px; color:var(--cream-dim);}
+  .legend span{display:inline-flex; align-items:center; gap:7px; white-space:nowrap;}
+  .legend i{width:10px; height:10px; border-radius:50%; display:inline-block;}
+  .legend .gov-tag{font-size:9.5px; letter-spacing:.08em; color:var(--night); background:var(--cream); padding:0 4px; margin-left:2px;}
+  .scrubber{display:grid; grid-template-columns:repeat(10,1fr); gap:0; margin:26px auto 0; max-width:960px; border-top:1px solid var(--night-line); position:relative;}
+  .scrubber button{all:unset; cursor:pointer; text-align:center; padding:12px 2px 4px; font-family:var(--mono); font-size:11.5px; color:var(--cream-dim); position:relative; transition:color .2s;}
+  .scrubber button::before{content:""; position:absolute; top:-4px; left:50%; width:7px; height:7px; border-radius:50%; transform:translateX(-50%); background:var(--night); border:1px solid var(--cream-dim); transition:background .2s, border-color .2s, transform .2s;}
+  .scrubber button:hover, .scrubber button[aria-pressed="true"]{color:var(--cream);}
+  .scrubber button[aria-pressed="true"]::before{background:#F0A27A; border-color:#F0A27A; transform:translateX(-50%) scale(1.35);}
+  .scrubber button small{display:block; font-size:9.5px; letter-spacing:.04em; opacity:.7; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .scrubber button:focus-visible{outline:1px solid #F0A27A; outline-offset:-2px;}
+  @media (max-width:640px){ .scrubber button small{display:none;} .scrubber button{font-size:10px;} }
+  .hero-foot{display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:18px; font-family:var(--mono); font-size:11px; color:rgba(243,238,223,.5);}
+  .hero-foot button{all:unset; cursor:pointer; color:var(--cream-dim);} .hero-foot button:hover{color:var(--cream);}
+
+  /* stats band */
+  .stats{background:var(--night-2); color:var(--cream); border-top:1px solid var(--night-line);}
+  .stats .grid{display:grid; grid-template-columns:repeat(4,1fr);}
+  .stat{padding:28px 22px 26px; border-left:1px solid var(--night-line);}
+  .stat:first-child{border-left:none;}
+  .stat .n{font-family:var(--serif); font-size:clamp(30px,3.6vw,44px); line-height:1; color:var(--cream);}
+  .stat .n em{font-style:normal; color:#F0A27A;}
+  .stat .l{font-family:var(--mono); font-size:11.5px; letter-spacing:.05em; color:var(--cream-dim); margin-top:10px; text-transform:uppercase;}
+  @media (max-width:760px){ .stats .grid{grid-template-columns:1fr 1fr;} .stat:nth-child(3){border-left:none;} .stat:nth-child(n+3){border-top:1px solid var(--night-line);} }
+
+  /* sections */
+  section.blk{padding:96px 0; border-bottom:1px solid var(--line);}
+  @media (max-width:640px){ section.blk{padding:68px 0;} }
+  .sec-head{display:grid; grid-template-columns:120px 1fr; gap:24px; margin-bottom:44px;}
+  .sec-head .num{font-family:var(--mono); font-size:12px; color:var(--paprika); letter-spacing:.08em; padding-top:12px;}
+  .sec-head h2{font-size:clamp(30px,4.4vw,50px); line-height:1.05;}
+  .sec-head h2 em{font-style:italic; font-weight:400; color:var(--forest);}
+  .sec-head p{font-size:18px; max-width:700px; margin:16px 0 0; color:var(--ink);}
+  @media (max-width:760px){ .sec-head{grid-template-columns:1fr; gap:6px;} .sec-head .num{padding-top:0;} }
+  .note{font-family:var(--mono); font-size:11.5px; color:var(--slate); letter-spacing:.02em;}
+  .js .reveal{opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s ease;}
+  .js .reveal.in{opacity:1; transform:none;}
+
+  /* question */
+  .question{font-family:var(--serif); font-size:clamp(26px,3.6vw,42px); line-height:1.2; max-width:900px; margin:0;}
+  .question em{color:var(--paprika); font-style:italic;}
+  .q-cols{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-top:52px;}
+  .q-cols > div{background:var(--card); padding:26px 24px;}
+  .q-cols h3{font-size:21px; margin-bottom:8px;}
+  .q-cols p{margin:0; color:var(--slate); font-size:15px;}
+  .q-cols .k{font-family:var(--mono); font-size:11.5px; color:var(--paprika); letter-spacing:.08em; margin-bottom:12px;}
+  @media (max-width:820px){ .q-cols{grid-template-columns:1fr;} }
+
+  /* napló parser */
+  .parser{display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:28px; align-items:start;}
+  @media (max-width:900px){ .parser{grid-template-columns:1fr;} }
+  .toggle{display:inline-flex; border:1px solid var(--ink); margin-bottom:16px;}
+  .toggle button{all:unset; cursor:pointer; padding:8px 14px; font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase;}
+  .toggle button[aria-pressed="true"]{background:var(--ink); color:var(--paper);}
+  .toggle button:focus-visible{outline:2px solid var(--paprika); outline-offset:2px;}
+  .napl{background:#FBF9F2; border:1px solid var(--line); box-shadow:0 1px 0 var(--line), 0 18px 40px -28px rgba(27,36,32,.35); padding:30px 34px 34px; font-family:var(--serif); font-size:17px; line-height:1.75; position:relative; overflow:hidden;}
+  @media (max-width:640px){ .napl{padding:22px 18px; font-size:16px;} }
+  .napl .runhead{display:flex; justify-content:space-between; font-family:var(--serif); font-size:12.5px; color:#6c6c64; border-bottom:1px solid rgba(0,0,0,.18); padding-bottom:6px; margin-bottom:18px; letter-spacing:.02em;}
+  .napl p{margin:0 0 12px; text-align:justify; hyphens:auto;}
+  .napl .ts{display:block; text-align:center; margin:4px 0 12px;}
+  .napl .sp{font-variant:normal; letter-spacing:.02em;}
+  .napl i{font-style:italic;}
+  .tok{border-radius:2px; transition:background .5s ease, box-shadow .5s ease, color .5s ease; position:relative;}
+  .tok[data-tag]::after{content:attr(data-tag); position:absolute; left:0; top:-1.35em; font-family:var(--mono); font-size:9.5px; font-style:normal; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; color:#fff; padding:0 4px; line-height:1.45; opacity:0; transform:translateY(4px); transition:opacity .35s ease, transform .35s ease; pointer-events:none; z-index:2;}
+  .napl p, .napl .ts{transition:line-height .5s ease, margin .5s ease;}
+  .napl.parsed p{line-height:2.85; margin-bottom:6px; text-align:left;}
+  .napl.parsed .ts{margin:18px 0 8px;}
+  .parsed .tok{box-shadow:0 0 0 2px var(--hl); background:var(--hlb);}
+  .parsed .tok[data-tag]::after{opacity:1; transform:none; background:var(--hl);}
+  .tok.k-speaker{--hl:#2F4A3D; --hlb:rgba(47,74,61,.12);}
+  .tok.k-applause{--hl:#2B6CB0; --hlb:rgba(43,108,176,.12);}
+  .tok.k-heckle{--hl:#B5321A; --hlb:rgba(181,50,26,.12);}
+  .tok.k-bench{--hl:#C26A12; --hlb:rgba(194,106,18,.14);}
+  .tok.k-bell{--hl:#6B6F6C; --hlb:rgba(107,111,108,.15);}
+  .tok.k-time{--hl:#7A62C4; --hlb:rgba(122,98,196,.12);}
+  .tok.k-bill{--hl:#0E7C6E; --hlb:rgba(14,124,110,.13);}
+  .tok.k-vote{--hl:#8A2618; --hlb:rgba(138,38,24,.08);}
+  .tok.k-attack{--hl:#B5321A; --hlb:rgba(181,50,26,.08);}
+  .rows{border:1px solid var(--line); background:var(--card);}
+  .rows .rh{display:flex; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--slate);}
+  .rows ol{list-style:none; margin:0; padding:0; counter-reset:r;}
+  .rows li{display:grid; grid-template-columns:28px 104px 1fr; gap:10px; padding:10px 16px; border-bottom:1px solid var(--line); font-size:13.5px; align-items:baseline; opacity:.25; transition:opacity .4s ease, background .4s ease;}
+  .rows li:last-child{border-bottom:none;}
+  .rows li::before{counter-increment:r; content:counter(r, decimal-leading-zero); font-family:var(--mono); font-size:11px; color:var(--slate);}
+  .rows li.on{opacity:1;}
+  .rows .ty{font-family:var(--mono); font-size:11px; letter-spacing:.05em; text-transform:uppercase; padding:1px 6px; color:#fff; justify-self:start;}
+  .rows .tx{color:var(--ink);} .rows .tx small{display:block; color:var(--slate); font-family:var(--mono); font-size:11px;}
+  .rows .empty{padding:22px 16px; color:var(--slate); font-size:14px;}
+  .legend-keys{display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:16px; font-family:var(--mono); font-size:11px; color:var(--slate);}
+  .legend-keys span{display:inline-flex; align-items:center; gap:6px;} .legend-keys i{width:9px; height:9px; display:inline-block;}
+  .how{list-style:none; margin:0 0 36px; padding:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); counter-reset:how;}
+  .how li{background:var(--card); padding:16px 18px 18px; font-size:14.5px; line-height:1.5; color:var(--slate); counter-increment:how;}
+  .how li::before{content:counter(how, decimal-leading-zero); display:block; font-family:var(--mono); font-size:11.5px; letter-spacing:.06em; color:var(--paprika); margin-bottom:6px;}
+  .how b{display:block; font-family:var(--serif); font-weight:500; font-size:18px; color:var(--ink); margin-bottom:2px;}
+  @media (max-width:900px){ .how{grid-template-columns:1fr 1fr;} }
+  @media (max-width:560px){ .how{grid-template-columns:1fr;} }
+
+  /* pipeline */
+  .dark{background:var(--night); color:var(--cream);}
+  .dark .sec-head h2 em{color:#F0A27A;}
+  .dark .sec-head p{color:var(--cream-dim);}
+  .dark .note{color:var(--cream-dim);}
+  .pipe{display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:28px;}
+  @media (max-width:900px){ .pipe{grid-template-columns:1fr;} }
+  .stages{list-style:none; margin:0; padding:0; border-top:1px solid var(--night-line);}
+  .stages li{display:grid; grid-template-columns:38px 1fr; gap:12px; padding:14px 4px; border-bottom:1px solid var(--night-line); transition:background .3s ease;}
+  .stages li .i{font-family:var(--mono); font-size:12px; color:var(--cream-dim); padding-top:3px;}
+  .stages li b{font-family:var(--serif); font-weight:500; font-size:19px; display:block;}
+  .stages li span{font-size:13.5px; color:var(--cream-dim);}
+  .stages li code{font-family:var(--mono); font-size:11.5px; color:#9FD3C0;}
+  .stages li.active{background:rgba(240,162,122,.08);} .stages li.active .i{color:#F0A27A;}
+  .stages li.done .i{color:#9FD3C0;}
+  .term{background:#0A0F0D; border:1px solid var(--night-line); font-family:var(--mono); font-size:12.5px; line-height:1.7; min-height:420px; display:flex; flex-direction:column;}
+  .term .bar{display:flex; gap:7px; align-items:center; padding:10px 14px; border-bottom:1px solid var(--night-line); color:var(--cream-dim); font-size:11px;}
+  .term .bar i{width:9px; height:9px; border-radius:50%; background:#3a4540; display:inline-block;}
+  .term .bar span{margin-left:8px;}
+  .term pre{margin:0; padding:16px 16px 20px; white-space:pre-wrap; word-break:break-word; color:#D9E2DC; flex:1; font:inherit;}
+  .term .c-step{color:#F0A27A;} .term .c-ok{color:#9FD3C0;} .term .c-dim{color:#7d8a84;}
+  .term .cursor{display:inline-block; width:7px; height:14px; background:#F0A27A; vertical-align:-2px; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .term .run{display:flex; gap:10px; padding:12px 14px; border-top:1px solid var(--night-line);}
+  .term .run .btn{padding:8px 12px; font-size:11.5px; color:var(--cream);}
+  .outputs{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--night-line); border:1px solid var(--night-line); margin-top:28px;}
+  .outputs div{background:var(--night); padding:18px 18px;}
+  .outputs b{font-family:var(--serif); font-size:28px; font-weight:500; display:block; line-height:1.1;}
+  .outputs span{font-size:13px; color:var(--cream-dim);}
+  @media (max-width:640px){ .outputs{grid-template-columns:1fr;} }
+
+  /* merge explorer */
+  .cases{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px;}
+  .cases button{all:unset; cursor:pointer; border:1px solid var(--line); background:var(--card); padding:9px 14px; font-size:14px; transition:background .2s, border-color .2s;}
+  .cases button small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--slate); letter-spacing:.05em; text-transform:uppercase;}
+  .cases button[aria-pressed="true"]{border-color:var(--ink); background:#fff;}
+  .cases button:focus-visible{outline:2px solid var(--paprika); outline-offset:2px;}
+  .utter{border-left:3px solid var(--paprika); padding:6px 0 6px 20px; margin-bottom:26px;}
+  .utter .hu{font-family:var(--serif); font-size:clamp(22px,2.8vw,30px); line-height:1.25; font-style:italic;}
+  .utter .en{color:var(--slate); margin-top:6px; font-size:15px;}
+  .utter .ctx{font-family:var(--mono); font-size:11.5px; color:var(--slate); margin-top:8px;}
+  .layers{display:grid; grid-template-columns:1fr 1fr 1.1fr; gap:1px; background:var(--line); border:1px solid var(--line);}
+  @media (max-width:900px){ .layers{grid-template-columns:1fr;} }
+  .layer{background:var(--card); padding:20px 20px 22px; position:relative;}
+  .layer.final{background:#fff;}
+  .layer h3{font-size:19px; margin-bottom:4px;}
+  .layer .who{font-family:var(--mono); font-size:11px; color:var(--slate); letter-spacing:.05em; text-transform:uppercase; margin-bottom:14px;}
+  .kv{display:grid; grid-template-columns:auto 1fr; gap:6px 14px; font-size:14px; margin:0;}
+  .kv dt{font-family:var(--mono); font-size:11.5px; color:var(--slate); padding-top:2px;}
+  .kv dd{margin:0;}
+  .pill{display:inline-block; font-family:var(--mono); font-size:11.5px; padding:1px 7px; border:1px solid currentColor;}
+  .pill.att{color:var(--neg);} .pill.pra{color:var(--pos);} .pill.neu{color:var(--slate);}
+  .meter{height:6px; background:var(--paper-2); margin-top:6px; position:relative; overflow:hidden;}
+  .meter i{position:absolute; left:0; top:0; bottom:0; background:var(--neg); transition:width .8s cubic-bezier(.2,.8,.2,1);}
+  .reason{display:inline-block; margin-top:14px; font-family:var(--mono); font-size:12.5px; background:var(--ink); color:var(--paper); padding:4px 9px;}
+  .seven{margin-top:30px; display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line);}
+  .seven div{background:var(--card); padding:13px 15px; font-size:13.5px; color:var(--slate); transition:background .3s, color .3s;}
+  .seven code{display:block; font-family:var(--mono); font-size:12px; color:var(--ink); margin-bottom:3px;}
+  .seven div.hit{background:var(--ink); color:rgba(231,234,225,.75);} .seven div.hit code{color:#F0A27A;}
+
+  /* accuracy */
+  .acc{margin-top:64px; display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); gap:40px; align-items:center;}
+  @media (max-width:900px){ .acc{grid-template-columns:1fr;} }
+  .acc h3{font-size:clamp(26px,3vw,36px); line-height:1.15;}
+  .acc h3 em{font-style:italic; color:var(--paprika); font-weight:400;}
+  .acc p{color:var(--slate); font-size:15.5px;}
+  .bars{position:relative; padding-top:10px;}
+  .bar-row{display:grid; grid-template-columns:110px 1fr; gap:14px; align-items:center; margin-bottom:22px;}
+  .bar-row .nm{font-family:var(--mono); font-size:12px; letter-spacing:.04em; text-transform:uppercase;}
+  .track{position:relative; height:34px; background:linear-gradient(90deg, var(--paper-2) 0 100%); }
+  .track .rng, .track .base{position:absolute; top:0; bottom:0; left:0; width:0; transition:left 1.1s cubic-bezier(.2,.8,.2,1), width 1.1s cubic-bezier(.2,.8,.2,1);}
+  .track .base{opacity:.28;}
+  .track .lab{position:absolute; top:50%; left:0; transform:translate(8px,-50%); font-family:var(--mono); font-size:12.5px; white-space:nowrap; opacity:0; transition:left 1.1s cubic-bezier(.2,.8,.2,1), opacity .6s ease .6s;}
+  .bar-row.hy .rng, .bar-row.hy .base{background:var(--forest);} .bar-row.rb .rng, .bar-row.rb .base{background:#6F7D76;} .bar-row.lm .rng, .bar-row.lm .base{background:#97A29C;}
+  .bar-row.hy .lab{font-weight:500; color:var(--forest);}
+  @media (max-width:640px){ .bar-row{grid-template-columns:84px 1fr;} .axis{grid-template-columns:84px 1fr;} .track .lab{font-size:11px;} }
+  .axis{display:grid; grid-template-columns:110px 1fr; gap:14px;}
+  .axis .ticks{display:flex; justify-content:space-between; font-family:var(--mono); font-size:10.5px; color:var(--slate); border-top:1px solid var(--line); padding-top:6px;}
+
+  /* single session */
+  .ss-grid{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr); gap:28px; align-items:start;}
+  @media (max-width:960px){ .ss-grid{grid-template-columns:1fr;} }
+  .panel{background:var(--card); border:1px solid var(--line); padding:22px 22px 20px;}
+  .panel h3{font-size:22px;}
+  .panel .ph{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:16px;}
+  .panel .sub{font-size:13.5px; color:var(--slate); margin-top:2px;}
+  .heat{display:grid; grid-template-columns:86px repeat(7, minmax(0,1fr)); gap:3px; font-family:var(--mono); font-size:11.5px;}
+  .heat .cl{display:flex; align-items:flex-end; justify-content:center; text-align:center; padding-bottom:6px; color:var(--slate); font-size:10.5px; letter-spacing:.02em; min-height:36px; transition:color .2s;}
+  .heat .rl{display:flex; align-items:center; justify-content:flex-end; padding-right:8px; color:var(--slate); font-size:11px; transition:color .2s;}
+  .heat .c{aspect-ratio:1.35/1; display:flex; align-items:center; justify-content:center; font-size:11.5px; cursor:default; transition:transform .2s ease, outline-color .2s; outline:2px solid transparent; outline-offset:-2px; position:relative; background:#ECEEE6;}
+  .heat .c.z{color:rgba(27,36,32,.22);}
+  .heat .c.hot{outline-color:var(--ink); transform:scale(1.04); z-index:2;}
+  .heat .lab-hot{color:var(--ink) !important; font-weight:500;}
+  @media (max-width:640px){ .heat{grid-template-columns:62px repeat(7,minmax(0,1fr)); gap:2px;} .heat .c{font-size:9.5px;} .heat .cl{font-size:8.5px; writing-mode:vertical-rl; transform:rotate(180deg); align-items:center; min-height:66px; padding:0 0 4px;} .heat .rl{font-size:9.5px;} }
+  .readout{margin-top:14px; min-height:44px; font-size:14.5px; border-top:1px solid var(--line); padding-top:12px;}
+  .readout b{font-family:var(--serif); font-size:18px; font-weight:500;}
+  .netwrap svg{width:100%; height:auto; display:block;}
+  .netwrap text{font-family:var(--mono); font-size:12px; fill:var(--ink);}
+  .netwrap .edge{transition:opacity .25s ease; fill:none;}
+  .netwrap .node{cursor:pointer;}
+  .netwrap.focus .edge{opacity:.08;} .netwrap.focus .edge.on{opacity:1;}
+  .scale{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:10.5px; color:var(--slate); margin-top:12px;}
+  .scale i{flex:1; height:8px; max-width:220px; background:linear-gradient(90deg, #7E1A0C, #B5321A, #E5946F, #ECEEE6, #8CC5A0, #2F7A4F);}
+  .bloc{display:grid; gap:14px;}
+  .bloc .arrowrow{display:grid; grid-template-columns:1fr; gap:4px;}
+  .bloc .lbl{font-family:var(--mono); font-size:11.5px; letter-spacing:.04em; color:var(--slate); text-transform:uppercase;}
+  .bloc .big{font-family:var(--serif); font-size:44px; line-height:1;}
+  .bloc .bt{height:10px; background:var(--paper-2); position:relative;} .bloc .bt i{position:absolute; left:0; top:0; bottom:0; width:0; background:var(--neg); transition:width 1.2s cubic-bezier(.2,.8,.2,1);}
+  .hbars{display:grid; gap:7px; margin-top:6px;}
+  .hb{display:grid; grid-template-columns:118px 1fr 34px; gap:10px; align-items:center; font-size:13px;}
+  .hb .nm{font-family:var(--mono); font-size:11.5px; text-align:right; color:var(--ink);} .hb .nm small{display:block; font-size:10px; color:var(--slate); font-style:italic; font-family:var(--serif); font-size:12px;}
+  .hb .tr{height:14px; position:relative;} .hb .tr i{position:absolute; left:0; top:0; bottom:0; width:0; transition:width 1s cubic-bezier(.2,.8,.2,1);}
+  .hb .v{font-family:var(--mono); font-size:11.5px; color:var(--slate);}
+  .waffle{display:grid; grid-template-columns:repeat(20,1fr); gap:3px; margin-top:6px;}
+  .waffle i{aspect-ratio:1; background:var(--paper-2); transition:background .3s ease;}
+  .wl{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:12px; font-family:var(--mono); font-size:11.5px; color:var(--slate);} .wl span{display:inline-flex; gap:6px; align-items:center;} .wl i{width:9px; height:9px; display:inline-block;}
+  .three{display:grid; grid-template-columns:repeat(3,1fr); gap:28px; margin-top:28px;}
+  @media (max-width:960px){ .three{grid-template-columns:1fr;} }
+
+  /* longitudinal */
+  .finds{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:36px; overflow:hidden;}
+  .finds div{background:var(--card); padding:22px 20px;}
+  .finds b{display:block; font-family:var(--serif); font-weight:500; font-size:40px; line-height:1; color:var(--paprika);}
+  .finds p{margin:10px 0 0; font-size:14px; color:var(--slate);}
+  @media (max-width:900px){ .finds{grid-template-columns:1fr 1fr;} }
+  .vs{display:grid; gap:10px;}
+  .vs-row{display:grid; grid-template-columns:96px 1fr 120px; gap:12px; align-items:center;}
+  .vs-row .nm{font-family:var(--mono); font-size:12px; text-align:right;}
+  .vs-row .ln{position:relative; height:26px;}
+  .vs-row .ln::before{content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:var(--line);}
+  .vs-row .stem{position:absolute; top:50%; height:2px; margin-top:-1px; transition:left 1s cubic-bezier(.2,.8,.2,1), width 1s cubic-bezier(.2,.8,.2,1);}
+  .vs-row .dot{position:absolute; top:50%; width:14px; height:14px; border-radius:50%; margin:-7px 0 0 -7px; transition:left 1s cubic-bezier(.2,.8,.2,1);}
+  .vs-row .meta{font-family:var(--mono); font-size:11px; color:var(--slate);} .vs-row .meta b{color:var(--ink); font-weight:500; font-size:12.5px;}
+  .vs-ref{position:absolute; top:-8px; bottom:-8px; width:0; border-left:1px dashed var(--ink); pointer-events:none;}
+  .vs-ref span{position:absolute; top:-18px; left:6px; font-family:var(--mono); font-size:10.5px; white-space:nowrap; color:var(--slate);}
+  .vs-box{position:relative; padding-top:22px; overflow:hidden;}
+  .vs-axis{display:grid; grid-template-columns:96px 1fr 120px; gap:12px; margin-top:6px;}
+  .vs-axis .t{display:flex; justify-content:space-between; font-family:var(--mono); font-size:10.5px; color:var(--slate);}
+  @media (max-width:640px){ .vs-row, .vs-axis{grid-template-columns:72px 1fr 78px;} .vs-row .meta span{display:none;} }
+
+  .gallery{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:44px;}
+  @media (max-width:900px){ .gallery{grid-template-columns:1fr 1fr;} }
+  @media (max-width:560px){ .gallery{grid-template-columns:1fr;} }
+  .fig{all:unset; cursor:zoom-in; display:flex; flex-direction:column; background:#fff; border:1px solid var(--line); transition:transform .25s ease, box-shadow .25s ease;}
+  .fig:hover, .fig:focus-visible{transform:translateY(-3px); box-shadow:0 16px 30px -22px rgba(27,36,32,.5);}
+  .fig:focus-visible{outline:2px solid var(--paprika); outline-offset:2px;}
+  .fig .im{aspect-ratio:16/10; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#fff; padding:10px; border-bottom:1px solid var(--line);}
+  .fig .im img{max-height:100%; width:auto; object-fit:contain;}
+  .fig .cap{padding:12px 14px 14px; font-size:13.5px; color:var(--slate);}
+  .fig .cap b{display:block; font-family:var(--serif); font-weight:500; font-size:17px; color:var(--ink); margin-bottom:2px;}
+  .fig .cap .k{font-family:var(--mono); font-size:10.5px; color:var(--paprika); letter-spacing:.06em; text-transform:uppercase; display:block; margin-bottom:4px;}
+
+  /* map */
+  .map-scroll{overflow-x:auto; border:1px solid var(--line); background:#fff; -webkit-overflow-scrolling:touch; min-width:0; width:100%;}
+  .fig{min-width:0; max-width:100%; box-sizing:border-box;}
+  .map-scroll img{min-width:1100px; width:100%;}
+  .map-hint{display:none;} @media (max-width:900px){ .map-hint{display:block; margin-top:8px;} }
+
+  /* pci */
+  .pci{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:28px;}
+  .pci div{background:var(--card); padding:20px 18px;}
+  .pci h3{font-size:22px;} .pci code{display:block; font-family:var(--mono); font-size:11.5px; color:var(--forest); margin:8px 0 6px;} .pci p{margin:0; font-size:13.5px; color:var(--slate);}
+  @media (max-width:900px){ .pci{grid-template-columns:1fr 1fr;} }
+
+  /* limits */
+  .lim{display:grid; grid-template-columns:1fr 1fr; gap:48px;}
+  @media (max-width:860px){ .lim{grid-template-columns:1fr;} }
+  .lim h3{font-size:24px; margin-bottom:16px;}
+  .lim ul{list-style:none; margin:0; padding:0;}
+  .lim li{padding:13px 0; border-top:1px solid var(--line); font-size:15px; color:var(--slate);}
+  .lim li b{color:var(--ink); font-weight:600;}
+  .lim .lede-s{font-size:16.5px; line-height:1.65; color:var(--ink); margin:0 0 14px; max-width:520px;}
+
+  /* poster + downloads */
+  .poster{display:grid; grid-template-columns:minmax(0,1.45fr) minmax(0,.55fr); gap:36px; align-items:start;}
+  @media (max-width:900px){ .poster{grid-template-columns:1fr;} }
+  .poster .pv{all:unset; cursor:zoom-in; display:block; border:1px solid var(--line); background:#fff; box-shadow:0 26px 50px -36px rgba(27,36,32,.6);}
+  .poster .pv:focus-visible{outline:2px solid var(--paprika); outline-offset:3px;}
+  .dl{display:grid; gap:12px;}
+  .dl a{display:grid; grid-template-columns:1fr auto; gap:4px 14px; align-items:center; text-decoration:none; padding:16px 18px; background:var(--card); border:1px solid var(--line); transition:background .2s, border-color .2s;}
+  .dl a:hover, .dl a:focus-visible{background:#fff; border-color:var(--ink);}
+  .dl b{font-family:var(--serif); font-weight:500; font-size:18px;}
+  .dl span{font-family:var(--mono); font-size:11px; color:var(--slate); grid-column:1;}
+  .dl em{grid-row:1 / span 2; grid-column:2; font-style:normal; font-family:var(--mono); color:var(--paprika); font-size:18px;}
+  .cite{margin-top:22px; background:var(--ink); color:var(--paper); padding:18px 18px 14px; font-size:13.5px; line-height:1.55;}
+  .cite .h{display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:rgba(231,234,225,.6); margin-bottom:8px;}
+  .cite button{all:unset; cursor:pointer; font-family:var(--mono); font-size:11px; color:#F0A27A;} .cite button:focus-visible{outline:1px solid #F0A27A;}
+  .stack{display:flex; flex-wrap:wrap; gap:6px; margin-top:22px;}
+  .stack span{font-family:var(--mono); font-size:11.5px; border:1px solid var(--line); padding:3px 8px; background:var(--card);}
+
+  footer{padding:56px 0 40px;}
+  footer .wrap{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; align-items:flex-end;}
+  footer h2{font-size:clamp(28px,4vw,40px);} footer h2 em{font-style:italic; font-weight:400; color:var(--paprika);}
+  footer .links{display:flex; flex-direction:column; gap:8px; align-items:flex-end;}
+  footer .links a{text-decoration:none; border-bottom:1px solid var(--line); font-size:15px;} footer .links a:hover{color:var(--paprika); border-color:var(--paprika);}
+  .fine{font-family:var(--mono); font-size:11px; color:var(--slate); padding-bottom:36px;}
+  .fine .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+  /* lightbox */
+  dialog.lb{border:none; padding:0; background:transparent; max-width:96vw; max-height:94vh; width:auto;}
+  dialog.lb::backdrop{background:rgba(10,15,13,.86);}
+  dialog.lb figure{margin:0; background:#fff; display:flex; flex-direction:column; max-height:94vh;}
+  dialog.lb img{max-width:94vw; max-height:calc(94vh - 64px); object-fit:contain; margin:0 auto;}
+  dialog.lb figcaption{display:flex; justify-content:space-between; gap:16px; align-items:center; padding:12px 16px; font-size:14px; border-top:1px solid var(--line);}
+  dialog.lb button{all:unset; cursor:pointer; font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--paprika); white-space:nowrap;}
+  dialog.lb button:focus-visible{outline:2px solid var(--paprika); outline-offset:2px;}
+
+  .scrubber button{ display:block; min-width:0; overflow:hidden; } .scrubber button small{ padding:0 2px; }
+
+  /* ===== hero stage: sticky hemicycle ===== */
+  .stage{ position:relative; height:420vh; background:radial-gradient(120% 90% at 70% 100%, #1d2c25 0%, var(--night) 60%); color:var(--cream); }
+  .stage::before{ content:""; position:absolute; inset:0; pointer-events:none; opacity:.45; background-image:radial-gradient(rgba(243,238,223,.06) 1px, transparent 1px); background-size:22px 22px; }
+  .stage-sticky{ position:sticky; top:0; height:100vh; min-height:620px; overflow:hidden; display:flex; flex-direction:column; justify-content:center; }
+  .stage-grid{ position:relative; max-width:1280px; width:100%; margin:0 auto; padding:84px 32px 40px; display:grid; grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr); gap:40px; align-items:center; }
+  .stage-copy .eyebrow{ color:#F0A27A; }
+  .stage-copy h1{ font-size:clamp(32px,4vw,58px); line-height:1.02; margin:14px 0 0; }
+  .stage-copy h1 em{ font-style:italic; font-weight:400; color:#F0A27A; }
+  .stage-copy .sub{ font-size:16.5px; color:var(--cream-dim); margin:16px 0 0; max-width:520px; }
+  .stage-copy .byline{ display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:16px; font-family:var(--mono); font-size:11.5px; color:var(--cream-dim); }
+  .stage-copy .byline b{ color:var(--cream); font-weight:500; }
+  .stage-copy .cta-row{ margin-top:20px; }
+  .era{ margin-top:30px; border-left:2px solid #F0A27A; padding:4px 0 4px 16px; min-height:86px; }
+  .era-k{ font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:#F0A27A; }
+  .era p{ margin:6px 0 0; font-family:var(--serif); font-style:italic; font-size:clamp(19px,1.8vw,24px); line-height:1.3; color:var(--cream); max-width:520px; }
+  .stage-viz .chamber{ margin:0; max-width:none; }
+  .stage-viz .legend{ margin-top:14px; min-height:44px; }
+  .scrub-wrap{ position:relative; margin-top:18px; }
+  .scrub-fill{ position:absolute; left:0; top:0; height:2px; width:0; background:#F0A27A; z-index:1; transition:width .15s linear; }
+  .stage-viz .scrubber{ margin:0; max-width:none; }
+  .scrubber button{ display:block; min-width:0; overflow:hidden; }
+  .scroll-hint{ position:absolute; left:50%; bottom:22px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--cream-dim); transition:opacity .4s; }
+  .scroll-hint i{ width:1px; height:34px; background:linear-gradient(var(--cream-dim), transparent); animation:hint 1.8s ease-in-out infinite; transform-origin:top; }
+  @keyframes hint{ 0%{ transform:scaleY(0); } 60%{ transform:scaleY(1); } 100%{ transform:scaleY(1); opacity:0; } }
+  .scroll-hint.gone{ opacity:0; }
+  .stage-src{ position:absolute; right:32px; bottom:22px; font-family:var(--mono); font-size:10.5px; color:rgba(243,238,223,.42); }
+  @media (max-width:960px){
+    .stage{ height:380vh; }
+    .stage-grid{ grid-template-columns:1fr; gap:14px; padding:70px 18px 54px; }
+    .stage-copy .sub, .stage-copy .byline, .stage-copy .cta-row{ display:none; }
+    .stage-copy h1{ font-size:clamp(26px,6.4vw,40px); }
+    .era{ margin-top:12px; min-height:70px; }
+    .era p{ font-size:17px; }
+    .stage-src{ display:none; }
+  }
+  @media (max-width:960px) and (max-height:700px){ .era{ display:none; } }
+
+  .stage-viz .chamber{ container-type:inline-size; }
+  .stage-viz .arc-label{ bottom:1%; width:36%; }
+  .stage-viz .arc-label .yr{ font-size:clamp(26px, 10.5cqw, 92px); }
+  .stage-viz .arc-label .gov{ font-size:clamp(9px, 1.45cqw, 13px); margin-top:6px; }
+  .stage-viz .arc-label .seats{ font-size:clamp(9px, 1.25cqw, 11.5px); }
+  .stage-viz .supermaj{ font-size:clamp(8.5px, 1.15cqw, 10.5px); margin-top:6px; }
+  /* ===== napló excerpt: highlighter and margin-note styles ===== */
+  .napl{ transform:rotate(-.5deg); box-shadow:0 1px 0 var(--line), 0 30px 50px -30px rgba(27,36,32,.45), 0 2px 6px rgba(27,36,32,.08); }
+  .napl::after{ content:""; position:absolute; right:28px; bottom:-24px; width:120px; height:120px; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle, transparent 54%, rgba(150,100,50,.13) 57%, rgba(150,100,50,.05) 62%, transparent 66%); }
+  .tok{ background-image:linear-gradient(104deg, transparent 0 2%, var(--mk) 2% 97%, transparent 97%); background-repeat:no-repeat; background-size:0% 70%; background-position:0 78%;
+    -webkit-box-decoration-break:clone; box-decoration-break:clone; transition:background-size .7s cubic-bezier(.3,.7,.2,1); }
+  .parsed .tok{ box-shadow:none !important; background-size:100% 70%; }
+  .tok.k-speaker{ --mk:rgba(110,190,140,.42); } .tok.k-applause{ --mk:rgba(110,170,255,.38); } .tok.k-heckle{ --mk:rgba(255,110,150,.36); }
+  .tok.k-bench{ --mk:rgba(255,170,60,.45); } .tok.k-bell{ --mk:rgba(160,160,160,.38); } .tok.k-time{ --mk:rgba(170,130,255,.36); }
+  .tok.k-bill{ --mk:rgba(60,200,180,.38); } .tok.k-vote{ --mk:rgba(255,215,40,.6); } .tok.k-attack{ --mk:rgba(255,120,90,.32); }
+  .tok[data-tag]::after{ font-family:'Caveat', cursive; font-size:17px; font-style:normal; letter-spacing:0; text-transform:none; color:var(--hl); background:none !important; padding:0; top:-1.25em; transform:rotate(-3deg) translateY(4px); line-height:1; }
+  .parsed .tok[data-tag]::after{ transform:rotate(-3deg); }
+</style>
+<!-- seo-head -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#3B67B5">
+<link rel="canonical" href="https://bdornyei42.ben-dornyei.workers.dev/thesis">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bendegúz Dörnyei">
+<meta property="og:url" content="https://bdornyei42.ben-dornyei.workers.dev/thesis">
+<meta property="og:title" content="Measuring Parliamentary Discourse in Hungary, 1990–2026">
+<meta property="og:description" content="A reproducible hybrid NLP pipeline for Hungarian parliamentary transcripts, with 82–91% accuracy against hand-coded segments.">
+<meta property="og:image" content="https://bdornyei42.ben-dornyei.workers.dev/media/og/thesis.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Poster: Measuring Democratic Discourse in Hungary">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "ScholarlyArticle", "headline": "Measuring Parliamentary Discourse in Hungary, 1990–2026", "author": {"@type": "Person", "name": "Bendegúz Dörnyei", "url": "https://bdornyei42.ben-dornyei.workers.dev/"}, "url": "https://bdornyei42.ben-dornyei.workers.dev/thesis", "image": "https://bdornyei42.ben-dornyei.workers.dev/media/og/thesis.jpg", "about": ["Hungarian parliament", "Natural language processing", "Political discourse"], "inLanguage": "en"}</script>
+<!-- /seo-head -->
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+<div class="progress" id="progress"></div>
+
+<header class="topbar" id="topbar">
+  <div class="wrap">
+    <a class="mark" href="/">B. DÖRNYEI</a>
+    <nav class="top-nav" aria-label="Page sections">
+      <a href="#parser" class="hide-sm">Method</a>
+      <a href="#session" class="hide-sm">Results</a>
+      <a href="#limits" class="hide-sm">Limits</a>
+      <a href="/#gallery">Projects</a>
+      <a class="pdf" href="files/dornyei-thesis-hungarian-parliamentary-discourse.pdf" target="_blank" rel="noopener">PDF</a>
+    </nav>
+  </div>
+</header>
+
+<section class="stage" id="top" aria-label="Hungarian parliaments, 1990–2026">
+  <div class="stage-sticky">
+    <div class="tricolor" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="stage-grid">
+      <div class="stage-copy">
+        <h1>Measuring Parliamentary Discourse in Hungary, 1990–2026</h1>
+        <p class="sub">A reproducible hybrid NLP pipeline that converts Hungary’s parliamentary transcripts (one PDF per sitting since 1990) into structured data on speakers, parties, attacks, interruptions and votes.</p>
+        <div class="byline"><span><b>Bendegúz Barna Dörnyei</b></span><span>Advisor · Prof. Jonathan Reuning-Scherer</span></div>
+        <div class="cta-row">
+          <a class="btn primary" href="files/dornyei-thesis-hungarian-parliamentary-discourse.pdf" target="_blank" rel="noopener">Read the paper <span class="arrow">→</span></a>
+          <a class="btn ghost" href="#session">Jump to results</a>
+        </div>
+        <div class="era" aria-live="polite"><span class="era-k" id="era-k">Parliament, 1990</span><p id="era-cap">The first freely elected parliament after 1989.</p></div>
+      </div>
+      <div class="stage-viz">
+        <div class="chamber" id="chamber">
+          <svg id="hemi" viewBox="0 0 1000 520" role="img" aria-labelledby="hemi-title"><title id="hemi-title">Seat distribution of the Hungarian National Assembly after each general election</title></svg>
+          <div class="arc-label">
+            <div class="yr" id="h-year">1990</div>
+            <div class="gov" id="h-gov">Antall · Boross</div>
+            <div class="seats" id="h-seats">386 seats</div>
+            <span class="supermaj" id="h-super">Two-thirds majority</span>
+          </div>
+        </div>
+        <div class="legend" id="h-legend"></div>
+        <div class="scrub-wrap"><div class="scrub-fill" id="scrub-fill"></div><div class="scrubber" id="scrubber" role="group" aria-label="Jump to a parliamentary cycle"></div></div>
+      </div>
+    </div>
+    <div class="scroll-hint" id="scroll-hint"><span>scroll</span><i></i></div>
+    <div class="stage-src">Seats after each general election · National Election Office; IPA Parline</div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="wrap grid">
+    <div class="stat"><div class="n"><em>82–91</em>%</div><div class="l">Hybrid accuracy vs. hand-coding</div></div>
+    <div class="stat"><div class="n" data-count="87000" data-prefix="~">87,000</div><div class="l">Transcript pages, 1990–2026</div></div>
+    <div class="stat"><div class="n" data-count="1800" data-prefix="~">1,800</div><div class="l">Plenary sessions in scope</div></div>
+    <div class="stat"><div class="n" data-count="57">57</div><div class="l">Annotated political events</div></div>
+  </div>
+</div>
+
+<main>
+<section class="blk" id="question">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">01</div>
+      <div>
+        <p class="question">The goal is to turn Hungary’s parliamentary transcripts into reliable structured data for longitudinal and correlational political research.</p>
+      </div>
+    </div>
+    <div class="q-cols reveal">
+      <div>
+        <div class="k">Source</div>
+        <h3>A detailed record</h3>
+        <p>The transcripts name the speaker of every speech and record interjections such as heckles and applause. Votes are recorded with exact counts and bills are numbered.</p>
+      </div>
+      <div>
+        <div class="k">Problem</div>
+        <h3>Published as PDFs</h3>
+        <p>Party labels appear once, sometimes only in the table of contents. Votes are written as Hungarian prose, and interjections are set mid-paragraph in italics. No published quantitative study covers more than a handful of sessions.</p>
+      </div>
+      <div>
+        <div class="k">Contribution</div>
+        <h3>A reusable pipeline</h3>
+        <p>It runs on any set of sessions. It is validated against hand-coding, and each output row records which layer produced it. Interpreting the results is left to future work.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 PARSER ============ -->
+<section class="blk" id="parser">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">02</div>
+      <div>
+        <h2>Parsing a <em>napló</em></h2>
+        <p>The napló’s formatting rules are not documented, so I reverse-engineered them. Capitalised names open a turn, italic parentheses mark interjections, timestamps appear every ten minutes, and votes use four stock phrasings.</p>
+      </div>
+    </div>
+    <ol class="how reveal" aria-label="How the demo works">
+      <li><b>The document</b>The napló (országgyűlési napló) is the official PDF record of each sitting. Below is a short illustrative excerpt.</li>
+      <li><b>What is extracted</b>Speakers and their parties, attacks, interruptions (applause, heckles, the chair’s bell), bill numbers and votes.</li>
+      <li><b>The output</b>Each extracted item becomes one data row in the numbered list beside the excerpt.</li>
+      <li><b>The toggle</b>“As published” shows the original text. “As parsed” highlights each extracted item and fills in the rows.</li>
+    </ol>
+    <div class="parser reveal">
+      <div>
+        <div class="toggle" role="group" aria-label="Transcript view">
+          <button type="button" id="v-raw" aria-pressed="true">As published</button>
+          <button type="button" id="v-parsed" aria-pressed="false">As parsed</button>
+        </div>
+        <article class="napl" id="napl" aria-label="Illustrative transcript excerpt">
+          <div class="runhead"><span>ORSZÁGGYŰLÉSI NAPLÓ</span><span>illustrative excerpt</span></div>
+          <span class="ts"><span class="tok k-time" data-tag="timestamp" data-row="0">(13.10)</span></span>
+          <p><span class="tok k-speaker sp" data-tag="chair" data-row="1">ELNÖK:</span> Köszönöm szépen. Megadom a szót.</p>
+          <p><span class="tok k-speaker sp" data-tag="speaker · MSZP" data-row="2">KÉPVISELŐ (MSZP):</span> Tisztelt Elnök Úr! Tisztelt Ház! <span class="tok k-attack" data-tag="attack · target KORMÁNY" data-row="2">Önök hazudnak az embereknek, és felelőtlenül költik a pénzüket.</span> <i><span class="tok k-applause" data-tag="applause" data-row="3">(Taps az ellenzéki padsorokban.</span> – <span class="tok k-heckle" data-tag="heckle" data-row="4">Közbekiáltás a kormánypárti padsorokból: Ez már tényleg szomorú!)</span></i></p>
+          <p><span class="tok k-speaker sp" data-tag="speaker · KORMÁNY" data-row="5">ÁLLAMTITKÁR:</span> Tisztelt Ház! <span class="tok k-attack" data-tag="sarcasm · LLM layer" data-row="5">Szuper, remek munka volt, gratulálok!</span> <i><span class="tok k-applause" data-tag="applause" data-row="6">(Taps a kormánypártok soraiból.</span> – <span class="tok k-bench" data-tag="bench" data-row="7">Padcsapkodás.)</span></i></p>
+          <p><i><span class="tok k-bell" data-tag="bell" data-row="8">(Az elnök a csengő megkocogtatásával jelzi az időkeret leteltét.)</span></i></p>
+          <p><span class="tok k-speaker sp" data-tag="chair" data-row="9">ELNÖK:</span> Most a <span class="tok k-bill" data-tag="bill" data-row="9">T/12345.</span> számú törvényjavaslatról szavazunk. Megállapítom, hogy <span class="tok k-vote" data-tag="vote · 186 / 0 / 0" data-row="9">az Országgyűlés a törvényjavaslatot 186 igen szavazattal, ellenszavazat és tartózkodás nélkül elfogadta.</span></p>
+        </article>
+        <p class="note" style="margin-top:12px;">Illustrative excerpt built from the conventions and phrases documented in the paper (§3.2, §4–5). Speaker names are placeholders; this is not a real sitting.</p>
+      </div>
+      <div>
+        <div class="rows" id="rows">
+          <div class="rh"><span>parsed segments</span><span id="row-count">0 rows</span></div>
+          <ol>
+            <li data-r="0"><span class="ty" style="background:#7A62C4">time</span><span class="tx">13:10 <small>timestamp, every ten minutes</small></span></li>
+            <li data-r="1"><span class="ty" style="background:#2F4A3D">chair</span><span class="tx">ELNÖK <small>chair turn: procedural, not scored</small></span></li>
+            <li data-r="2"><span class="ty" style="background:#B5321A">speech</span><span class="tx">MSZP → KORMÁNY <small>tone attack · lexicon: hazudnak, felelőtlenül · direct address</small></span></li>
+            <li data-r="3"><span class="ty" style="background:#2B6CB0">applause</span><span class="tx">opposition benches <small>“Taps …” opening bigram</small></span></li>
+            <li data-r="4"><span class="ty" style="background:#B5321A">heckle</span><span class="tx">government benches <small>quoted interjection</small></span></li>
+            <li data-r="5"><span class="ty" style="background:#2F4A3D">speech</span><span class="tx">KORMÁNY → MSZP <small>party from the ToC · “praise” re-read as sarcasm by the LLM</small></span></li>
+            <li data-r="6"><span class="ty" style="background:#2B6CB0">applause</span><span class="tx">governing benches</span></li>
+            <li data-r="7"><span class="ty" style="background:#C26A12">bench</span><span class="tx">padcsapkodás <small>bench-thumping</small></span></li>
+            <li data-r="8"><span class="ty" style="background:#6B6F6C">bell</span><span class="tx">chair’s bell <small>time limit reached</small></span></li>
+            <li data-r="9"><span class="ty" style="background:#8A2618">vote</span><span class="tx">T/12345 · yes 186 · no 0 · abstain 0 <small>unanimous-elision phrasing</small></span></li>
+          </ol>
+        </div>
+        <div class="legend-keys">
+          <span><i style="background:#2F4A3D"></i>speaker turn</span><span><i style="background:#2B6CB0"></i>applause</span><span><i style="background:#B5321A"></i>heckle / attack</span><span><i style="background:#C26A12"></i>bench</span><span><i style="background:#6B6F6C"></i>bell</span><span><i style="background:#0E7C6E"></i>bill</span><span><i style="background:#8A2618"></i>vote</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 PIPELINE ============ -->
+<section class="blk dark" id="pipeline">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">03</div>
+      <div>
+        <h2>Seven-stage pipeline</h2>
+        <p>Each stage is a pure function with typed inputs and outputs, and can be tested or swapped on its own. Every figure is a deterministic function of one saved dataframe, so results replicate without rerunning the slow steps.</p>
+      </div>
+    </div>
+    <div class="pipe reveal">
+      <ol class="stages" id="stages">
+        <li><span class="i">01</span><div><b>PDF extraction</b><span>PyMuPDF keeps font, CAPS, bold and italic flags. Italics are how interjections are found. <code>pdf_io.py</code></span></div></li>
+        <li><span class="i">02</span><div><b>Table-of-contents parsing</b><span>Speaker → party map taken from the document’s own ToC. <code>pdf_io.py</code></span></div></li>
+        <li><span class="i">03</span><div><b>Segmentation</b><span>Speeches, interjections, chair turns and votes; votes split on bill references and parsed from prose. <code>parsing.py</code></span></div></li>
+        <li><span class="i">04</span><div><b>Rule-based scoring</b><span>huBERT sentiment + hand-curated accusative lexicon + direct-address markers → attack score and target. <code>sentiment.py · analysis.py</code></span></div></li>
+        <li><span class="i">05</span><div><b>LLM refinement</b><span>Gemini 2.5 Flash-Lite scores each segment a second time; a seven-case merge protocol combines the two layers. <code>llm_scoring.py · analysis_ai.py</code></span></div></li>
+        <li><span class="i">06</span><div><b>Per-session outputs</b><span>CSVs, metadata.json and ~25 figures per sitting. <code>data/processed/sessions/</code></span></div></li>
+        <li><span class="i">07</span><div><b>Longitudinal aggregation</b><span>Combines every session CSV into 7 longitudinal tables and 15 figures. <code>longitudinal.py</code></span></div></li>
+      </ol>
+      <div class="term" aria-label="Pipeline console output">
+        <div class="bar"><i></i><i></i><i></i><span>python main_ai.py data/raw/nyYYMMDD.pdf</span></div>
+        <pre id="term-out"><span class="c-dim"># press run to process one session</span>
+<span class="cursor"></span></pre>
+        <div class="run"><button type="button" class="btn ghost" id="term-run">▶ Run pipeline</button><span class="note" style="align-self:center;">Log lines from the paper (§4); LLM step shortened</span></div>
+      </div>
+    </div>
+    <div class="outputs reveal">
+      <div><b>~6 min</b><span>per session, end to end; limited by the free-tier LLM rate limit</span></div>
+      <div><b>$450–600</b><span>estimated API cost for the full 1990–2026 corpus</span></div>
+      <div><b>0 calls</b><span>to re-run unchanged text; the cache is keyed on text hash + prompt version</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 HYBRID ============ -->
+<section class="blk" id="hybrid">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">04</div>
+      <div>
+        <h2>Merging rule-based and LLM scores</h2>
+        <p>The rule-based layer is fast and auditable but scores sarcasm as praise. The LLM detects sarcasm but hallucinates targets and drifts between runs. The hybrid keeps rule scores for confident cases and uses the LLM to correct hard ones. A merge function with seven named outcomes decides each segment, and every row stores its <code class="mono">merge_reason</code>.</p>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="cases" id="cases" role="group" aria-label="Example segments"></div>
+      <div class="utter"><div class="hu" id="u-hu"></div><div class="en" id="u-en"></div><div class="ctx" id="u-ctx"></div></div>
+      <div class="layers">
+        <div class="layer"><h3>Rule-based layer</h3><div class="who">huBERT · lexicon · address markers</div><dl class="kv" id="l-rule"></dl></div>
+        <div class="layer"><h3>LLM layer</h3><div class="who">Gemini 2.5 Flash-Lite · JSON output</div><dl class="kv" id="l-llm"></dl></div>
+        <div class="layer final"><h3>Merged result</h3><div class="who">deterministic merge function</div><dl class="kv" id="l-final"></dl><span class="reason" id="l-reason"></span></div>
+      </div>
+      <p class="note" style="margin-top:10px;">Sentences and merge rules from the paper (§4.4–4.6); individual scores are illustrative.</p>
+      <div class="seven" id="seven"></div>
+    </div>
+
+    <div class="acc reveal" id="acc">
+      <div>
+        <div class="eyebrow">Validation · 126 hand-coded segments · 9 sessions</div>
+        <h3 style="margin-top:12px;">The hybrid scored higher than both alternatives in every session.</h3>
+        <p>Ranges span the nine sessions. The gap is widest where sarcasm and quoted attribution are common. Rules cannot resolve these cases, and an LLM alone scores them inconsistently.</p>
+      </div>
+      <div class="bars">
+        <div class="bar-row hy"><span class="nm">Hybrid</span><div class="track"><div class="base"></div><div class="rng" data-lo="82" data-hi="91"></div><span class="lab">82–91%</span></div></div>
+        <div class="bar-row rb"><span class="nm">Rule-based</span><div class="track"><div class="base"></div><div class="rng" data-lo="55" data-hi="72"></div><span class="lab">55–72%</span></div></div>
+        <div class="bar-row lm"><span class="nm">LLM-only</span><div class="track"><div class="base"></div><div class="rng" data-lo="34" data-hi="50"></div><span class="lab">34–50%</span></div></div>
+        <div class="axis"><span></span><div class="ticks"><span>0</span><span>25</span><span>50</span><span>75</span><span>100%</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 SINGLE SESSION ============ -->
+<section class="blk" id="session">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">05</div>
+      <div>
+        <h2>Results from one sitting</h2>
+        <p>The charts below show attacks, praise and interruptions in a single plenary sitting.</p>
+      </div>
+    </div>
+    <div class="ss-grid reveal">
+      <div class="panel">
+        <div class="ph">
+          <div><h3>Party-to-party sentiment</h3><div class="sub">Net directed sentiment (praise − attack). Rows are the speaking party, columns the target.</div></div>
+          <div class="toggle" role="group" aria-label="Sentiment view" style="margin:0;">
+            <button type="button" id="hv-m" aria-pressed="true">Matrix</button>
+            <button type="button" id="hv-n" aria-pressed="false">Network</button>
+          </div>
+        </div>
+        <div id="heat-wrap"><div class="heat" id="heat"></div></div>
+        <div class="netwrap" id="net-wrap" hidden><svg id="net" viewBox="0 0 640 520" role="img" aria-label="Network of net sentiment between parties"></svg></div>
+        <div class="scale"><span>−218</span><i></i><span>+20</span></div>
+        <div class="readout" id="readout">Hover a cell for its value. The largest flow is <b>MSZP → KORMÁNY, −218.5</b>.</div>
+      </div>
+      <div class="panel">
+        <h3>Opposition vs. government</h3>
+        <div class="sub" style="margin-bottom:18px;">Total attack intensity between the two blocs.</div>
+        <div class="bloc" id="bloc">
+          <div class="arrowrow"><span class="lbl">Opposition → Government</span><span class="big">558.5</span><div class="bt"><i data-w="100"></i></div></div>
+          <div class="arrowrow"><span class="lbl">Government → Opposition</span><span class="big">235.9</span><div class="bt"><i data-w="42.2"></i></div></div>
+        </div>
+        <p class="note" style="margin-top:18px;">KORMÁNY = government-affiliated parties and roles; ELLENZÉK = all opposition. Static post-2010 mapping (see limits).</p>
+      </div>
+    </div>
+    <div class="three reveal">
+      <div class="panel">
+        <h3>Interjections</h3><div class="sub">210 detected and classified after LLM refinement.</div>
+        <div class="hbars" id="inter" style="margin-top:14px;"></div>
+      </div>
+      <div class="panel">
+        <h3>Tone of 140 speeches</h3><div class="sub">Cross-bloc praise is rare.</div>
+        <div class="waffle" id="waffle" style="margin-top:16px;"></div>
+        <div class="wl"><span><i style="background:var(--neg)"></i>attack 104</span><span><i style="background:#9AA39E"></i>procedural 29</span><span><i style="background:#D3B467"></i>neutral 4</span><span><i style="background:var(--pos)"></i>praise 3</span></div>
+      </div>
+      <div class="panel">
+        <h3>How the layers were merged</h3><div class="sub">merge_reason counts, same session.</div>
+        <div class="hbars" id="merge" style="margin-top:14px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 LONGITUDINAL ============ -->
+<section class="blk" id="decade">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">06</div>
+      <div>
+        <h2>Nine sessions, 2014–2022</h2>
+        <p>The longitudinal model was run on the first spring-term plenary of each year, giving one observation per year and controlling for session type and legislative calendar. These results illustrate what the full corpus could support. They are not yet substantive claims.</p>
+      </div>
+    </div>
+    <div class="finds reveal">
+      <div><b>8 of 9</b><p>sessions where the opposition attacked harder than the government. February 2019 was the exception.</p></div>
+      <div><b>3.4×</b><p>LMP’s share of words spoken relative to its share of seats (3.3% of seats on average).</p></div>
+      <div><b>0.18×</b><p>Fidesz’s voice-to-seat ratio while holding 58.6% of seats; ministers and state secretaries spoke for the government.</p></div>
+      <div><b>~1.2→1.7</b><p>interjections per speech, rising from 2014 to peaks in 2016 and 2022, with a dip in 2018.</p></div>
+    </div>
+    <div class="panel reveal">
+      <div class="ph"><div><h3>Voice ÷ seats</h3><div class="sub">Share of words spoken divided by share of seats, mean across sessions. Right of the line = speaks more than its seats predict.</div></div></div>
+      <div class="vs-box" id="vs"></div>
+    </div>
+
+    <div class="gallery reveal" id="gallery">
+      <button class="fig" data-src="media/thesis/attack-praise.webp" data-cap="Figure 6 · Attack vs. praise by party, 2014–2022"><div class="im"><img src="media/thesis/attack-praise.webp" alt="Small multiples of attack and praise totals by party, 2014 to 2022" loading="lazy"></div><div class="cap"><span class="k">Figure 6</span><b>Attack vs. praise by party</b>KORMÁNY peaks near 280 in 2022; praise is near zero everywhere except KDNP.</div></button>
+      <button class="fig" data-src="media/thesis/events.webp" data-cap="Figure 9 · Interjection frequency and major political events"><div class="im"><img src="media/thesis/events.webp" alt="Interjections per speech by session with major events marked" loading="lazy"></div><div class="cap"><span class="k">Figure 9</span><b>Events vs. interjections</b>Interjection rates correspond moderately with high-salience events.</div></button>
+      <button class="fig" data-src="media/thesis/asymmetry.webp" data-cap="Figure 10 · Bloc tone asymmetry per session"><div class="im"><img src="media/thesis/asymmetry.webp" alt="Scatter of government vs opposition mean attack intensity per session" loading="lazy"></div><div class="cap"><span class="k">Figure 10</span><b>Bloc tone asymmetry</b>Points above the diagonal are sessions where the opposition attacked harder. Eight of nine sessions are above it.</div></button>
+      <button class="fig" data-src="media/thesis/consistency.webp" data-cap="Figure 11 · Speaker consistency map: mean attack intensity vs. rhetorical volatility"><div class="im"><img src="media/thesis/consistency.webp" alt="Scatter of speakers by mean attack intensity and its standard deviation" loading="lazy"></div><div class="cap"><span class="k">Figure 11</span><b>Speaker consistency map</b>Each speaker’s mean attack intensity against its standard deviation.</div></button>
+      <button class="fig" data-src="media/thesis/participation.webp" data-cap="Figure 7.1 · Party participation shares across sessions"><div class="im"><img src="media/thesis/participation.webp" alt="Stacked area chart of share of words spoken by party" loading="lazy"></div><div class="cap"><span class="k">Figure 7.1</span><b>Share of words spoken</b>DK and Párbeszéd enter from 2020; MSZP’s share shrinks after 2016.</div></button>
+      <button class="fig" data-src="media/thesis/voice-seats.webp" data-cap="Figure 8 · Voice ÷ seats by party, per session"><div class="im"><img src="media/thesis/voice-seats.webp" alt="Voice to seat ratio over time for each party" loading="lazy"></div><div class="cap"><span class="k">Figure 8</span><b>Voice ÷ seats over time</b>The per-session series behind the averages above.</div></button>
+      <button class="fig" data-src="media/thesis/attackers.webp" data-cap="Figure 12.1 · Top attackers and their party affiliations"><div class="im"><img src="media/thesis/attackers.webp" alt="Bar chart of speakers ranked by cumulative attack intensity" loading="lazy"></div><div class="cap"><span class="k">Figure 12.1</span><b>Top attackers</b>Attackers come from both blocs. “Attack” measures adversarial intensity regardless of political direction.</div></button>
+      <button class="fig" data-src="media/thesis/network.webp" data-cap="Figure 3.1 · Party-to-party attack network, single session"><div class="im"><img src="media/thesis/network.webp" alt="Directed attack network between parties" loading="lazy"></div><div class="cap"><span class="k">Figure 3.1</span><b>Attack network</b>Edge thickness proportional to total attack intensity.</div></button>
+      <button class="fig" data-src="media/thesis/timeline.webp" data-cap="Figure 3.3 · Attack intensity across the sitting day, 10-minute bins"><div class="im"><img src="media/thesis/timeline.webp" alt="Bar chart of attack intensity in 10-minute windows" loading="lazy"></div><div class="cap"><span class="k">Figure 3.3</span><b>Attacks across the day</b>Attack intensity in 10-minute windows across one sitting day.</div></button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 MAP ============ -->
+<section class="blk" id="map">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">07</div>
+      <div>
+        <h2>Parliaments and events, 1990–2026</h2>
+        <p>The map covers ten parliaments and 57 events (elections, EU accession, the Őszöd speech, the migrant-quota referendum, COVID rule by decree). The events are stored in an editable file that the pipeline uses for before/after comparisons.</p>
+      </div>
+    </div>
+    <button class="fig reveal" style="width:100%; cursor:zoom-in;" data-src="media/thesis/map.webp" data-cap="Figure 0 · Parliamentary compositions, periods and major events, 1990–2026">
+      <div class="map-scroll"><img src="media/thesis/map.webp" alt="Timeline of Hungarian parliaments 1990–2026 with seat hemicycles, governing coalitions and 57 major events" loading="lazy"></div>
+    </button>
+    <p class="note map-hint">Scroll sideways, or tap to enlarge.</p>
+  </div>
+</section>
+
+<!-- ============ 08 PCI ============ -->
+<section class="blk" id="pci">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">08</div>
+      <div>
+        <h2>A proposed Parliamentary Climate Index</h2>
+        <p>The index is a per-session score for how well parliament is functioning. It averages four components, each rescaled to [0, 1] across sessions. It is a prototype and has not been validated.</p>
+      </div>
+    </div>
+    <div class="pci reveal">
+      <div><h3>Cooperation</h3><code>praise_x / (praise_x + attack_x)</code><p>Share of cross-bloc sentiment that is praise.</p></div>
+      <div><h3>Consensus</h3><code>mean |yes − no| / total</code><p>How lopsided the session’s recorded votes were.</p></div>
+      <div><h3>Peace</h3><code>1 / hostility</code><p>Inverse of mean cross-bloc attack intensity.</p></div>
+      <div><h3>Order</h3><code>1 / interjection rate</code><p>Inverse of interjections per speech.</p></div>
+    </div>
+    <button class="fig reveal" style="width:100%;" data-src="media/thesis/pci.webp" data-cap="Figure 13 · Concept Parliamentary Climate Index, 2014–2022"><div class="im" style="aspect-ratio:auto; padding:16px;"><img src="media/thesis/pci.webp" alt="Prototype climate index declining from about 87 in 2014 to about 33 in 2022, with four faint component lines" loading="lazy" style="width:100%; height:auto;"></div><div class="cap"><span class="k">Figure 13 · prototype</span>Composite in black, components faint. Weighting and external validation are open questions.</div></button>
+  </div>
+</section>
+
+<!-- ============ 09 LIMITS ============ -->
+<section class="blk" id="limits">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">09</div>
+      <div><h2>Limitations and future work</h2></div>
+    </div>
+    <div class="lim reveal">
+      <div>
+        <h3>Limitations</h3>
+        <ul>
+          <li><b>Transcription bias.</b> The secretaries who write the napló are often MPs with party ties; selective transcription would carry into interjection rates.</li>
+          <li><b>Static bloc mapping.</b> Government = Fidesz–KDNP holds after 2010 but not for the Antall or Horn eras; a date-indexed table is needed before pre-2010 claims.</li>
+          <li><b>Sarcasm.</b> The pipeline catches roughly 60–70% of what a human reader flags; misses inflate the cooperation component.</li>
+          <li><b>Targets and procedure.</b> Implicit or multi-party attacks resolve imperfectly; procedurally dressed attacks are zeroed.</li>
+          <li><b>Hungarian morphology.</b> Case endings (Fidesz, Fideszt, Fidesznek, Fidesszel) and free compounding strain any lexicon.</li>
+          <li><b>Validation.</b> One annotator, 126 segments. Indicative only; there is no formal inter-rater study.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Future work</h3>
+        <ul>
+          <li><b>Process the full corpus.</b> ~1,800 sessions and 87,000 pages, released as a public research dataset.</li>
+          <li><b>Expand validation.</b> Multiple fluent coders, inter-rater reliability, a sample stratified by year, party and session type.</li>
+          <li><b>Date-indexed blocs.</b> A (start, end, governing parties) table so 1990–2010 can be read correctly.</li>
+          <li><b>Event windows.</b> ±3-month comparisons around the 57 annotated events.</li>
+          <li><b>Controls and topics.</b> PPP-adjusted GDP per capita and institutional indicators; topic models to split health, economy, foreign policy.</li>
+          <li><b>Refine the PCI.</b> Test alternative weights against external expert assessments of parliamentary functioning.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10 EARLIER WORK ============ -->
+<section class="blk" id="earlier">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">10</div>
+      <div><h2>Where this started</h2></div>
+    </div>
+    <div class="lim reveal">
+      <div>
+        <h3>Hungary’s electoral incentives</h3>
+        <p class="lede-s">An earlier, unfinished project asked how parties’ incentive strategies and changes to the electoral rules shaped party competition and voter behavior in Hungary from 1989 to 2025. I presented it as a work in progress at the Jackson School’s Academic Workshop Series.</p>
+        <p class="lede-s">Part of it was a first pass over about 56,000 pages of plenary transcripts with Python and an LLM API. That experiment became the pipeline on this page.</p>
+      </div>
+      <div>
+        <h3>What it drew on</h3>
+        <ul>
+          <li><b>Archives.</b> Library of the Hungarian Parliament, Hungarian National Archives, Central Statistical Office (KSH), Metropolitan Ervin Szabó Library.</li>
+          <li><b>Election data.</b> Returns from the National Election Office, with KSH sociodemographics.</li>
+          <li><b>Party positions.</b> Chapel Hill Expert Survey (1999–2019) and V-Party (2020–2025).</li>
+          <li><b>Literature.</b> 61 scholarly papers, 32 reports and 5 datasets.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11 POSTER + DOWNLOADS ============ -->
+<section class="blk" id="poster" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">11</div>
+      <div><h2>Paper, poster and citation</h2></div>
+    </div>
+    <div class="poster reveal">
+      <button class="pv" data-src="media/thesis/poster.webp" data-cap="Project poster"><img src="media/thesis/poster.webp" alt="Poster: Measuring Democratic Discourse in Hungary (1990–2026), Reproducible Hybrid NLP Pipeline for Parliamentary Transcripts" loading="lazy"></button>
+      <div>
+        <div class="dl">
+          <a href="files/dornyei-thesis-hungarian-parliamentary-discourse.pdf" target="_blank" rel="noopener"><b>Full paper</b><span>PDF · 54 pages · 2.7 MB</span><em>↓</em></a>
+          <a href="files/dornyei-thesis-poster.pdf" target="_blank" rel="noopener"><b>Poster</b><span>PDF · 1 page · 2.1 MB</span><em>↓</em></a>
+        </div>
+        <div class="cite">
+          <div class="h"><span>Cite</span><button type="button" id="copy-cite">Copy</button></div>
+          <div id="cite-text">Dörnyei, Bendegúz Barna. 2026. “Measuring Parliamentary Discourse in Hungary, 1990–2026: A Reproducible Pipeline for Extracting Structured Discourse Data from Hungarian Parliamentary Transcripts.” Senior project, Department of Statistics &amp; Data Science, Yale University. Advisor: Jonathan Reuning-Scherer.</div>
+        </div>
+        <div class="stack" aria-label="Tools used">
+          <span>Python</span><span>PyMuPDF</span><span>huBERT · NYTK sentiment-hts5</span><span>huSpaCy hu_core_news_lg</span><span>Gemini 2.5 Flash-Lite</span><span>pandas</span><span>matplotlib</span>
+        </div>
+        <p class="note" style="margin-top:18px;">Sources: Hungaricana digital library (1990–2022), parlament.hu (2022–2026), Hungarian National Archives and IPA Parline for seats.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Other projects</h2>
+    <div class="links">
+      <a href="/#gallery">More projects →</a>
+      <a href="pandemic-risk">Pandemic risk assessment →</a>
+      <a href="mailto:ben.dornyei@gmail.com">ben.dornyei@gmail.com</a>
+      <a href="https://www.linkedin.com/in/ben-dornyei/" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+<div class="fine"><div class="wrap"><span>© 2026 Bendegúz Dörnyei</span><a href="/" style="text-decoration:none;">← Home</a></div></div>
+
+<dialog class="lb" id="lb" aria-label="Enlarged figure">
+  <figure><img id="lb-img" alt=""><figcaption><span id="lb-cap"></span><button type="button" id="lb-close">Close ✕</button></figcaption></figure>
+</dialog>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+  /* ---------- top bar + progress ---------- */
+  const bar = $('#topbar'), prog = $('#progress'), hero = $('#top');
+  const onScroll = () => {
+    const h = document.documentElement;
+    prog.style.transform = `scaleX(${h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight)})`;
+    bar.classList.toggle('solid', hero.getBoundingClientRect().bottom < 60);
+    bar.classList.toggle('scrolled', h.scrollTop > 8);
+  };
+  addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  /* ---------- reveal + one-shot triggers ---------- */
+  const triggers = new Map();
+  const when = (el, fn) => triggers.set(el, fn);
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    const fn = triggers.get(e.target); if (fn) { fn(); triggers.delete(e.target); }
+    io.unobserve(e.target);
+  }), {threshold:0, rootMargin:'0px 0px -12% 0px'}) : null;
+  const watch = el => io ? io.observe(el) : (el.classList.add('in'), triggers.get(el)?.());
+
+  /* ---------- hemicycle ---------- */
+  const COL = {'MSZP':'#E0473C','SZDSZ':'#4C8BE0','Fidesz':'#F28C28','Fidesz–KDNP':'#F28C28','Fidesz–MDF':'#F28C28','MDF':'#3FA36B','KDNP':'#E9C46A',
+    'FKGP':'#9DB35A','MIÉP':'#8B6A52','Jobbik':'#A0815F','LMP':'#77D08A','DK':'#6FB3EE','Együtt':'#A89BEA','MSZP–Párbeszéd':'#E8705F','MSZP–SZDSZ joint':'#F09A8F',
+    'MSZP-led alliance':'#D95550','United for Hungary':'#A97BDB','Mi Hazánk':'#6FAE5C','Tisza':'#3FA9F5','Independent':'#8A928D','German minority':'#C9C2B2','Agrarian / ind.':'#8A928D'};
+  const PARL = [
+    {y:1990, gov:'Antall · Boross', yrs:'1990–94', g:['MDF','FKGP','KDNP'], s:[['MSZP',33],['SZDSZ',94],['Fidesz',22],['Agrarian / ind.',8],['MDF',164],['KDNP',21],['FKGP',44]]},
+    {y:1994, gov:'Horn', yrs:'1994–98', g:['MSZP','SZDSZ'], s:[['MSZP',209],['SZDSZ',70],['Fidesz',20],['Agrarian / ind.',1],['MDF',38],['KDNP',22],['FKGP',26]]},
+    {y:1998, gov:'Orbán I', yrs:'1998–2002', g:['Fidesz','FKGP','MDF'], s:[['MSZP',134],['SZDSZ',24],['Independent',1],['MDF',17],['Fidesz',148],['FKGP',48],['MIÉP',14]]},
+    {y:2002, gov:'Medgyessy · Gyurcsány I', yrs:'2002–06', g:['MSZP','SZDSZ'], s:[['MSZP',178],['SZDSZ',20],['MDF',24],['Fidesz',164]]},
+    {y:2006, gov:'Gyurcsány II · Bajnai', yrs:'2006–10', g:['MSZP','SZDSZ','MSZP–SZDSZ joint'], s:[['MSZP',186],['MSZP–SZDSZ joint',6],['SZDSZ',18],['Independent',1],['MDF',11],['Fidesz–KDNP',164]]},
+    {y:2010, gov:'Orbán II', yrs:'2010–14', g:['Fidesz–KDNP'], s:[['MSZP',59],['LMP',16],['Independent',1],['Fidesz–KDNP',263],['Jobbik',47]]},
+    {y:2014, gov:'Orbán III', yrs:'2014–18', g:['Fidesz–KDNP'], s:[['MSZP-led alliance',38],['LMP',5],['Fidesz–KDNP',133],['Jobbik',23]]},
+    {y:2018, gov:'Orbán IV', yrs:'2018–22', g:['Fidesz–KDNP'], s:[['MSZP–Párbeszéd',20],['DK',9],['Együtt',1],['LMP',8],['Independent',1],['German minority',1],['Fidesz–KDNP',133],['Jobbik',26]]},
+    {y:2022, gov:'Orbán V', yrs:'2022–26', g:['Fidesz–KDNP'], s:[['United for Hungary',57],['German minority',1],['Fidesz–KDNP',135],['Mi Hazánk',6]]},
+    {y:2026, gov:'Magyar', yrs:'2026–', g:['Tisza'], s:[['Tisza',141],['Fidesz–KDNP',52],['Mi Hazánk',6]]},
+  ];
+  // display names for the legend where the short key isn't self-explanatory
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const svg = $('#hemi');
+  const CX = 500, CY = 505, R = 490;
+  const layouts = {};
+  function layout(n){
+    if (layouts[n]) return layouts[n];
+    const rows = n > 300 ? 10 : 7, r0 = .4;
+    const radii = Array.from({length:rows}, (_, i) => r0 + (1 - r0) * (i / (rows - 1)));
+    const tot = radii.reduce((a,b) => a + b, 0);
+    let per = radii.map(r => Math.round(n * r / tot));
+    per[rows - 1] += n - per.reduce((a,b) => a + b, 0);
+    const spacing = R * (1 - r0) / (rows - 1);
+    const pts = [];
+    radii.forEach((r, i) => { const k = per[i];
+      for (let j = 0; j < k; j++){ const t = Math.PI - (k === 1 ? Math.PI/2 : j / (k - 1) * Math.PI);
+        pts.push({x: CX + R*r*Math.cos(t), y: CY - R*r*Math.sin(t), t}); } });
+    pts.sort((a,b) => b.t - a.t || 0);
+    const arcSp = Math.PI * R * tot / n; // seat-to-seat distance along every row
+    return layouts[n] = {pts, dot: Math.min(spacing * .38, arcSp * .4)};
+  }
+  let group = null, curN = 0, idx = 0, timer = null, playing = !reduce;
+  function draw(i){
+    const P = PARL[i], n = P.s.reduce((a, [, v]) => a + v, 0), L = layout(n);
+    const colors = []; P.s.forEach(([p, v]) => { for (let k = 0; k < v; k++) colors.push(COL[p] || '#888'); });
+    if (n !== curN){
+      if (group){ const old = group; old.classList.add('g-old'); setTimeout(() => old.remove(), 500); }
+      group = document.createElementNS(SVGNS, 'g');
+      L.pts.forEach((p, k) => { const c = document.createElementNS(SVGNS, 'circle');
+        c.setAttribute('cx', p.x.toFixed(1)); c.setAttribute('cy', p.y.toFixed(1)); c.setAttribute('r', L.dot.toFixed(1));
+        c.setAttribute('fill', '#2a3a33'); c.style.transitionDelay = reduce ? '0ms' : `${Math.round((1 - p.t/Math.PI) * 650)}ms`;
+        group.appendChild(c); });
+      svg.appendChild(group); curN = n;
+      group.getBoundingClientRect();
+    }
+    [...group.children].forEach((c, k) => c.setAttribute('fill', colors[k]));
+    $('#h-year').textContent = P.y;
+    $('#h-gov').textContent = P.gov + ' · ' + P.yrs;
+    const govSeats = P.s.filter(([p]) => P.g.includes(p)).reduce((a, [, v]) => a + v, 0);
+    $('#h-seats').textContent = `${n} seats · governing ${govSeats}`;
+    $('#h-super').classList.toggle('on', govSeats >= Math.ceil(n * 2 / 3));
+    $('#h-legend').innerHTML = [...P.s].sort((a, b) => b[1] - a[1]).map(([p, v]) =>
+      `<span><i style="background:${COL[p]}"></i>${p} ${v}${P.g.includes(p) ? '<b class="gov-tag">GOV</b>' : ''}</span>`).join('');
+    $$('#scrubber button').forEach((b, k) => b.setAttribute('aria-pressed', k === i));
+    idx = i;
+  }
+  $('#scrubber').innerHTML = PARL.map((P, k) => `<button type="button" aria-pressed="false" aria-label="${P.y}: ${P.gov}">${P.y}<small>${P.gov}</small></button>`).join('');
+  // one line per parliament, as you scroll through them
+  const ERA = [
+    'The first freely elected parliament after 1989.',
+    'The Socialists return; their coalition with SZDSZ holds more than two-thirds of the seats.',
+    'Orbán’s first government, in coalition with the Smallholders and MDF.',
+    'MSZP and SZDSZ return to power.',
+    'The first government re-elected since the transition.',
+    'Fidesz–KDNP wins a two-thirds majority.',
+    'A new electoral law shrinks the chamber from 386 seats to 199.',
+    'Fidesz–KDNP wins a third consecutive two-thirds majority.',
+    'Fidesz–KDNP wins a fourth consecutive two-thirds majority.',
+    'Tisza wins 141 of 199 seats, and sixteen years of Orbán governments end.',
+  ];
+  const stage = $('#top'), fill = $('#scrub-fill'), hint = $('#scroll-hint');
+  const stageP = () => { const r = stage.getBoundingClientRect(), span = Math.max(1, stage.offsetHeight - innerHeight); return Math.min(1, Math.max(0, -r.top / span)); };
+  let shown = -1;
+  const show = k => { if (k === shown) return; shown = k; draw(k); $('#era-k').textContent = 'Parliament, ' + PARL[k].y; $('#era-cap').textContent = ERA[k]; };
+  const onStage = () => { const p = stageP(); fill.style.width = (p * 100) + '%'; hint.classList.toggle('gone', p > .04); show(Math.min(PARL.length - 1, Math.floor(p * PARL.length * .999))); };
+  $$('#scrubber button').forEach((b, k) => b.addEventListener('click', () => {
+    const top = stage.getBoundingClientRect().top + scrollY, span = stage.offsetHeight - innerHeight;
+    scrollTo({top: top + span * (k + .5) / PARL.length, behavior: reduce ? 'auto' : 'smooth'}); }));
+  // the seats rain into the chamber once, on arrival
+  draw(0); shown = 0;
+  if (!reduce && group && group.children[0].animate){
+    [...group.children].forEach((c, k) => c.animate([{transform:`translateY(${-260 - Math.random() * 380}px)`, opacity:0}, {transform:'translateY(0)', opacity:1}],
+      {duration:900 + Math.random() * 500, delay:Math.random() * 900, easing:'cubic-bezier(.2,.9,.25,1.15)', fill:'backwards'}));
+  }
+  addEventListener('scroll', onStage, {passive:true}); addEventListener('resize', onStage); onStage();
+
+  /* ---------- counters ---------- */
+  $$('.stat .n[data-count]').forEach(el => {
+    const to = +el.dataset.count, pre = el.dataset.prefix || '';
+    const fmt = v => pre + Math.round(v).toLocaleString('en-US');
+    if (reduce){ el.textContent = fmt(to); return; }
+
+    when(el, () => { const t0 = performance.now(), D = 1400;
+      const step = t => { const p = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(to * e); if (p < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step); });
+    watch(el);
+  });
+
+  /* ---------- napló parser ---------- */
+  const napl = $('#napl'), rowsEl = $$('#rows li'), cnt = $('#row-count');
+  let parseTimers = [];
+  function setView(parsed){
+    $('#v-raw').setAttribute('aria-pressed', !parsed); $('#v-parsed').setAttribute('aria-pressed', parsed);
+    parseTimers.forEach(clearTimeout); parseTimers = [];
+    const toks = $$('.tok', napl);
+    if (!parsed){ napl.classList.remove('parsed'); toks.forEach(t => t.style.transitionDelay = '0ms'); rowsEl.forEach(r => r.classList.remove('on')); cnt.textContent = '0 rows'; return; }
+    napl.classList.add('parsed');
+    toks.forEach(t => t.style.transitionDelay = reduce ? '0ms' : `${(+t.dataset.row) * 170}ms`);
+    rowsEl.forEach((r, k) => parseTimers.push(setTimeout(() => { r.classList.add('on'); cnt.textContent = `${k + 1} rows`; }, reduce ? 0 : k * 170 + 120)));
+  }
+  $('#v-raw').addEventListener('click', () => setView(false));
+  $('#v-parsed').addEventListener('click', () => setView(true));
+  when(napl, () => setTimeout(() => { if ($('#v-raw').getAttribute('aria-pressed') === 'true') setView(true); }, 900));
+  watch(napl);
+
+  /* ---------- pipeline terminal ---------- */
+  const LOG = [
+    [0, '<span class="c-step">[1/7]</span> Extracting lines from data/raw/nyYYMMDD.pdf'],
+    [0, '      lines + font, size, italic, bold flags per span'],
+    [1, '<span class="c-step">[2/7]</span> Parsing ToC and segments'],
+    [1, '      ToC: speakers attributed to a party'],
+    [2, '      segments: speeches · interjections · chair · votes'],
+    [3, '<span class="c-step">[3/7]</span> Loading spaCy + HuBERT sentiment (rule-based backbone)'],
+    [3, '      Loading weights: 100%|██████████| 201/201'],
+    [3, '<span class="c-step">[4/7]</span> Running rule-based pipeline'],
+    [4, '<span class="c-step">[5/7]</span> LLM cache at: data/processed/llm_cache'],
+    [4, '__PROGRESS__'],
+    [4, '      LLM refining: 100%|██████████| 131/131 [00:00, 284.64seg/s]'],
+    [5, '<span class="c-step">[6/7]</span> Rendering figures'],
+    [5, '      <span class="c-ok">25 figure(s) rendered successfully</span>'],
+    [6, '<span class="c-step">[7/7]</span> Saving CSVs to: data/processed'],
+    [6, '<span class="c-ok">✓ done</span> <span class="c-dim">(every row tagged with merge_reason)</span>'],
+  ];
+  const out = $('#term-out'), stages = $$('#stages li'), runBtn = $('#term-run');
+  let running = false;
+  async function runPipe(){
+    if (running) return; running = true; runBtn.disabled = true;
+    stages.forEach(s => s.classList.remove('active', 'done'));
+    const lines = []; const render = (extra = '') => out.innerHTML = lines.join('\n') + (extra ? '\n' + extra : '') + '\n<span class="cursor"></span>';
+    const wait = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+    let cur = -1;
+    for (const [st, txt] of LOG){
+      if (st !== cur){ if (cur >= 0){ stages[cur].classList.remove('active'); stages[cur].classList.add('done'); } stages[st].classList.add('active'); cur = st; }
+      if (txt === '__PROGRESS__'){
+        for (let k = 0; k <= 131; k += reduce ? 131 : 7){
+          const v = Math.min(k, 131), p = v / 131, fill = '█'.repeat(Math.round(p * 10)).padEnd(10, ' ');
+          render(`      scoring: ${String(Math.round(p * 100)).padStart(3)}%|${fill}| ${v}/131 [${p < 1 ? '…' : '06:55, 3.17s/seg'}]`);
+          await wait(70);
+        }
+        lines.push('      scoring: 100%|██████████| 131/131 [06:55, 3.17s/seg]');
+      } else { lines.push(txt); render(); await wait(330); }
+    }
+    stages[cur].classList.remove('active'); stages[cur].classList.add('done');
+    running = false; runBtn.disabled = false; runBtn.textContent = '↻ Run again';
+  }
+  runBtn.addEventListener('click', runPipe);
+  when($('#pipeline .pipe'), () => setTimeout(runPipe, 500));
+  watch($('#pipeline .pipe'));
+
+  /* ---------- merge explorer ---------- */
+  const SEVEN = [
+    ['agreement_on_attack', 'Both layers score an attack. The final score is a weighted average of the two.'],
+    ['llm_detected_praise', 'Rules score weak negativity and the LLM scores praise. The LLM result is used and the attack score is set to zero.'],
+    ['llm_detected_sarcasm', 'Rules score the segment as positive and the LLM flags sarcasm. It is scored as an attack.'],
+    ['llm_corrected_target', 'Both layers score an attack but name different targets. The LLM’s target is used.'],
+    ['llm_flagged_procedural', 'The LLM marks the segment as procedural. All scores are set to zero.'],
+    ['llm_flagged_neutral', 'The LLM marks the segment as neutral and the rules agree. It is kept with zero scores.'],
+    ['llm_low_confidence_kept_rule', 'LLM confidence is low. The rule-based result is kept unchanged.'],
+  ];
+  const CASES = [
+    {k:'Direct attack', s:'agreement', hu:'„Önök hazudnak az embereknek, és felelőtlenül költik a pénzüket.”', en:'“You are lying to people and spending their money irresponsibly.”', ctx:'speaker: opposition MP · addressing the government benches',
+      rule:{tone:['attack','att'], sent:'−0.82 (very negative)', cues:'hazudnak “they lie” · felelőtlenül “irresponsibly” · Önök (direct address)', attack:7.6, target:'KORMÁNY'},
+      llm:{tone:['attack','att'], attack:8, target:'KORMÁNY', conf:'high'},
+      fin:{tone:['attack','att'], attack:7.8, target:'KORMÁNY'}, reason:'agreement_on_attack'},
+    {k:'Sarcasm', s:'sarcasm', hu:'„Szuper, remek munka volt, gratulálok!”', en:'“Super, excellent work, congratulations!”, delivered in a critical context.', ctx:'illustrative: a response to a report, said in a critical tone',
+      rule:{tone:['praise?','pra'], sent:'+0.91 (very positive)', cues:'no accusative-lexicon hits', attack:0.3, target:'KORMÁNY'},
+      llm:{tone:['sarcasm','att'], attack:6, target:'KORMÁNY', conf:'high'},
+      fin:{tone:['attack','att'], attack:6, target:'KORMÁNY'}, reason:'llm_detected_sarcasm'},
+    {k:'Wrong target', s:'target', hu:'„Ahogy a Jobbik is elmondta: a kormánypártok becsapják a választókat.”', en:'“As Jobbik also said: the governing parties are deceiving the voters.”', ctx:'speaker: opposition MP · rule layer picks the nearest named party',
+      rule:{tone:['attack','att'], sent:'−0.64 (negative)', cues:'becsapják “they deceive” · nearest party name: Jobbik', attack:6.1, target:'Jobbik'},
+      llm:{tone:['attack','att'], attack:6, target:'KORMÁNY', conf:'high'},
+      fin:{tone:['attack','att'], attack:6.1, target:'KORMÁNY'}, reason:'llm_corrected_target'},
+    {k:'Procedure', s:'procedural', hu:'„Most a 7-es számú indítványról szavazunk.”', en:'“We now vote on motion number 7.”', ctx:'speaker: chair of the sitting',
+      rule:{tone:['neutral','neu'], sent:'−0.12 (spurious)', cues:'none · small non-zero score', attack:0.6, target:'—'},
+      llm:{tone:['procedural','neu'], attack:0, target:'—', conf:'high'},
+      fin:{tone:['procedural','neu'], attack:0, target:'—'}, reason:'llm_flagged_procedural'},
+  ];
+  const meter = v => `<div class="meter"><i style="width:${v * 10}%"></i></div>`;
+  function showCase(i){
+    const C = CASES[i];
+    $$('#cases button').forEach((b, k) => b.setAttribute('aria-pressed', k === i));
+    $('#u-hu').textContent = C.hu; $('#u-en').textContent = C.en; $('#u-ctx').textContent = C.ctx;
+    $('#l-rule').innerHTML = `<dt>tone</dt><dd><span class="pill ${C.rule.tone[1]}">${C.rule.tone[0]}</span></dd><dt>sentiment</dt><dd>${C.rule.sent}</dd><dt>cues</dt><dd>${C.rule.cues}</dd><dt>attack</dt><dd>${C.rule.attack.toFixed(1)} / 10${meter(C.rule.attack)}</dd><dt>target</dt><dd>${C.rule.target}</dd>`;
+    $('#l-llm').innerHTML = `<dt>tone</dt><dd><span class="pill ${C.llm.tone[1]}">${C.llm.tone[0]}</span></dd><dt>attack</dt><dd>${C.llm.attack} / 10${meter(C.llm.attack)}</dd><dt>target</dt><dd>${C.llm.target}</dd><dt>confidence</dt><dd>${C.llm.conf}</dd>`;
+    $('#l-final').innerHTML = `<dt>tone</dt><dd><span class="pill ${C.fin.tone[1]}">${C.fin.tone[0]}</span></dd><dt>attack</dt><dd>${C.fin.attack.toFixed(1)} / 10${meter(C.fin.attack)}</dd><dt>target</dt><dd>${C.fin.target}</dd>`;
+    $('#l-reason').textContent = 'merge_reason = ' + C.reason;
+    $$('#seven div').forEach(d => d.classList.toggle('hit', d.dataset.r === C.reason));
+  }
+  $('#cases').innerHTML = CASES.map(C => `<button type="button" aria-pressed="false"><small>case</small>${C.k}</button>`).join('');
+  $('#seven').innerHTML = SEVEN.map(([r, d]) => `<div data-r="${r}"><code>${r}</code>${d}</div>`).join('') +
+    `<div style="background:var(--paper-2);"><code>→ audit trail</code>Every output row keeps its tag, so any score traces back to the layer that set it.</div>`;
+  $$('#cases button').forEach((b, k) => b.addEventListener('click', () => showCase(k)));
+  showCase(0);
+
+  /* accuracy bars */
+  const acc = $('#acc');
+  when(acc, () => $$('.rng', acc).forEach(r => { const lo = +r.dataset.lo, hi = +r.dataset.hi, tr = r.parentElement;
+    r.style.left = lo + '%'; r.style.width = (hi - lo) + '%'; tr.querySelector('.base').style.width = lo + '%';
+    const lab = tr.querySelector('.lab'); lab.style.opacity = 1;
+    // labels sit just right of the range; the hybrid's would overflow at 91%, so it goes inside-left instead
+    if (hi > 80){ lab.style.left = lo + '%'; lab.style.transform = 'translate(calc(-100% - 8px),-50%)'; } else lab.style.left = hi + '%'; }));
+  watch(acc);
+
+  /* ---------- heatmap + network ---------- */
+  const COLS = ['ELLENZÉK','Fidesz','Jobbik','KDNP','KORMÁNY','LMP','MSZP'];
+  const ROWS = ['Fidesz','Jobbik','KDNP','KORMÁNY','LMP','MSZP','független'];
+  const M = [[-26.6,0,0,0,20,0,0],[0,0,0,0,-155,0,0],[-7,0,0,0,10,0,-7],[-68,0,-42.2,0,0,-26,-59],[0,-8,0,-7,-101,0,0],[0,-23,0,-15,-218.5,0,0],[0,-8,0,0,-30,0,0]];
+  const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+  const hex = h => [1,3,5].map(i => parseInt(h.slice(i, i + 2), 16));
+  function cellColor(v){
+    if (!v) return '#ECEEE6';
+    const t = Math.min(1, Math.sqrt(Math.abs(v) / 220));
+    const stops = v < 0 ? ['#ECEEE6','#E5946F','#B5321A','#7E1A0C'] : ['#ECEEE6','#8CC5A0','#2F7A4F','#1D5536'];
+    const seg = t * 3, i = Math.min(2, Math.floor(seg));
+    return `rgb(${mix(hex(stops[i]), hex(stops[i + 1]), seg - i).join(',')})`;
+  }
+  const heat = $('#heat'), readout = $('#readout');
+  heat.innerHTML = '<div></div>' + COLS.map((c, j) => `<div class="cl" data-c="${j}">${c}</div>`).join('') +
+    ROWS.map((r, i) => `<div class="rl" data-r="${i}">${r}</div>` + M[i].map((v, j) =>
+      `<div class="c ${v ? '' : 'z'}" data-i="${i}" data-j="${j}" style="background:${cellColor(v)}; color:${Math.abs(v) > 90 ? '#FBF3E4' : 'inherit'}" tabindex="${v ? 0 : -1}" aria-label="${r} to ${COLS[j]}: ${v ? (v > 0 ? '+' : '') + v : 'no interaction'}">${v ? (v > 0 ? '+' : '') + v.toFixed(1).replace('.0','') : '·'}</div>`).join('')).join('');
+  const describe = (i, j) => { const v = M[i][j]; return v ? `<b>${ROWS[i]} → ${COLS[j]}: ${v > 0 ? '+' : ''}${v}</b> ${v < 0 ? 'net attack' : 'net praise'}${COLS[j] === 'KORMÁNY' || COLS[j] === 'ELLENZÉK' ? ` aimed at the ${COLS[j] === 'KORMÁNY' ? 'government bloc' : 'opposition bloc'}` : ''}.` : `${ROWS[i]} → ${COLS[j]}: no scored interaction.`; };
+  function hot(i, j){
+    $$('.c', heat).forEach(c => c.classList.toggle('hot', +c.dataset.i === i && +c.dataset.j === j));
+    $$('.rl', heat).forEach(c => c.classList.toggle('lab-hot', +c.dataset.r === i));
+    $$('.cl', heat).forEach(c => c.classList.toggle('lab-hot', +c.dataset.c === j));
+    readout.innerHTML = describe(i, j);
+  }
+  $$('.c', heat).forEach(c => { const f = () => hot(+c.dataset.i, +c.dataset.j); c.addEventListener('mouseenter', f); c.addEventListener('focus', f); });
+  heat.addEventListener('mouseleave', () => { $$('.hot, .lab-hot', heat).forEach(c => c.classList.remove('hot', 'lab-hot')); });
+
+  // network: same values as directed edges
+  const NODES = ['KORMÁNY','KDNP','Fidesz','független','ELLENZÉK','Jobbik','LMP','MSZP'];
+  const net = $('#net'), NX = 320, NY = 260, NR = 200;
+  const pos = {}; NODES.forEach((n, k) => { const a = -Math.PI/2 + k / NODES.length * Math.PI * 2 + Math.PI/2; pos[n] = [NX + NR * Math.cos(a), NY + NR * Math.sin(a)]; });
+  const edges = []; M.forEach((row, i) => row.forEach((v, j) => { if (v) edges.push({a:ROWS[i], b:COLS[j], v}); }));
+  let ns = `<defs><marker id="ah-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#B5321A"/></marker><marker id="ah-p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2F7A4F"/></marker></defs>`;
+  edges.forEach((e, k) => {
+    const [x1, y1] = pos[e.a], [x2, y2] = pos[e.b], dx = x2 - x1, dy = y2 - y1, d = Math.hypot(dx, dy);
+    const ux = dx / d, uy = dy / d, sx = x1 + ux * 26, sy = y1 + uy * 26, ex = x2 - ux * 30, ey = y2 - uy * 30;
+    const mx = (sx + ex) / 2 - uy * 34, my = (sy + ey) / 2 + ux * 34;
+    const w = 1 + Math.sqrt(Math.abs(e.v)) * .62;
+    ns += `<path class="edge" data-a="${e.a}" data-b="${e.b}" d="M${sx.toFixed(1)},${sy.toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}" stroke="${e.v < 0 ? '#B5321A' : '#2F7A4F'}" stroke-opacity="${e.v < 0 ? .25 + Math.min(.7, Math.abs(e.v) / 220) : .8}" stroke-width="${w.toFixed(1)}" marker-end="url(#${e.v < 0 ? 'ah-n' : 'ah-p'})"><title>${e.a} → ${e.b}: ${e.v > 0 ? '+' : ''}${e.v}</title></path>`;
+  });
+  NODES.forEach(n => { const [x, y] = pos[n], big = n === 'KORMÁNY' || n === 'ELLENZÉK';
+    const lx = x + (x > NX + 5 ? 30 : x < NX - 5 ? -30 : 0), ly = y + (Math.abs(x - NX) < 6 ? (y < NY ? -30 : 38) : 4);
+    ns += `<g class="node" data-n="${n}" tabindex="0" role="button" aria-label="${n}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 19 : 15}" fill="${big ? '#1B2420' : '#F3F5EF'}" stroke="#1B2420" stroke-width="1.5"/><text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${x > NX + 5 ? 'start' : x < NX - 5 ? 'end' : 'middle'}">${n}</text></g>`; });
+  net.innerHTML = ns;
+  const netWrap = $('#net-wrap');
+  $$('.node', net).forEach(g => {
+    const n = g.dataset.n, on = () => { netWrap.classList.add('focus'); $$('.edge', net).forEach(e => e.classList.toggle('on', e.dataset.a === n || e.dataset.b === n));
+      const out = edges.filter(e => e.a === n).reduce((a, e) => a + e.v, 0), inn = edges.filter(e => e.b === n).reduce((a, e) => a + e.v, 0);
+      readout.innerHTML = `<b>${n}</b>: sends net ${out ? out.toFixed(1) : '0'}, receives net ${inn ? inn.toFixed(1) : '0'}.`; };
+    g.addEventListener('mouseenter', on); g.addEventListener('focus', on);
+    g.addEventListener('mouseleave', () => netWrap.classList.remove('focus')); g.addEventListener('blur', () => netWrap.classList.remove('focus'));
+  });
+  const setNet = isNet => { $('#hv-m').setAttribute('aria-pressed', !isNet); $('#hv-n').setAttribute('aria-pressed', isNet); $('#heat-wrap').hidden = isNet; netWrap.hidden = !isNet;
+    readout.innerHTML = isNet ? 'Hover a party. Edge width scales with net intensity; red = net attack, green = net praise.' : 'Hover a cell for its value. The largest flow is <b>MSZP → KORMÁNY, −218.5</b>.'; };
+  $('#hv-m').addEventListener('click', () => setNet(false)); $('#hv-n').addEventListener('click', () => setNet(true));
+
+  /* bloc + bars + waffle */
+  const bloc = $('#bloc'); when(bloc, () => $$('.bt i', bloc).forEach(i => i.style.width = i.dataset.w + '%')); watch(bloc);
+  function hbars(el, data, color){
+    const max = Math.max(...data.map(d => d[1]));
+    el.innerHTML = data.map(([n, v, hu, c]) => `<div class="hb"><span class="nm">${n}${hu ? `<small>${hu}</small>` : ''}</span><span class="tr"><i data-w="${v / max * 100}" style="background:${c || color}"></i></span><span class="v">${v}</span></div>`).join('');
+    when(el, () => $$('.tr i', el).forEach(i => i.style.width = i.dataset.w + '%')); watch(el);
+  }
+  hbars($('#inter'), [['applause',118,'taps','#2B6CB0'],['heckle',39,'','#B5321A'],['bell',12,'csengő','#6B6F6C'],['gesture',11,'','#9AA39E'],['bench',8,'padcsapkodás','#C26A12'],['murmuring',8,'','#8B6A52'],['laughter',6,'derültség','#D3B467'],['chair_change',5,'','#7A62C4'],['procedural',3,'','#4E8A3A']]);
+  hbars($('#merge'), [['refined_interjection',92],['corrected_target',19],['flagged_procedural',15],['agreement_on_attack',13],['vote_segment',9],['detected_praise',1],['flagged_neutral',1]], '#2F4A3D');
+  const waffle = $('#waffle'), W = [['var(--neg)',104],['#9AA39E',29],['#D3B467',4],['var(--pos)',3]];
+  waffle.innerHTML = '<i></i>'.repeat(140);
+  when(waffle, () => { let k = 0; const cells = $$('i', waffle); W.forEach(([c, n]) => { for (let m = 0; m < n; m++, k++){ const el = cells[k]; setTimeout(() => el.style.background = c, reduce ? 0 : k * 9); } }); });
+  watch(waffle);
+
+  /* voice ÷ seats */
+  const VS = [['LMP',3.40,'3.3%',8],['DK',2.06,'4.5%',3],['Párbeszéd',1.90,'2.5%',3],['Jobbik',1.29,'12.3%',9],['MSZP',1.12,'12.0%',8],['KDNP',0.54,'8.4%',9],['KORMÁNY',0.49,'67.0%',9],['Fidesz',0.18,'58.6%',9]];
+  const vs = $('#vs'), MAXV = 3.6, pct = v => v / MAXV * 100;
+  vs.innerHTML = `<div class="vs-row" style="position:absolute; left:0; right:0; top:0; bottom:28px; pointer-events:none;"><span></span><span style="position:relative;"><span class="vs-ref" style="left:${pct(1)}%"><span>1.0 = parity</span></span></span><span></span></div>` +
+    `<div class="vs">` + VS.map(([n, v, s, k]) => { const over = v >= 1, c = over ? '#C1440E' : '#2F4A3D';
+      return `<div class="vs-row"><span class="nm">${n}</span><span class="ln"><span class="stem" data-l="${pct(Math.min(v, 1))}" data-w="${Math.abs(pct(v) - pct(1))}" style="left:${pct(1)}%; width:0; background:${c}"></span><span class="dot" data-x="${pct(v)}" style="left:${pct(1)}%; background:${c}"></span></span><span class="meta"><b>${v.toFixed(2)}×</b> <span>· ${s} seats</span></span></div>`; }).join('') + `</div>` +
+    `<div class="vs-axis"><span></span><div class="t"><span>0</span><span>1</span><span>2</span><span>3</span><span>3.6</span></div><span></span></div>`;
+  // axis ticks at 0,1,2,3 of 3.6 → use absolute positions
+  const tick = vs.querySelector('.vs-axis .t'); tick.style.position = 'relative'; tick.style.height = '16px';
+  tick.innerHTML = [0,1,2,3].map(v => `<span style="position:absolute; left:${pct(v)}%; transform:translateX(-50%)">${v}</span>`).join('');
+  when(vs, () => $$('.vs-row', vs).forEach(r => { const s = r.querySelector('.stem'), d = r.querySelector('.dot'); if (!s) return;
+    s.style.left = s.dataset.l + '%'; s.style.width = s.dataset.w + '%'; d.style.left = d.dataset.x + '%'; }));
+  watch(vs);
+
+  /* ---------- lightbox ---------- */
+  const lb = $('#lb'), lbImg = $('#lb-img'), lbCap = $('#lb-cap');
+  $$('[data-src]').forEach(b => b.addEventListener('click', () => {
+    lbImg.src = b.dataset.src; lbImg.alt = b.querySelector('img')?.alt || ''; lbCap.innerHTML = b.dataset.cap || '';
+    if (lb.showModal) lb.showModal(); else window.open(b.dataset.src, '_blank');
+  }));
+  $('#lb-close').addEventListener('click', () => lb.close());
+  lb.addEventListener('click', e => { if (e.target === lb) lb.close(); });
+
+  /* cite */
+  $('#copy-cite').addEventListener('click', async e => { try { await navigator.clipboard.writeText($('#cite-text').textContent.trim()); e.target.textContent = 'Copied ✓'; } catch { e.target.textContent = 'Select & copy'; } setTimeout(() => e.target.textContent = 'Copy', 2200); });
+
+  $$('.reveal').forEach(watch);
+})();
+</script>
+</body>
+</html>

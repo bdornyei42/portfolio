@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jackson Coffee Buddies</title>
+<meta name="description" content="A new group of three from the Jackson WhatsApp group every Monday. Sign in with your WhatsApp number to see yours.">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#fbf6ec">
+<meta property="og:title" content="Jackson Coffee Buddies">
+<meta property="og:description" content="A new group of three every Monday. Sign in with your WhatsApp number to see yours.">
+<link rel="icon" href="/media/jackson/jackson-crest.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#3152a4; --navy:#14275e; --sky:#dfe8f8; --gold:#f2d215;
+  --cream:#fbf6ec; --cream-2:#f3ead8; --latte:#e9d3ae; --caramel:#c98b4a; --espresso:#3b2416; --bean:#5b3a24;
+  --ink:#1f1a17; --ink-2:#5a5048; --ink-3:#8d8278; --line:#e6dccb;
+  --tomato:#e4572e; --mint:#2e9e6a; --pink:#f3a6b8;
+  --display:"Bricolage Grotesque", "DM Sans", system-ui, sans-serif;
+  --body:"DM Sans", system-ui, sans-serif;
+  --r:18px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font:16.5px/1.55 var(--body);overflow-x:hidden}
+/* a couple of coffee rings on the page, like a real café table */
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;border:10px solid rgba(160,110,60,.07);pointer-events:none}
+body::before{width:260px;height:260px;right:-70px;top:120px;box-shadow:inset 0 0 0 3px rgba(160,110,60,.05)}
+body::after{width:200px;height:200px;left:-60px;bottom:60px;border-width:8px}
+img{display:block;max-width:100%}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--blue)}
+[hidden]{display:none!important}
+.wrap{width:min(1140px, 100% - 32px);margin-inline:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+h1,h2,h3{font-family:var(--display);color:var(--navy);margin:0;letter-spacing:-.02em}
+h1{font-weight:800;font-size:clamp(42px,6.4vw,84px);line-height:.95}
+h2{font-weight:800;font-size:clamp(30px,4vw,48px);line-height:1}
+h3{font-weight:700;font-size:21px;line-height:1.15}
+.muted{color:var(--ink-3)}
+.small{font-size:14.5px}
+
+/* header */
+.top{position:sticky;top:0;z-index:30;background:rgba(251,246,236,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:68px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.brand img{width:34px;height:auto}
+.brand b{font:800 22px/1 var(--display);color:var(--blue);letter-spacing:-.02em;white-space:nowrap}
+.top .right{display:flex;align-items:center;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:700;font-size:14px;color:var(--navy);white-space:nowrap}
+.me-btn{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:3px 12px 3px 3px;font-weight:700;font-size:14.5px}
+.me-btn:hover{border-color:var(--blue)}
+.me-btn .av{width:30px;height:30px;font-size:12px}
+@media (max-width:640px){ .brand b{font-size:19px} .top .pill{display:none} }
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;background:var(--blue);color:#fff;border-radius:999px;padding:12px 20px;font-weight:700;font-size:16px;text-decoration:none;white-space:nowrap;box-shadow:0 3px 0 var(--navy);transition:transform .12s, box-shadow .12s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 0 var(--navy)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--navy)}
+.btn.ghost{background:#fff;color:var(--navy);box-shadow:0 3px 0 var(--line);border:1.5px solid var(--line)}
+.btn.wa{background:#25a35a;box-shadow:0 3px 0 #17703c}
+.btn.gold{background:var(--gold);color:var(--navy);box-shadow:0 3px 0 #b39a0a}
+.btn.sm{padding:8px 14px;font-size:14.5px}
+.linkbtn{background:none;border:0;padding:0;color:var(--blue);font-weight:700;text-decoration:underline;text-underline-offset:3px;font-size:inherit}
+.wa-ico{width:18px;height:18px;flex:none}
+input[type=text],input[type=tel],input[type=search],input[type=url],select{border:2px solid var(--line);border-radius:14px;padding:11px 14px;background:#fff;font-size:16px;min-width:0}
+input:focus,select:focus{outline:none;border-color:var(--blue)}
+
+/* avatars */
+.av{border-radius:50%;overflow:hidden;background:var(--bean);color:#fff;display:grid;place-items:center;font:700 14px/1 var(--display);flex:none;position:relative}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* ---------- the table (top-down), shared ---------- */
+.stage{position:relative;width:min(520px,100%);justify-self:center;padding:14px 14px 34px}
+.table{position:relative;aspect-ratio:1;border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,240,215,.25), transparent 45%),
+    repeating-radial-gradient(circle at 47% 53%, rgba(60,30,10,.07) 0 1.5px, transparent 1.5px 8px),
+    radial-gradient(circle, #b07f52 0%, #94653c 60%, #7a4e2c 92%, #633d22 100%);
+  box-shadow: inset 0 0 0 10px #6b4325, inset 0 0 0 12px rgba(255,220,180,.15), inset 0 -16px 34px rgba(0,0,0,.25), 0 30px 50px -26px rgba(59,36,22,.7)}
+.cup{position:absolute;width:29%;aspect-ratio:1;transform:translate(-50%,-50%);border:0;padding:0;background:none;
+  transition:left .55s cubic-bezier(.6,-.2,.3,1.3), top .55s cubic-bezier(.6,-.2,.3,1.3), transform .2s}
+button.cup:hover{transform:translate(-50%,-50%) rotate(-6deg) scale(1.05)}
+.cup .saucer{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 40% 35%, #fff, #f0eadf 62%, #ddd2c1 72%, #f6f1e8 74%, #e6dccc 100%);box-shadow:0 10px 16px -7px rgba(0,0,0,.5)}
+.cup .handle{position:absolute;width:24%;height:13%;border-radius:20px;background:linear-gradient(#fff,#e6ddce);box-shadow:0 2px 3px rgba(0,0,0,.25);top:50%;left:50%;transform-origin:0 50%}
+.cup .rim{position:absolute;inset:14%;border-radius:50%;background:#fffdf9;box-shadow:0 6px 10px -4px rgba(0,0,0,.3)}
+.cup .coffee{position:absolute;inset:20%;border-radius:50%;overflow:hidden;background:radial-gradient(circle, #d3a46f, #9c6638 68%, #6f4120);box-shadow:inset 0 0 0 3px #c08a55}
+.cup .coffee img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cup .coffee .ini{position:absolute;inset:0;display:grid;place-items:center;font:800 clamp(16px,2.8vw,26px)/1 var(--display);color:#fff4e3}
+.cup .coffee .heart{position:absolute;inset:0;display:grid;place-items:center}
+.cup .coffee .heart svg{width:46%;fill:#f7e7cf;opacity:.95}
+.cup.pour .coffee img,.cup.pour .coffee .ini{animation:pour .7s ease-out both}
+@keyframes pour{from{clip-path:circle(0% at 50% 50%)}to{clip-path:circle(75% at 50% 50%)}}
+.cup.lift{transform:translate(-50%,-50%) scale(1.12)}
+.cup .label{position:absolute;left:50%;top:100%;transform:translate(-50%,4px) rotate(var(--t,0deg));background:#fff;color:var(--ink);font:700 14px/1.15 var(--display);padding:5px 10px;border-radius:10px;white-space:nowrap;box-shadow:0 3px 0 rgba(59,36,22,.25);max-width:170px;overflow:hidden;text-overflow:ellipsis}
+.cup.up .label{top:auto;bottom:100%;transform:translate(-50%,-4px) rotate(var(--t,0deg))}
+.cup.me .label{background:var(--gold);color:var(--navy)}
+.steam{position:absolute;left:50%;top:-6%;width:42%;transform:translateX(-50%);pointer-events:none}
+.steam path{fill:none;stroke:rgba(255,255,255,.75);stroke-width:3;stroke-linecap:round;animation:rise 3.8s ease-in-out infinite;opacity:0}
+.steam path:nth-child(2){animation-delay:1.25s}.steam path:nth-child(3){animation-delay:2.5s}
+@keyframes rise{0%{opacity:0;transform:translateY(12px)}40%{opacity:.85}100%{opacity:0;transform:translateY(-18px)}}
+.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:27%;aspect-ratio:1;border-radius:50%;border:0;padding:6%;background:var(--gold);color:var(--navy);box-shadow:0 5px 0 #b39a0a, 0 12px 20px -8px rgba(0,0,0,.4);font:800 15px/1.1 var(--display);text-align:center;display:grid;place-items:center;text-decoration:none;transition:transform .2s;white-space:nowrap}
+button.center:hover,a.center:hover{transform:translate(-50%,-50%) rotate(-8deg) scale(1.06)}
+.center small{display:block;font:500 12px/1.2 var(--body);margin-top:3px}
+.center.plain{background:#fffdf9;box-shadow:0 6px 12px -5px rgba(0,0,0,.45)}
+.stamp{position:absolute;left:50%;top:50%;z-index:4;transform:translate(-50%,-50%) rotate(-10deg);border:4px solid var(--tomato);color:var(--tomato);background:rgba(255,251,244,.94);padding:8px 16px 9px;text-align:center;border-radius:12px;pointer-events:none;box-shadow:0 6px 14px -5px rgba(0,0,0,.45)}
+.stamp b{display:block;font:800 30px/1 var(--display);letter-spacing:.06em}
+.stamp span{display:block;font-weight:700;font-size:13px;margin-top:3px}
+.stamp.fresh{animation:thunk .5s cubic-bezier(.3,1.7,.5,1)}
+@keyframes thunk{0%{transform:translate(-50%,-50%) rotate(-10deg) scale(2.4);opacity:0}100%{transform:translate(-50%,-50%) rotate(-10deg) scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){ .steam path{animation:none;opacity:.4} .cup{transition:none} .stamp.fresh,.cup.pour .coffee img{animation:none} }
+
+/* ---------- signed out ---------- */
+.hello{padding:46px 0 30px}
+.hello .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:center}
+@media (max-width:900px){ .hello .grid{grid-template-columns:1fr;gap:6px} .hello .stage{order:-1;width:min(380px,100%)} }
+.hello h1{color:var(--blue)}
+.hello h1 span{display:block;color:var(--navy)}
+.lede{font-size:19px;color:var(--ink-2);max-width:30em;margin:18px 0 14px}
+.counts{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.counts span{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;font-weight:700;font-size:14px}
+.counts b{color:var(--blue)}
+.card{background:#fff;border-radius:var(--r);padding:22px;box-shadow:0 2px 0 var(--line), 0 18px 40px -28px rgba(59,36,22,.5);border:1.5px solid var(--line)}
+.signin{max-width:470px}
+.signin p{margin:6px 0 14px;color:var(--ink-2);font-size:15.5px}
+.row{display:flex;gap:8px}
+.row input{flex:1}
+.err{color:var(--tomato);font-size:15px;margin-top:10px;min-height:1.2em;font-weight:600}
+.picks{display:grid;gap:6px;margin-top:10px}
+.picks button{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px}
+.picks button:hover{border-color:var(--blue)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:20px 0 50px}
+.steps .card{display:flex;gap:14px;align-items:flex-start}
+.steps .n{flex:none;width:44px;height:44px;border-radius:50%;background:var(--sky);color:var(--blue);display:grid;place-items:center;font:800 20px/1 var(--display)}
+.steps p{margin:4px 0 0;color:var(--ink-2);font-size:15px}
+@media (max-width:820px){ .steps{grid-template-columns:1fr} }
+
+/* ---------- signed in: your group ---------- */
+.mine{padding:34px 0 20px}
+.mine .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:center}
+@media (max-width:940px){ .mine .grid{grid-template-columns:1fr;gap:4px} .mine .stage{order:-1;width:min(420px,100%)} }
+.kicker{display:inline-block;background:var(--sky);color:var(--blue);font-weight:700;font-size:14px;border-radius:999px;padding:5px 12px;margin-bottom:12px}
+.mine h1{font-size:clamp(38px,5.4vw,68px)}
+.mine h1 em{font-style:normal;color:var(--blue)}
+.when{color:var(--ink-2);font-size:17px;margin:12px 0 20px}
+.people{display:grid;gap:12px}
+.person{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:center;background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:12px 14px 12px 12px;box-shadow:0 2px 0 var(--line)}
+.person .av{width:72px;height:72px;font-size:22px;cursor:pointer;box-shadow:0 0 0 3px #fff, 0 0 0 5px var(--latte)}
+.person .nm{font:800 20px/1.15 var(--display);color:var(--navy)}
+.person .nm button{all:unset;cursor:pointer}
+.person .nm button:hover{color:var(--blue)}
+.person .sub{font-size:14px;color:var(--ink-3)}
+.person .bio{font-size:14.5px;color:var(--ink-2)}
+.person .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.person .num{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.person .none{font-size:14px;color:var(--ink-3)}
+
+.tiles{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:16px;padding:16px 0 54px}
+@media (max-width:980px){ .tiles{grid-template-columns:1fr} }
+.tile{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:0 2px 0 var(--line);position:relative;overflow:hidden}
+.tile h3{margin-bottom:6px}
+.tile p{margin:0 0 12px;color:var(--ink-2);font-size:15px}
+.tile ol{margin:6px 0 0;padding-left:20px;font-size:15px}
+.tile li{margin-bottom:10px}
+.tile.chat{background:#e9f7ee;border-color:#cdebd8;box-shadow:0 2px 0 #cdebd8}
+.tile.met{background:#fff7d1;border-color:#f1e3a0;box-shadow:0 2px 0 #f1e3a0}
+.tile.talk{background:var(--sky);border-color:#c9d7f1;box-shadow:0 2px 0 #c9d7f1}
+.bigcheck{display:flex;align-items:center;gap:12px;width:100%;border:2px dashed var(--caramel);background:#fff;border-radius:14px;padding:14px 16px;font:800 19px/1.1 var(--display);color:var(--espresso);text-align:left}
+.bigcheck .bx{width:30px;height:30px;border-radius:9px;border:2.5px solid currentColor;display:grid;place-items:center;flex:none}
+.bigcheck svg{width:20px;height:20px}
+.bigcheck.on{border:2px solid var(--mint);background:var(--mint);color:#fff}
+.met .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.met select{flex:1;min-width:160px}
+.upl{position:relative;overflow:hidden}
+.upl input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.polas{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.pola{background:#fff;padding:6px 6px 20px;width:96px;box-shadow:0 8px 16px -8px rgba(0,0,0,.45);transform:rotate(var(--r,0deg));position:relative}
+.pola img{width:100%;aspect-ratio:1;object-fit:cover;cursor:zoom-in}
+.pola button{position:absolute;right:4px;bottom:2px;border:0;background:none;color:var(--ink-3);font-size:11px}
+.q{font:700 22px/1.25 var(--display);color:var(--navy);min-height:3.8em;margin:4px 0 14px;transition:opacity .2s, transform .2s}
+.q.swap{opacity:0;transform:translateY(8px)}
+
+/* ---------- sections ---------- */
+.sec{padding:60px 0}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.sec-head p{margin:6px 0 0;color:var(--ink-2)}
+.band{background:var(--navy);color:#e8edf8}
+.band h2{color:#fff}
+.band .sec-head p{color:#bcc7e2}
+
+/* coffee card + badges */
+.punch{background:linear-gradient(135deg,#fff 0%,#fff9ee 100%);border-radius:22px;padding:24px;border:1.5px solid var(--line);box-shadow:0 2px 0 var(--line), 0 24px 40px -30px rgba(59,36,22,.6);position:relative;overflow:hidden}
+.punch .head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.punch .head b{font:800 22px/1 var(--display);color:var(--navy)}
+.punch .head img{width:30px}
+.holes{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:12px;margin-top:18px}
+.hole{aspect-ratio:1;border-radius:50%;border:2px dashed var(--latte);display:grid;place-items:center;font:800 14px/1 var(--display);color:var(--ink-3);background:none;padding:0}
+.hole.done{border:0;background:radial-gradient(circle at 40% 35%, #7b4a2a, #3c2213);color:#fff2dc;box-shadow:inset 0 3px 6px rgba(0,0,0,.45)}
+.hole.done svg{width:48%;height:48%}
+.hole.now{border:2.5px solid var(--blue);color:var(--blue)}
+.badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.badge{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 14px 7px 8px;font-weight:700;font-size:14.5px;background:var(--cream-2)}
+.badge i{font-style:normal;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;font-size:15px}
+.badge.off{opacity:.45}
+.hist{margin-top:26px;display:grid;gap:10px}
+.hrow{display:grid;grid-template-columns:96px 1fr auto;gap:14px;align-items:center;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px}
+.hrow .wk{font:800 16px/1.1 var(--display);color:var(--navy)}
+.hrow .wk small{display:block;font:500 13px/1.3 var(--body);color:var(--ink-3)}
+.faces{display:flex;align-items:center}
+.faces .av{width:38px;height:38px;border:2.5px solid #fff;margin-left:-9px;font-size:12px;cursor:pointer}
+.faces .av:first-child{margin-left:0}
+.hrow .who{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-weight:600}
+.hrow .thumbs{display:flex;gap:6px;margin-top:6px}
+.hrow .thumbs img{width:44px;height:44px;object-fit:cover;border-radius:8px;cursor:zoom-in}
+.tog{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:14px;color:var(--ink-3)}
+.tog svg{width:15px;height:15px}
+.tog.on{background:var(--mint);border-color:var(--mint);color:#fff}
+@media (max-width:600px){ .hrow{grid-template-columns:1fr auto} .hrow .wk{grid-column:1/-1} }
+
+/* café passport */
+.passport{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.cafe{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:16px;display:grid;grid-template-columns:86px 1fr;gap:14px;box-shadow:0 2px 0 var(--line)}
+.seal{width:86px;height:86px;border-radius:50%;border:3px double var(--latte);display:grid;place-items:center;text-align:center;color:var(--ink-3);transform:rotate(var(--r,0deg));position:relative}
+.seal b{display:block;font:800 22px/1 var(--display)}
+.seal small{display:block;font-size:11px;font-weight:700;letter-spacing:.04em}
+.seal.inked{border-color:var(--tomato);color:var(--tomato);background:rgba(228,87,46,.06)}
+.cafe h3{font-size:19px}
+.cafe .aka{font-size:13.5px;color:var(--caramel);font-weight:700}
+.cafe p{margin:4px 0 6px;font-size:14.5px;color:var(--ink-2);line-height:1.45}
+.cafe .get{font-size:14px}
+.cafe .get b{color:var(--espresso)}
+.cafe .addr{font-size:14px;font-weight:700}
+.cafe .chip{display:inline-block;background:var(--sky);color:var(--blue);font-size:12px;font-weight:700;border-radius:999px;padding:2px 8px;margin-left:4px}
+
+/* all groups as little tables */
+.tables{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:26px 16px}
+.mini{text-align:center}
+.mini .t{position:relative;width:118px;aspect-ratio:1;margin:0 auto 10px;border-radius:50%;background:radial-gradient(circle,#a2734a,#7a4e2c 85%,#633d22);box-shadow:inset 0 0 0 4px #5a371f, 0 10px 18px -10px rgba(0,0,0,.7)}
+.mini .seat{position:absolute;width:42%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;padding:3px;background:#f3ece0;box-shadow:0 3px 6px rgba(0,0,0,.4)}
+.mini .seat .av{width:100%;height:100%;font-size:11px;cursor:pointer}
+.mini .ok{position:absolute;right:-6px;top:-6px;width:32px;height:32px;border-radius:50%;background:var(--mint);color:#fff;display:grid;place-items:center;box-shadow:0 0 0 3px var(--navy)}
+.mini .ok svg{width:17px;height:17px}
+.mini .nm{font-size:14px;line-height:1.35;color:#dde4f4}
+.mini .nm small{display:block;color:var(--gold);font-weight:700}
+.mini.you .t{box-shadow:inset 0 0 0 4px #5a371f, 0 0 0 4px var(--gold)}
+.mini.dim{opacity:.15}
+.progress{height:10px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:0 0 28px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#ffe66b);border-radius:99px}
+.band input[type=search]{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;border-radius:999px}
+.band input::placeholder{color:#aebadb}
+
+/* organizer */
+.org table{width:100%;border-collapse:collapse;font-size:14.5px;background:#fff}
+.org th,.org td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.org th{font-size:12.5px;color:var(--ink-3)}
+.org .tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.org .scroll{max-height:600px;overflow:auto;border:1.5px solid var(--line);border-radius:14px}
+.org td .av{width:30px;height:30px;font-size:11px}
+
+/* sheet, lightbox, toast, confetti */
+.sheet{position:fixed;inset:0;z-index:50;background:rgba(20,39,94,.35);display:grid;justify-items:end;backdrop-filter:blur(2px)}
+.sheet .in{width:min(440px,100%);height:100%;background:var(--cream);padding:24px;overflow:auto;box-shadow:-10px 0 40px rgba(0,0,0,.2);animation:slide .22s ease-out}
+@keyframes slide{from{transform:translateX(30px);opacity:0}}
+.sheet .close{float:right}
+.sheet label{display:block;font-weight:700;font-size:15px;margin:18px 0 6px}
+.sheet input[type=text]{width:100%}
+.sheet .big{width:136px;height:136px;font-size:40px;margin:6px 0 12px}
+.sheet .bigphoto{width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r);margin:14px 0}
+.toggle{display:flex;gap:10px;align-items:flex-start}
+.optout{margin-top:30px;padding-top:20px;border-top:2px dashed var(--line)}
+.optout p{margin:6px 0 10px;color:var(--ink-2);font-size:15px}
+.btn.danger{background:#fff;color:var(--tomato);border:1.5px solid var(--tomato);box-shadow:0 3px 0 rgba(228,87,46,.35)}
+.toggle input{width:20px;height:20px;margin-top:3px;accent-color:var(--blue)}
+.lightbox{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.85);display:grid;place-items:center;padding:20px;cursor:zoom-out}
+.lightbox img{max-width:100%;max-height:90vh;border-radius:8px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:70;background:var(--navy);color:#fff;padding:11px 18px;border-radius:999px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.bean{position:fixed;z-index:80;width:16px;height:22px;pointer-events:none}
+footer{background:var(--espresso);color:#e7d8c4;padding:30px 0 36px;font-size:14.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+footer .linkbtn{color:#fff}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="tick" viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 5.3 3.2 1.7-2 3.2-3.2 5.3-3.2 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></symbol>
+  <symbol id="wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3a.5.5 0 0 0 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.7 11.7 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.3-.2-.5-.3Z"/></symbol>
+  <symbol id="bean" viewBox="0 0 16 22"><ellipse cx="8" cy="11" rx="7" ry="10" fill="#6b4226"/><path d="M5 3c4 3 2 11 6 16" fill="none" stroke="#3b2416" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</svg>
+
+<header class="top"><div class="wrap">
+  <a class="brand" href="/jackson-coffee-buddies"><img src="/media/jackson/jackson-crest.svg" alt="" width="60" height="61"><b>Jackson Coffee Buddies</b></a>
+  <div class="right"><span class="pill" id="weekpill" hidden></span><button class="me-btn" id="me-btn" type="button" hidden></button></div>
+</div></header>
+
+<!-- signed out -->
+<main id="door" hidden>
+  <section class="hello"><div class="wrap grid">
+    <div>
+      <h1>Jackson Coffee <span>Buddies</span></h1>
+      <p class="lede">Every Monday until the last day of classes in May, you get two people from the Jackson WhatsApp group. You three find a café, have a coffee, and tick it off here.</p>
+      <div class="counts" id="counts"></div>
+      <div class="card signin" id="signin"></div>
+    </div>
+    <div class="stage" aria-hidden="true"><div id="door-table"></div></div>
+  </div></section>
+  <div class="wrap steps">
+    <div class="card"><span class="n">1</span><div><h3>Monday</h3><p>The cups get shuffled and you land in a new group of three. Nobody you've already had coffee with.</p></div></div>
+    <div class="card"><span class="n">2</span><div><h3>That week</h3><p>Message your group, pick a café from the list below, and go. No groups over winter break or spring recess.</p></div></div>
+    <div class="card"><span class="n">3</span><div><h3>After</h3><p>Tick it off, add a photo, and your café gets a stamp in your passport.</p></div></div>
+  </div>
+</main>
+
+<!-- signed in -->
+<main id="app" hidden>
+  <section class="mine"><div class="wrap grid">
+    <div id="mine-copy"></div>
+    <div class="stage" id="mine-table"></div>
+  </div></section>
+  <div class="wrap tiles" id="tiles"></div>
+
+  <section class="sec" id="card-sec"><div class="wrap">
+    <div class="sec-head"><div><h2>Your coffee card</h2><p>One hole per round, through the last day of classes in May. It gets punched when your group meets.</p></div></div>
+    <div class="punch" id="punch"></div>
+    <div class="hist" id="hist"></div>
+  </div></section>
+</main>
+
+<section class="sec" id="cafes-sec" hidden><div class="wrap">
+  <div class="sec-head"><div><h2>Café passport</h2><p id="cafes-sub">Walking times from Horchow Hall are rough.</p></div></div>
+  <div class="passport" id="cafes"></div>
+</div></section>
+
+<section class="sec band" id="all-sec" hidden><div class="wrap">
+  <div class="sec-head"><div><h2>Everyone this round</h2><p id="all-count"></p></div><input type="search" id="find" placeholder="Find someone"></div>
+  <div class="progress"><i id="prog"></i></div>
+  <div class="tables" id="tables"></div>
+</div></section>
+
+<section class="sec org" id="org" hidden><div class="wrap">
+  <div class="sec-head"><div><h2>Roster</h2><p id="org-sum"></p></div></div>
+  <div class="tools">
+    <input type="search" id="org-find" placeholder="Search">
+    <input type="text" id="org-name" placeholder="New person's name">
+    <input type="tel" id="org-phone" placeholder="Their WhatsApp number">
+    <button class="btn sm" id="org-add" type="button">Add to a group this week</button>
+    <button class="btn sm ghost" id="org-shuffle" type="button">Redo this week's groups</button>
+  </div>
+  <div class="scroll"><table><thead><tr><th></th><th>Name</th><th>On WhatsApp</th><th>Number</th><th>Last signed in</th><th>Matched</th><th></th></tr></thead><tbody id="org-rows"></tbody></table></div>
+</div></section>
+
+<footer><div class="wrap">
+  <div>Made by Ben Dörnyei for the Jackson WhatsApp group. Not run by the Jackson School. Want to run it next year? Message Ben.</div>
+  <div style="display:flex;gap:16px"><button class="linkbtn" id="optout-link" type="button" hidden>Opt out</button><button class="linkbtn" id="logout" type="button" hidden>Sign out</button></div>
+</div></footer>
+
+<div class="sheet" id="sheet" hidden></div>
+
+<script>
+"use strict";
+const API = "/api/coffee";
+
+// Cafés. walk = rough minutes from Horchow Hall (55 Hillhouse Ave). Checked Nov 2026.
+const CAFES = [
+  { name: "Elm & Ivy", walk: 4, address: "168 Grove St", about: "Coffee counter downstairs in the Schwarzman Center, with the whole building to sit in.", points: true },
+  { name: "Mazagi Coffee", aka: "Mazagi", walk: 5, address: "Prospect & Sachem", about: "Egyptian coffee cart across from Ingalls Rink. No seats, so it's a walk-and-talk.", order: "cardamom latte" },
+  { name: "Steep Café", aka: "Steep", walk: 8, address: "219 Prospect St", about: "Bright café in Kline Tower. Busy right before classes.", points: true },
+  { name: "The Acorn", aka: "Silliman Acorn", walk: 8, address: "Byers Hall, Silliman", about: "Student-run café in Silliman. Open during term, hours on @sillimanacorn." },
+  { name: "Koffee?", walk: 8, address: "104 Audubon St", about: "Brick walls, lots of tables, nobody rushing you. Wine and beer later in the day." },
+  { name: "Willoughby's", walk: 8, address: "258 Church St", about: "New Haven roaster, here since 1985." },
+  { name: "Arwa Yemeni Coffee", aka: "Arwa", walk: 10, address: "335 Orange St", about: "Yemeni coffee house, open late. Crowded in the evening.", order: "Adeni tea or a Yemeni latte" },
+  { name: "M2 Mocha Café", aka: "M2", walk: 12, address: "100 Ashmun St", about: "Yemeni café across from Yale Health, opened spring 2026. Big tables.", order: "Mufawar coffee" },
+  { name: "Glaze N Grind", aka: "Glaze & Grind", walk: 13, address: "290 York St", about: "Coffee and donuts on York St. Students say it takes 10% off with a Yale ID, so ask at the counter." },
+  { name: "Vía Láctea", walk: 7, address: "2 Whitney Ave", about: "Plant-based ice cream and pastries, from San Juan. Good when it's not coffee weather." },
+  { name: "Taichi Bubble Tea", aka: "Taichi", walk: 12, address: "200 College St", about: "Bubble tea, plus ramen and poke if you're hungry." },
+  { name: "Tropical Smoothie Cafe", walk: 12, address: "15 Dixwell Ave", about: "Smoothies and wraps on Broadway, behind Payne Whitney." },
+  { name: "Ashley's Ice Cream", aka: "Ashley's", walk: 13, address: "280 York St", about: "New Haven ice cream since 1979. Small inside, so take it for a walk." },
+  { name: "Elena's on Orange", aka: "Elena's", walk: 15, address: "831 Orange St", about: "Soft serve in East Rock. One listing says it's closed, so check before you go." },
+  { name: "G Cafe", walk: 15, address: "1177 Chapel St", about: "Local bakery café with fresh pastries. There are more G Cafes on Orange St and in East Rock." },
+  { name: "Pistachio Café 2", aka: "Pistachio", walk: 17, address: "1245 Chapel St", about: "Middle Eastern café downtown, the second Pistachio after the Westville one. Open late, good for food too." },
+  { name: "MOTW Coffee & Pastries", aka: "MOTW", walk: 15, address: "296 Crown St", about: "Quiet during the day, open until midnight on Fridays and Saturdays.", order: "iced chai" },
+  { name: "Atticus Market", walk: 15, address: "771 Orange St", about: "East Rock bakery with a patio. Few seats inside.", order: "kouign amann" },
+  { name: "Book Trader Cafe", walk: 18, address: "1140 Chapel St", about: "Used bookshop and café with a patio." },
+];
+
+// Things to talk about, one at a time.
+const QUESTIONS = [
+  "What did you do before Jackson that people here don't know about?",
+  "Which class this term has surprised you the most?",
+  "What's a policy you've changed your mind on?",
+  "Sally's, Pepe's, Modern, or somewhere else?",
+  "What's the best thing you've eaten in New Haven so far?",
+  "What's your hometown known for, and does it deserve it?",
+  "If one job opened up tomorrow and you could have it, which one?",
+  "What's something you're bad at but do anyway?",
+  "Which country's politics do you follow closely, apart from your own?",
+  "What book or podcast do you keep telling people about?",
+  "What would you be studying if you weren't here?",
+  "What's the most useful thing your last job taught you?",
+  "What's a small thing that makes your week better?",
+  "If you could change one thing about Yale, what would it be?",
+  "Where's the strangest place you've had coffee?",
+  "What do you want to be doing in five years, honestly?",
+  "Who outside your field would you love to have dinner with?",
+  "What's something from home you can't find here?",
+  "What was your summer internship, or what do you want it to be?",
+  "What's the last thing you got really nerdy about?",
+];
+
+let S = null, firstReveal = true, qIndex = Math.floor(Math.random() * QUESTIONS.length);
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const tick = '<svg aria-hidden="true"><use href="#tick"/></svg>';
+const waIco = '<svg class="wa-ico" aria-hidden="true"><use href="#wa"/></svg>';
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+async function call(path, opts = {}) {
+  const isBlob = opts.body instanceof Blob;
+  const r = await fetch(API + path, { credentials: "same-origin", ...opts,
+    headers: opts.body && !isBlob ? { "Content-Type": "application/json" } : opts.headers });
+  let data = {};
+  try { data = await r.json(); } catch {}
+  if (!r.ok) { const e = new Error(data.error || "Something went wrong."); e.status = r.status; throw e; }
+  return data;
+}
+const post = (p, b) => call(p, { method: "POST", body: JSON.stringify(b || {}) });
+function toast(t) { const el = document.createElement("div"); el.className = "toast"; el.textContent = t; document.body.appendChild(el); setTimeout(() => el.remove(), 2800); }
+
+const day = (iso, o = { month: "short", day: "numeric" }) => new Date(iso + "T12:00:00Z").toLocaleDateString("en-US", { timeZone: "UTC", ...o });
+function range(w) { const a = new Date(w.start + "T12:00:00Z"), b = new Date(w.end + "T12:00:00Z"); return day(w.start) + "–" + (a.getUTCMonth() === b.getUTCMonth() ? b.getUTCDate() : day(w.end)); }
+const roundLabel = (w) => `Round ${w.n} of ${w.total}, ${range(w)}`;
+const BACK = "Coffee Buddies is back for the 2027–28 school year. Ben, or whoever runs it next, will add the incoming class.";
+const monday = (ts) => new Date(ts).toLocaleDateString("en-US", { timeZone: "America/New_York", weekday: "long", month: "short", day: "numeric" });
+
+const COLORS = ["#3152a4", "#c98b4a", "#2e9e6a", "#e4572e", "#7a5bb5", "#14275e", "#b5476b", "#5b3a24"];
+function color(s) { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return COLORS[h % COLORS.length]; }
+function initials(n) { const p = String(n || "?").replace(/[“”"'.]/g, "").trim().split(/\s+/); return ((p[0]?.[0] || "?") + (p.length > 1 ? p[p.length - 1][0] : "")).toUpperCase(); }
+function avatar(p, cls = "", attrs = "") {
+  const img = p.photo ? `<img src="${esc(p.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : "";
+  return `<span class="av ${cls}" style="background:${color(p.id || p.name)}" ${attrs}>${esc(initials(p.name))}${img}</span>`;
+}
+const first = (p) => String(p.name || "").split(" ")[0];
+const list = (a) => a.length <= 1 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+function fmtPhone(p) { const d = String(p || "").replace(/\D/g, ""); return d.length === 11 && d[0] === "1" ? `+1 (${d.slice(1, 4)}) ${d.slice(4, 7)}-${d.slice(7)}` : "+" + d; }
+function waLink(p, text) { return `https://wa.me/${String(p.phone).replace(/\D/g, "")}${text ? "?text=" + encodeURIComponent(text) : ""}`; }
+function hello(p) { return `Hi ${first(p)}, it's ${first(S.me)} from Jackson Coffee Buddies. We're in the same group this week. When are you free for a coffee?`; }
+
+// ----- the table: one cup per seat -----
+function seats(k) {
+  return Array.from({ length: k }, (_, i) => {
+    const a = (-90 + (i * 360) / k + (k === 3 ? 0 : 45)) * Math.PI / 180;
+    return { x: 50 + 31 * Math.cos(a), y: 50 + 31 * Math.sin(a), deg: a * 180 / Math.PI };
+  });
+}
+function tableHtml(members, { empty = false, center = "" } = {}) {
+  const pos = seats(members.length);
+  const cups = members.map((p, i) => {
+    const s = pos[i];
+    const inner = empty ? `<span class="heart"><svg viewBox="0 0 24 24"><use href="#heart"/></svg></span>`
+      : `<span class="ini">${esc(initials(p.name))}</span>${p.photo ? `<img src="${esc(p.photo)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}`;
+    const el = empty ? "div" : "button";
+    return `<${el} class="cup ${p.me ? "me" : ""} ${s.y < 45 ? "up" : ""}" style="left:${s.x}%;top:${s.y}%" data-i="${i}" ${empty ? "" : `type="button" data-person="${esc(p.id)}" title="${esc(p.name)}"`}>
+      <span class="saucer"></span><span class="handle" style="transform:rotate(${s.deg + 35}deg) translate(28%,-50%)"></span>
+      <span class="rim"></span><span class="coffee">${inner}</span>
+      ${empty ? `<svg class="steam" viewBox="0 0 40 50"><path d="M12 48c-6-8 6-12 0-22s6-14 2-24"/><path d="M22 48c-6-8 6-12 0-22s6-14 2-24"/><path d="M32 48c-6-8 6-12 0-22s6-14 2-24"/></svg>` : `<span class="label" style="--t:${(i % 2 ? 3 : -3)}deg">${esc(p.me ? "You" : p.name)}</span>`}
+    </${el}>`;
+  }).join("");
+  return `<div class="table">${cups}${center}</div>`;
+}
+// shell game: swap two cups' positions
+function swapCups(root) {
+  const cups = [...root.querySelectorAll(".cup")];
+  if (cups.length < 2) return;
+  const i = Math.floor(Math.random() * cups.length);
+  let j = Math.floor(Math.random() * (cups.length - 1)); if (j >= i) j++;
+  const a = cups[i], b = cups[j];
+  const [al, at, bl, bt] = [a.style.left, a.style.top, b.style.left, b.style.top];
+  a.classList.add("lift"); b.classList.add("lift");
+  a.style.left = bl; a.style.top = bt; b.style.left = al; b.style.top = at;
+  setTimeout(() => { a.classList.remove("lift"); b.classList.remove("lift"); }, 560);
+}
+let shellTimer = null;
+function shellGame(root) { clearInterval(shellTimer); if (reduced) return; shellTimer = setInterval(() => { if (document.body.contains(root)) swapCups(root); else clearInterval(shellTimer); }, 1700); }
+// reveal: a few quick swaps on empty cups, then pour in the faces
+let revealId = 0; // a newer render cancels a reveal that's still shuffling
+async function reveal(stage, html) {
+  const id = ++revealId;
+  if (reduced) { stage.innerHTML = html; return; }
+  stage.innerHTML = tableHtml([{}, {}, {}], { empty: true, center: `<div class="center plain">Shuffling</div>` });
+  const t = stage.querySelector(".table");
+  for (let k = 0; k < 4; k++) { swapCups(t); await new Promise((r) => setTimeout(r, 430)); if (id !== revealId) return; }
+  stage.innerHTML = html;
+  stage.querySelectorAll(".cup").forEach((c, i) => { c.classList.add("pour"); c.style.transitionDelay = i * 80 + "ms"; });
+}
+
+// coffee bean confetti
+function beans(fromEl) {
+  if (reduced) return;
+  const r = fromEl.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  for (let i = 0; i < 26; i++) {
+    const b = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    b.setAttribute("class", "bean"); b.setAttribute("viewBox", "0 0 16 22"); b.innerHTML = '<use href="#bean"/>';
+    b.style.left = cx + "px"; b.style.top = cy + "px"; document.body.appendChild(b);
+    const ang = Math.random() * Math.PI * 2, dist = 90 + Math.random() * 160;
+    const dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist - 80;
+    b.animate([{ transform: "translate(-50%,-50%) rotate(0)", opacity: 1 },
+      { transform: `translate(${dx}px,${dy + 220}px) rotate(${Math.random() * 720 - 360}deg)`, opacity: 0 }],
+      { duration: 1100 + Math.random() * 500, easing: "cubic-bezier(.2,.7,.4,1)" }).onfinish = () => b.remove();
+  }
+}
+
+// ================= signed out =================
+let step = { at: "phone", phone: "" };
+function renderSignin() {
+  const el = $("#signin"), s = step;
+  if (s.at === "phone") {
+    el.innerHTML = `<h3>See your group</h3>
+      <p>Sign in with the number you use in the Jackson WhatsApp group. Add the country code if it isn't American.</p>
+      <form id="f1" class="row"><label class="sr" for="ph">WhatsApp number</label>
+        <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="+1 203 555 0123" value="${esc(s.phone)}" required>
+        <button class="btn" type="submit">Go</button></form>
+      <div class="err" id="e"></div>`;
+    $("#f1").onsubmit = async (ev) => {
+      ev.preventDefault();
+      const phone = $("#ph").value.trim(); $("#e").textContent = "";
+      try { const r = await post("/login", { phone }); if (r.ok) return boot(!r.named); step = { at: "who", phone }; renderSignin(); }
+      catch (er) { $("#e").textContent = er.message; }
+    };
+  } else if (s.at === "who") {
+    el.innerHTML = `<h3>First time here</h3>
+      <p>That number isn't linked to anyone yet. Type your name and pick yourself.</p>
+      <div class="row"><label class="sr" for="who">Your name</label><input id="who" type="text" placeholder="Your name" autocomplete="name"></div>
+      <div class="picks" id="picks"></div><div class="err" id="e"></div>
+      <p class="small" style="margin:8px 0 0">Not on the list? <button class="linkbtn" id="j" type="button">Join with your name</button>. Wrong number? <button class="linkbtn" id="b" type="button">Go back</button>.</p>`;
+    let t; $("#who").oninput = () => { clearTimeout(t); t = setTimeout(find, 220); }; $("#who").focus();
+    $("#j").onclick = () => { step = { at: "join", phone: s.phone }; renderSignin(); };
+    $("#b").onclick = () => { step = { at: "phone", phone: s.phone }; renderSignin(); };
+    async function find() {
+      const q = $("#who").value.trim(); if (q.length < 2) { $("#picks").innerHTML = ""; return; }
+      try {
+        const { matches } = await post("/lookup", { query: q });
+        $("#picks").innerHTML = matches.length ? matches.map((m) => `<button type="button" data-id="${esc(m.id)}"><span><b>${esc(m.name)}</b>${m.wa ? `<br><span class="muted small">“${esc(m.wa)}” on WhatsApp</span>` : ""}</span><span class="small"><b>That's me</b></span></button>`).join("")
+          : `<p class="muted small" style="margin:6px 0 0">No one by that name. Try another spelling, or join with your name.</p>`;
+        $("#picks").querySelectorAll("button").forEach((b) => b.onclick = async () => {
+          try { await post("/claim", { phone: s.phone, id: b.dataset.id }); boot(); } catch (er) { $("#e").textContent = er.message; }
+        });
+      } catch (er) { $("#e").textContent = er.message; }
+    }
+  } else {
+    el.innerHTML = `<h3>Join</h3><p>Your name as people know it. You'll get a group this week.</p>
+      <form id="f2" class="row"><label class="sr" for="nm">Your name</label><input id="nm" type="text" autocomplete="name" placeholder="First and last name" required><button class="btn" type="submit">Join</button></form>
+      <div class="err" id="e"></div><p class="small" style="margin:8px 0 0"><button class="linkbtn" id="b" type="button">Back</button></p>`;
+    $("#nm").focus();
+    $("#b").onclick = () => { step = { at: "who", phone: s.phone }; renderSignin(); };
+    $("#f2").onsubmit = async (ev) => { ev.preventDefault(); try { await post("/join", { phone: s.phone, name: $("#nm").value }); boot(); } catch (er) { $("#e").textContent = er.message; } };
+  }
+}
+async function showDoor() {
+  $("#app").hidden = true; $("#door").hidden = false; $("#me-btn").hidden = true; $("#logout").hidden = true; $("#optout-link").hidden = true; $("#org").hidden = true; $("#all-sec").hidden = true;
+  document.title = "Jackson Coffee Buddies";
+  $("#door-table").innerHTML = tableHtml([{}, {}, {}], { empty: true, center: `<div class="center" id="door-week">Week 1</div>` });
+  shellGame($("#door-table .table"));
+  renderSignin(); renderCafes();
+  try {
+    const p = await call("/pulse");
+    const wp = $("#weekpill"); wp.hidden = false; wp.textContent = p.week.over ? "See you in 2027–28" : `Round ${p.week.n} of ${p.week.total}`;
+    $("#door-week").textContent = p.week.over ? "2027–28" : p.week.brk ? "On break" : `Round ${p.week.n}`;
+    if (p.week.over) $(".lede").textContent = BACK;
+    else if (p.week.brk) $(".lede").textContent = `We're on break. New groups on ${monday(p.week.next)}.`;
+    $("#counts").innerHTML = `<span><b>${p.members}</b> people</span><span><b>${p.tables}</b> groups this round</span><span><b>${p.done}</b> ${p.done === 1 ? "coffee" : "coffees"} had</span>`;
+  } catch {}
+}
+
+// ================= signed in =================
+function render() {
+  const d = S;
+  clearInterval(shellTimer);
+  $("#door").hidden = true; $("#app").hidden = false; $("#logout").hidden = false; $("#optout-link").hidden = false; $("#all-sec").hidden = false;
+  document.title = "Jackson Coffee Buddies";
+  const wp = $("#weekpill"); wp.hidden = false; wp.textContent = d.week.over ? "See you in 2027–28" : `Round ${d.week.n} of ${d.week.total}`;
+  const mb = $("#me-btn"); mb.hidden = false; mb.innerHTML = avatar(d.me) + `<span>${esc(first(d.me))}</span>`;
+  renderMine(); renderCard(); renderGroups(); renderCafes();
+  $("#org").hidden = !d.me.admin; if (d.me.admin) renderOrg();
+}
+
+function personCard(p) {
+  const num = p.phone
+    ? `<span class="num">${esc(fmtPhone(p.phone))}</span><a class="btn wa sm" href="${esc(waLink(p, hello(p)))}" target="_blank" rel="noopener">${waIco}Say hi</a>`
+    : `<span class="none">${p.signedUp ? "Number hidden." : "Hasn't signed in yet, so no number here. They're in the Jackson WhatsApp group."}</span>`;
+  return `<div class="person">${avatar(p, "", `data-person="${esc(p.id)}"`)}
+    <div><div class="nm"><button type="button" data-person="${esc(p.id)}">${esc(p.name)}</button></div>
+    ${p.wa ? `<div class="sub">“${esc(p.wa)}” on WhatsApp</div>` : ""}${p.bio ? `<div class="bio">${esc(p.bio)}</div>` : ""}
+    <div class="acts">${num}</div></div></div>`;
+}
+
+function renderMine() {
+  const d = S, copy = $("#mine-copy"), stage = $("#mine-table");
+  revealId++;
+  const g = d.week.over || d.week.brk ? null : d.group;
+  if (d.week.over || d.week.brk) {
+    copy.innerHTML = d.week.over
+      ? `<span class="kicker">2026–27 is done</span><h1>See you in 2027–28</h1><p class="when">${BACK}</p><p class="when">Thanks for having coffee. Your card and all your groups are still below.</p>`
+      : `<span class="kicker">On break</span><h1>No groups over the break</h1><p class="when">The cups get shuffled again on ${monday(d.week.next)}.</p>`;
+    stage.innerHTML = tableHtml([{}, {}, {}], { empty: true, center: `<div class="center">${d.week.over ? "2027–28" : "Back soon"}</div>` });
+    shellGame(stage.querySelector(".table"));
+    $("#tiles").innerHTML = "";
+    return;
+  }
+  if (!g) {
+    copy.innerHTML = `<span class="kicker">${roundLabel(d.week)}</span><h1>No group this round</h1>
+      <p class="when">${d.week.last ? "This is the last round of the year." : d.me.active ? `You joined after this round's groups were made. You'll get one on ${monday(d.week.next)}.` : `You're sitting out. Turn matching back on to get a group on ${monday(d.week.next)}.`}</p>
+      ${d.me.active ? "" : `<button class="btn" id="resume" type="button">Put me back in</button>`}`;
+    stage.innerHTML = tableHtml([{}, {}, {}], { empty: true, center: `<div class="center">Round ${d.week.n}</div>` });
+    shellGame(stage.querySelector(".table"));
+    $("#tiles").innerHTML = "";
+    const r = $("#resume"); if (r) r.onclick = () => saveProfile({ active: true });
+    return;
+  }
+  const others = g.members.filter((p) => !p.me);
+  const until = d.week.last ? `classes end on ${day(d.week.end, { weekday: "long", month: "short", day: "numeric" })}` : `${monday(d.week.next)}, when the cups get shuffled again`;
+  copy.innerHTML = `<span class="kicker">${d.week.last ? "Last round, " + range(d.week) : roundLabel(d.week)}</span>
+    <h1>You, <em>${esc(list(others.map(first)))}</em></h1>
+    <p class="when">${g.done ? (d.week.last ? "You've met. That was the last round of the year." : "You've met this round. New groups on " + monday(d.week.next) + ".") : "Have a coffee before " + until + "."}</p>
+    <div class="people">${others.map(personCard).join("")}</div>
+    <p class="small muted" style="margin:12px 0 0">Can't do it this term? <button class="linkbtn" type="button" id="to-optout">Pause or opt out</button></p>`;
+  const center = g.chat
+    ? `<a class="center" href="${esc(g.chat)}" target="_blank" rel="noopener">Group chat<small>open it</small></a>`
+    : `<button class="center" type="button" id="center">Group chat<small>set it up</small></button>`;
+  const html = tableHtml(g.members, { center }) + (g.done ? `<div class="stamp ${window.__fresh ? "fresh" : ""}"><b>MET</b><span>${new Date(g.doneAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}${g.cafe ? " · " + esc(g.cafe) : ""}</span></div>` : "");
+  window.__fresh = false;
+  if (firstReveal) { firstReveal = false; reveal(stage, html).then(wireCenter); } else { stage.innerHTML = html; wireCenter(); }
+  function wireCenter() { const c = $("#center"); if (c) c.onclick = () => { const t = $("#chat-tile"); t.scrollIntoView({ behavior: "smooth", block: "center" }); t.animate([{ transform: "scale(1)" }, { transform: "scale(1.03)" }, { transform: "scale(1)" }], { duration: 500, delay: 300 }); }; }
+
+  // tiles: group chat, met, something to talk about
+  const withNum = others.filter((p) => p.phone), without = others.filter((p) => !p.phone);
+  const gname = `Coffee: ${list(g.members.map(first))}`;
+  const chat = g.chat
+    ? `<h3>Group chat</h3><p>${g.chatBy ? esc(g.chatBy) + " made one." : "Your group has a chat."}</p>
+       <a class="btn wa" href="${esc(g.chat)}" target="_blank" rel="noopener">${waIco}Open the group chat</a>
+       <p class="small" style="margin:12px 0 0"><button class="linkbtn" type="button" id="chat-change">Change the link</button></p>`
+    : `<h3>Make a group chat</h3><p>WhatsApp won't let a website make groups, so one of you does it in the app:</p>
+       <ol>
+         <li>${withNum.length ? `<button class="btn sm ghost" type="button" id="vcf">Save ${esc(list(withNum.map(first)))} to contacts</button>` : "No numbers here yet."}${without.length ? `<br><span class="muted small">${esc(list(without.map(first)))} ${without.length > 1 ? "haven't" : "hasn't"} signed in, so find them in the Jackson group.</span>` : ""}</li>
+         <li>New group in WhatsApp, add them, name it “${esc(gname)}”. <button class="linkbtn" type="button" id="copy-name">Copy name</button></li>
+         <li>Group info, Invite via link, paste it here:
+           <div class="row" style="margin-top:8px"><input type="url" id="chat-link" placeholder="chat.whatsapp.com/…"><button class="btn sm" type="button" id="chat-save">Save</button></div></li>
+       </ol>`;
+  $("#tiles").innerHTML = `
+    <div class="tile chat" id="chat-tile">${chat}</div>
+    <div class="tile met">
+      <h3>After the coffee</h3>
+      <button class="bigcheck ${g.done ? "on" : ""}" type="button" id="done" aria-pressed="${g.done}"><span class="bx">${g.done ? tick : ""}</span>${g.done ? "We met!" : "Tick it off"}</button>
+      ${g.done ? `<p class="small" style="margin:8px 0 0">Ticked by ${esc(g.doneBy || "your group")}.</p>` : ""}
+      <div class="controls"><select id="cafe" aria-label="Where you went">${cafeOptions(g.cafe)}</select>
+        <span class="btn sm ghost upl">Add a photo<input type="file" accept="image/*" id="pic"></span></div>
+      <div class="polas">${g.photos.map((p, i) => `<div class="pola" style="--r:${[-4, 3, -2, 5][i % 4]}deg"><img src="${p.url}" alt="Photo from your coffee" data-full="${p.url}">${p.mine || d.me.admin ? `<button type="button" data-del="${p.id}">remove</button>` : ""}</div>`).join("")}</div>
+    </div>
+    <div class="tile talk">
+      <h3>Something to talk about</h3>
+      <p class="q" id="q">${esc(QUESTIONS[qIndex])}</p>
+      <button class="btn sm" type="button" id="next-q">Another one</button>
+    </div>`;
+
+  $("#done").onclick = (e) => { if (!g.done) { window.__fresh = true; beans(e.currentTarget); } setDone(g, !g.done, $("#cafe").value); };
+  $("#cafe").onchange = async (e) => {
+    let v = e.target.value;
+    if (v === "__other") { v = (prompt("Which café?") || "").trim(); if (!v) { e.target.value = g.cafe || ""; return; } }
+    S = await post("/done", { week: g.week, gid: g.gid, cafe: v }); render();
+  };
+  $("#pic").onchange = (e) => upload(e.target.files[0], `kind=table&week=${g.week}&gid=${g.gid}`, 1400);
+  document.querySelectorAll("#tiles [data-del]").forEach((b) => b.onclick = async () => { S = await post("/photo/delete", { id: b.dataset.del }); render(); });
+  $("#next-q").onclick = () => { const q = $("#q"); q.classList.add("swap"); setTimeout(() => { qIndex = (qIndex + 1 + Math.floor(Math.random() * 3)) % QUESTIONS.length; q.textContent = QUESTIONS[qIndex]; q.classList.remove("swap"); }, 180); };
+  wireChat(g, others);
+  $("#to-optout").onclick = () => { focusOptout = true; openProfile(); };
+}
+
+function wireChat(g, others) {
+  const vcf = $("#vcf");
+  if (vcf) vcf.onclick = () => {
+    const cards = others.filter((p) => p.phone).map((p) => ["BEGIN:VCARD", "VERSION:3.0", `FN:${p.name}`, `N:${p.name.split(" ").slice(1).join(" ")};${first(p)};;;`, `TEL;TYPE=CELL:${p.phone}`, "NOTE:Jackson Coffee Buddies", "END:VCARD"].join("\r\n")).join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([cards], { type: "text/vcard" })); a.download = `coffee-week-${g.week}.vcf`; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  };
+  const cn = $("#copy-name");
+  if (cn) cn.onclick = async () => { try { await navigator.clipboard.writeText(`Coffee: ${list(g.members.map(first))}`); toast("Copied."); } catch { toast("Couldn't copy."); } };
+  const save = $("#chat-save");
+  if (save) save.onclick = async () => { try { S = await post("/chat", { week: g.week, gid: g.gid, link: $("#chat-link").value }); render(); toast("Saved. Your group can join from here now."); } catch (er) { toast(er.message); } };
+  const ch = $("#chat-change");
+  if (ch) ch.onclick = async () => { const v = prompt("Paste the new invite link (empty removes it):", g.chat); if (v === null) return; try { S = await post("/chat", { week: g.week, gid: g.gid, link: v }); render(); } catch (er) { toast(er.message); } };
+}
+
+function cafeOptions(sel) {
+  const names = CAFES.map((c) => c.name), extra = sel && !names.includes(sel) ? [sel] : [];
+  return `<option value="">Where did you go?</option>` + [...names, ...extra].map((n) => `<option ${n === sel ? "selected" : ""}>${esc(n)}</option>`).join("") + `<option value="__other">Somewhere else</option>`;
+}
+async function setDone(g, done, cafe) {
+  const b = { week: g.week, gid: g.gid, done };
+  if (cafe && cafe !== "__other") b.cafe = cafe;
+  try { S = await post("/done", b); render(); if (done) toast("Nice. Punched your card."); } catch (er) { toast(er.message); }
+}
+
+function myWeeks() { return [...(S.group ? [S.group] : []), ...S.history]; }
+function renderCard() {
+  const d = S, rows = myWeeks(), byWeek = new Map(rows.map((g) => [g.week, g]));
+  const total = d.week.total;
+  let holes = "";
+  for (let w = 1; w <= total; w++) {
+    const g = byWeek.get(w), cls = g?.done ? "done" : w === d.week.n ? "now" : "";
+    holes += `<button class="hole ${cls}" type="button" ${g ? `data-w="${w}"` : "disabled"} title="Round ${w}">${g?.done ? tick : w}</button>`;
+  }
+  // streak = rounds met in a row, counting back from this round (or the one before if it's still open)
+  let streak = 0;
+  for (let w = byWeek.get(d.week.n)?.done ? d.week.n : d.week.n - 1; w >= 1 && byWeek.get(w)?.done; w--) streak++;
+  const cafes = new Set(rows.filter((g) => g.done && g.cafe).map((g) => g.cafe)).size;
+  const met = rows.filter((g) => g.done).length;
+  const badge = (on, icon, text) => `<span class="badge ${on ? "" : "off"}"><i>${icon}</i>${text}</span>`;
+  $("#punch").innerHTML = `<div class="head"><b>${esc(d.me.name)}</b><img src="/media/jackson/jackson-crest.svg" alt=""></div>
+    <div class="holes">${holes}</div>
+    <div class="badges">
+      ${badge(met >= 1, "☕", met === 1 ? "First coffee" : `${met} coffees`)}
+      ${badge(d.stats.met >= 1, "👋", `Met ${d.stats.met} ${d.stats.met === 1 ? "person" : "people"}`)}
+      ${badge(streak >= 2, "🔥", `${streak} in a row`)}
+      ${badge(cafes >= 1, "📍", `${cafes} of ${CAFES.length} cafés`)}
+    </div>`;
+  $("#punch").querySelectorAll("[data-w]").forEach((b) => b.onclick = () => document.getElementById("wk-" + b.dataset.w)?.scrollIntoView({ behavior: "smooth", block: "center" }));
+  $("#hist").innerHTML = rows.map((g) => {
+    const others = g.members.filter((p) => !p.me);
+    return `<div class="hrow" id="wk-${g.week}">
+      <div class="wk">Round ${g.week}${g.week === d.week.n && !d.week.over && !d.week.brk ? "<small>now</small>" : ""}</div>
+      <div><div class="who"><span class="faces">${others.map((p) => avatar(p, "", `data-person="${esc(p.id)}"`)).join("")}</span><span>${esc(list(others.map((p) => p.name)))}${g.cafe ? `<span class="muted"> at ${esc(g.cafe)}</span>` : ""}</span></div>
+        ${g.photos.length ? `<div class="thumbs">${g.photos.map((p) => `<img src="${p.url}" alt="" data-full="${p.url}">`).join("")}</div>` : ""}</div>
+      <button class="tog ${g.done ? "on" : ""}" type="button" data-week="${g.week}" data-gid="${g.gid}" aria-pressed="${g.done}">${g.done ? tick + "Met" : "Not yet"}</button>
+    </div>`;
+  }).join("");
+  $("#hist").querySelectorAll(".tog").forEach((b) => b.onclick = (e) => {
+    const g = rows.find((x) => x.week == b.dataset.week && x.gid == b.dataset.gid);
+    if (!g.done) beans(e.currentTarget);
+    setDone(g, !g.done);
+  });
+}
+
+function renderGroups() {
+  const d = S, done = d.tables.filter((t) => t.done).length;
+  $("#all-count").textContent = `Round ${d.week.n}: ${done} of ${d.tables.length} groups have had their coffee.`;
+  $("#prog").style.width = (d.tables.length ? Math.max(2, done / d.tables.length * 100) : 0) + "%";
+  $("#tables").innerHTML = d.tables.map((t) => {
+    const pos = seats(t.members.length), you = t.members.some((p) => p.me);
+    return `<div class="mini ${you ? "you" : ""}" data-s="${esc(t.members.map((p) => p.name + " " + (p.wa || "")).join(" ").toLowerCase())}">
+      <div class="t">${t.members.map((p, i) => `<div class="seat" style="left:${50 + (pos[i].x - 50) * 1.08}%;top:${50 + (pos[i].y - 50) * 1.08}%" title="${esc(p.name)}">${avatar(p, "", `data-person="${esc(p.id)}"`)}</div>`).join("")}${t.done ? `<span class="ok" title="Met">${tick}</span>` : ""}</div>
+      <div class="nm">${esc(t.members.map((p) => (p.me ? "You" : first(p))).join(", "))}${t.cafe ? `<small>${esc(t.cafe)}</small>` : ""}</div></div>`;
+  }).join("");
+  filterGroups();
+}
+function filterGroups() { const q = $("#find").value.trim().toLowerCase(); document.querySelectorAll(".mini").forEach((m) => m.classList.toggle("dim", !!q && !m.dataset.s.includes(q))); }
+
+function renderCafes() {
+  $("#cafes-sec").hidden = false;
+  const visited = {};
+  if (S) for (const g of myWeeks()) if (g.done && g.cafe) visited[g.cafe] = visited[g.cafe] || g.doneAt;
+  const went = {};
+  if (S) for (const t of S.tables) if (t.cafe) went[t.cafe] = (went[t.cafe] || 0) + 1;
+  const n = Object.keys(visited).length;
+  $("#cafes-sub").textContent = S ? `${n ? `${n} stamped so far. ` : "Have a coffee at one of these and it gets stamped. "}Walking times from Horchow Hall are rough.` : "Walking times from Horchow Hall are rough.";
+  $("#cafes").innerHTML = CAFES.slice().sort((a, b) => a.walk - b.walk).map((c, i) => {
+    const v = visited[c.name];
+    return `<div class="cafe">
+      <div class="seal ${v ? "inked" : ""}" style="--r:${[-8, 6, -4, 9, -6][i % 5]}deg">${v ? `<span><b>✓</b><small>${new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()}</small></span>` : `<span><b>${c.walk}</b><small>MIN WALK</small></span>`}</div>
+      <div><h3>${esc(c.name)}${c.points ? `<span class="chip">dining points</span>` : ""}</h3>${c.aka ? `<div class="aka">aka “${esc(c.aka)}”</div>` : ""}
+        <p>${esc(c.about)}</p>${c.order ? `<div class="get"><b>Get:</b> ${esc(c.order)}</div>` : ""}
+        <a class="addr" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ", " + c.address + ", New Haven, CT")}" target="_blank" rel="noopener">${esc(c.address)} ↗</a>
+        ${went[c.name] ? `<div class="small" style="color:var(--mint);font-weight:700;margin-top:4px">${went[c.name]} ${went[c.name] > 1 ? "groups" : "group"} went this round</div>` : ""}</div>
+    </div>`;
+  }).join("");
+}
+
+// ----- someone's card -----
+function findPerson(id) { for (const g of [...myWeeks(), ...S.tables]) for (const p of g.members) if (p.id === id) return p; return null; }
+function openPerson(id) {
+  const p = findPerson(id); if (!p) return;
+  if (p.me) return openProfile();
+  const weeks = myWeeks().filter((g) => g.members.some((m) => m.id === id)).map((g) => g.week).sort((a, b) => a - b);
+  const sh = $("#sheet"); sh.hidden = false;
+  sh.innerHTML = `<div class="in" role="dialog" aria-label="${esc(p.name)}">
+    <button class="linkbtn close" type="button" id="x">Close</button>
+    <h2 style="font-size:34px">${esc(p.name)}</h2>${p.wa ? `<div class="muted">“${esc(p.wa)}” on WhatsApp</div>` : ""}
+    ${p.photo ? `<img class="bigphoto" src="${esc(p.photo)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : avatar(p, "big")}
+    ${p.bio ? `<p>${esc(p.bio)}</p>` : ""}
+    ${weeks.length ? `<p class="muted">In your group in week ${list(weeks.map(String))}.</p>` : ""}
+    ${p.phone
+      ? `<p style="font:800 22px/1 var(--display);margin:16px 0 12px">${esc(fmtPhone(p.phone))}</p>
+         <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn wa" href="${esc(waLink(p, weeks.includes(S.week.n) ? hello(p) : ""))}" target="_blank" rel="noopener">${waIco}WhatsApp</a><button class="btn ghost" type="button" id="cp">Copy number</button></div>`
+      : `<p class="muted">${p.signedUp ? "You'll see their number once you've been in a group together." : "They haven't signed in yet, so there's no number. They're in the Jackson WhatsApp group."}</p>`}
+  </div>`;
+  sh.onclick = (e) => { if (e.target === sh) closeSheet(); };
+  $("#x").onclick = closeSheet;
+  const cp = $("#cp"); if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(p.phone); toast("Copied."); } catch { toast("Couldn't copy."); } };
+}
+
+// ----- your profile -----
+let focusOptout = false;
+function openProfile() {
+  const me = S.me, sh = $("#sheet"); sh.hidden = false;
+  sh.innerHTML = `<div class="in" role="dialog" aria-label="Your profile">
+    <button class="linkbtn close" type="button" id="x">Close</button>
+    <h2 style="font-size:34px">You</h2>
+    <p class="muted small" style="margin:4px 0 0">${me.phone ? `Signed in with ${esc(fmtPhone(me.phone))}. ` : ""}People in your groups can see your number.</p>
+    <label>Photo</label>${avatar(me, "big")}
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="btn sm upl">Upload a photo<input type="file" accept="image/*" id="av-up"></span>
+      ${me.photo && me.photo.startsWith("/api/") ? `<button class="btn sm ghost" id="av-del" type="button">Remove it</button>` : ""}</div>
+    <label for="pn">Name</label><input type="text" id="pn" value="${esc(me.name)}" maxlength="60">
+    <label for="bio">One line about you</label><input type="text" id="bio" value="${esc(me.bio)}" maxlength="140" placeholder="MPP '27, energy policy, will talk about cycling">
+    <div style="margin-top:22px"><button class="btn" id="save" type="button">Save</button></div><div class="err" id="pe"></div>
+    <div class="optout" id="optout">
+      <h3>Opt out</h3>
+      ${me.active
+        ? `<p>You get a new group every Monday. Pausing stops that from the next round on. Your current group and your history stay.</p>
+           <button class="btn sm ghost" id="pause" type="button">Pause matching</button>`
+        : `<p><b>Paused.</b> You won't get new groups until you turn it back on.</p>
+           <button class="btn sm" id="pause" type="button">Start matching again</button>`}
+      <p style="margin-top:18px">Deleting your account takes you out of this round's group, wipes your name, number and photos, and signs you out. You won't be matched again.</p>
+      <button class="btn sm danger" id="leave" type="button">Delete my account</button>
+    </div></div>`;
+  sh.onclick = (e) => { if (e.target === sh) closeSheet(); };
+  $("#x").onclick = closeSheet;
+  $("#av-up").onchange = async (e) => { await upload(e.target.files[0], "kind=avatar", 640, true); openProfile(); };
+  if ($("#av-del")) $("#av-del").onclick = async () => { S = await post("/photo/delete", { id: "avatar" }); render(); openProfile(); };
+  $("#save").onclick = async () => { try { await saveProfile({ name: $("#pn").value, bio: $("#bio").value }); closeSheet(); toast("Saved."); } catch (er) { $("#pe").textContent = er.message; } };
+  $("#pause").onclick = async () => {
+    const on = !me.active;
+    try { await saveProfile({ active: on }); openProfile(); toast(on ? "You're back in from the next round." : "Paused. No new groups for you."); } catch (er) { toast(er.message); }
+  };
+  $("#leave").onclick = async () => {
+    if (!confirm("Delete your Coffee Buddies account? Your name, number and photos are removed and you won't be matched again. This can't be undone.")) return;
+    try { await post("/leave"); closeSheet(); S = null; firstReveal = true; step = { at: "phone", phone: "" }; showDoor(); toast("Your account is deleted."); }
+    catch (er) { toast(er.message); }
+  };
+  if (focusOptout) { focusOptout = false; setTimeout(() => $("#optout").scrollIntoView({ behavior: "smooth" }), 60); }
+}
+function closeSheet() { $("#sheet").hidden = true; $("#sheet").innerHTML = ""; }
+async function saveProfile(b) { S = await post("/profile", b); render(); }
+
+async function shrink(file, max, square) {
+  const bmp = await createImageBitmap(file).catch(() => null);
+  if (!bmp) throw new Error("Couldn't read that image.");
+  let sx = 0, sy = 0, sw = bmp.width, sh = bmp.height;
+  if (square) { const m = Math.min(sw, sh); sx = (sw - m) / 2; sy = (sh - m) / 2; sw = sh = m; }
+  const k = Math.min(1, max / Math.max(sw, sh)), c = document.createElement("canvas");
+  c.width = Math.round(sw * k); c.height = Math.round(sh * k);
+  c.getContext("2d").drawImage(bmp, sx, sy, sw, sh, 0, 0, c.width, c.height);
+  return new Promise((res) => c.toBlob(res, "image/jpeg", 0.84));
+}
+async function upload(file, qs, max, square = false) {
+  if (!file) return;
+  toast("Uploading…");
+  try { const blob = await shrink(file, max, square); S = await call("/photo?" + qs, { method: "POST", body: blob, headers: { "Content-Type": "image/jpeg" } }); render(); }
+  catch (er) { toast(er.message); }
+}
+
+// ----- organizer -----
+async function renderOrg() {
+  try {
+    const { members } = await call("/admin/roster");
+    $("#org-sum").textContent = `${members.length} people. ${members.filter((m) => m.phone).length} have a number, ${members.filter((m) => m.seen).length} have signed in, ${members.filter((m) => !m.active).length} are sitting out.`;
+    $("#org-rows").innerHTML = members.map((m) => `<tr data-s="${esc((m.name + " " + m.wa + " " + m.phone).toLowerCase())}">
+      <td>${avatar(m)}</td><td><b>${esc(m.name || "(no name yet)")}</b>${m.admin ? " (you)" : ""}</td><td>${esc(m.wa)}</td>
+      <td>${m.phone ? `<a href="https://wa.me/${esc(m.phone.replace(/\D/g, ""))}" target="_blank" rel="noopener">${esc(fmtPhone(m.phone))}</a>` : `<span class="muted">none</span>`}</td>
+      <td>${m.seen ? new Date(m.seen).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "never"}</td>
+      <td><input type="checkbox" data-act="${esc(m.id)}" ${m.active ? "checked" : ""} aria-label="Matched every Monday"></td>
+      <td style="white-space:nowrap">${m.phone && !m.admin ? `<button class="linkbtn" data-reset="${esc(m.id)}" type="button">Unlink number</button> ` : ""}${m.admin ? "" : `<button class="linkbtn" style="color:var(--tomato)" data-rm="${esc(m.id)}" type="button">Remove</button>`}</td></tr>`).join("");
+    $("#org-rows").querySelectorAll("[data-act]").forEach((c) => c.onchange = () => post("/admin/member", { id: c.dataset.act, active: c.checked }).then(() => toast("Saved.")));
+    $("#org-rows").querySelectorAll("[data-reset]").forEach((b) => b.onclick = async () => { if (confirm("Unlink this number? They can claim their name again.")) { await post("/admin/member", { id: b.dataset.reset, resetPhone: true }); renderOrg(); } });
+    $("#org-rows").querySelectorAll("[data-rm]").forEach((b) => b.onclick = async () => { if (confirm("Remove them? They won't be matched anymore.")) { await post("/admin/member", { id: b.dataset.rm, remove: true }); renderOrg(); } });
+    filterOrg();
+  } catch (er) { $("#org-sum").textContent = er.message; }
+}
+function filterOrg() { const q = $("#org-find").value.trim().toLowerCase(); $("#org-rows").querySelectorAll("tr").forEach((r) => r.hidden = !!q && !r.dataset.s.includes(q)); }
+
+// ----- start -----
+async function boot(needName) {
+  const m = location.hash.match(/organizer=([^&]+)/);
+  if (m) { history.replaceState(null, "", location.pathname); try { await post("/admin/login", { token: decodeURIComponent(m[1]) }); } catch (er) { toast(er.message); } }
+  try {
+    S = await call("/me"); render();
+    if (needName || !S.me.name || S.me.name === "New member") { openProfile(); setTimeout(() => $("#pn")?.select(), 50); }
+  } catch (er) { showDoor(); if (er.status !== 401) toast(er.message); }
+}
+document.addEventListener("click", (e) => {
+  const im = e.target.closest("img[data-full]");
+  if (im) { const lb = document.createElement("div"); lb.className = "lightbox"; lb.innerHTML = `<img src="${im.dataset.full}" alt="">`; lb.onclick = () => lb.remove(); document.body.appendChild(lb); return; }
+  const who = e.target.closest("[data-person]");
+  if (who && S && !e.target.closest(".sheet")) openPerson(who.dataset.person);
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeSheet(); document.querySelector(".lightbox")?.remove(); } });
+$("#me-btn").onclick = openProfile;
+$("#optout-link").onclick = () => { focusOptout = true; openProfile(); };
+$("#find").oninput = filterGroups;
+$("#org-find").oninput = filterOrg;
+$("#org-add").onclick = async () => {
+  const name = $("#org-name").value.trim(); if (!name) return toast("Type a name first.");
+  try { await post("/admin/member", { add: true, name, phone: $("#org-phone").value, slot: true }); $("#org-name").value = $("#org-phone").value = ""; S = await call("/me"); render(); toast("Added to a group."); } catch (er) { toast(er.message); }
+};
+$("#org-shuffle").onclick = async () => { if (!confirm("Redo every group for this week? This week's ticks, photos and chat links are cleared.")) return; S = await post("/admin/reshuffle"); firstReveal = true; render(); toast("Reshuffled."); };
+$("#logout").onclick = async () => { await post("/logout").catch(() => {}); S = null; firstReveal = true; step = { at: "phone", phone: "" }; showDoor(); };
+boot();
+</script>
+</body>
+</html>
