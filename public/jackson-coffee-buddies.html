@@ -259,7 +259,7 @@ button.center:hover,a.center:hover{transform:translate(-50%,-50%) rotate(-8deg) 
 .cafe{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:16px;display:grid;grid-template-columns:86px 1fr;gap:14px;box-shadow:0 2px 0 var(--line)}
 .seal{width:86px;height:86px;border-radius:50%;border:3px double var(--latte);display:grid;place-items:center;text-align:center;color:var(--ink-3);transform:rotate(var(--r,0deg));position:relative}
 .seal b{display:block;font:800 22px/1 var(--display)}
-.seal small{display:block;font-size:11px;font-weight:700;letter-spacing:.04em}
+.seal small{display:block;font-size:10px;line-height:1.15;font-weight:700;letter-spacing:.03em;margin-top:2px}
 .seal.inked{border-color:var(--tomato);color:var(--tomato);background:rgba(228,87,46,.06)}
 .cafe h3{font-size:19px}
 .cafe .aka{font-size:13.5px;color:var(--caramel);font-weight:700}
@@ -364,7 +364,7 @@ footer .linkbtn{color:#fff}
 </main>
 
 <section class="sec" id="cafes-sec" hidden><div class="wrap">
-  <div class="sec-head"><div><h2>Café passport</h2><p id="cafes-sub">Walking times from Horchow Hall are rough.</p></div></div>
+  <div class="sec-head"><div><h2>Café passport</h2><p id="cafes-sub">Walking times are from Horchow Hall (55 Hillhouse Ave), roughly.</p></div></div>
   <div class="passport" id="cafes"></div>
 </div></section>
 
@@ -863,11 +863,11 @@ function renderCafes() {
   const went = {};
   if (S) for (const t of S.tables) if (t.cafe) went[t.cafe] = (went[t.cafe] || 0) + 1;
   const n = Object.keys(visited).length;
-  $("#cafes-sub").textContent = S ? `${n ? `${n} stamped so far. ` : "Have a coffee at one of these and it gets stamped. "}Walking times from Horchow Hall are rough.` : "Walking times from Horchow Hall are rough.";
+  $("#cafes-sub").textContent = S ? `${n ? `${n} stamped so far. ` : "Have a coffee at one of these and it gets stamped. "}Walking times are from Horchow Hall (55 Hillhouse Ave), roughly.` : "Walking times are from Horchow Hall (55 Hillhouse Ave), roughly.";
   $("#cafes").innerHTML = CAFES.slice().sort((a, b) => a.walk - b.walk).map((c, i) => {
     const v = visited[c.name];
     return `<div class="cafe">
-      <div class="seal ${v ? "inked" : ""}" style="--r:${[-8, 6, -4, 9, -6][i % 5]}deg">${v ? `<span><b>✓</b><small>${new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()}</small></span>` : `<span><b>${c.walk}</b><small>MIN WALK</small></span>`}</div>
+      <div class="seal ${v ? "inked" : ""}" style="--r:${[-8, 6, -4, 9, -6][i % 5]}deg">${v ? `<span><b>✓</b><small>${new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()}</small></span>` : `<span><b>${c.walk}</b><small>MIN FROM<br>HORCHOW</small></span>`}</div>
       <div><h3>${esc(c.name)}${c.points ? `<span class="chip">dining points</span>` : ""}</h3>${c.aka ? `<div class="aka">aka “${esc(c.aka)}”</div>` : ""}
         <p>${esc(c.about)}</p>${c.order ? `<div class="get"><b>Get:</b> ${esc(c.order)}</div>` : ""}
         <a class="addr" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ", " + c.address + ", New Haven, CT")}" target="_blank" rel="noopener">${esc(c.address)} ↗</a>
