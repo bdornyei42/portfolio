@@ -544,7 +544,7 @@ function renderSignin() {
   const el = $("#signin"), s = step;
   if (s.at === "phone") {
     el.innerHTML = `<h3>See your group</h3>
-      <p>Sign in with the number you use in the Jackson WhatsApp group. Add the country code if it isn't American.</p>
+      <p>Sign in with the number you use in the Jackson WhatsApp group. Add the country code if it isn't American, like +82 1012345678. Digits only is fine, no spaces or dashes needed.</p>
       <form id="f1" class="row"><label class="sr" for="ph">WhatsApp number</label>
         <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="+1 203 555 0123" value="${esc(s.phone)}" required>
         <button class="btn" type="submit">Go</button></form>
@@ -557,7 +557,7 @@ function renderSignin() {
     };
   } else if (s.at === "who") {
     el.innerHTML = `<h3>First time here</h3>
-      <p>That number isn't linked to anyone yet. Type your name and pick yourself.</p>
+      <p>Welcome! ${esc(s.phone)} isn't linked to a profile yet, which is normal the first time. Type your name below and tap yourself to link it.</p>
       <div class="row"><label class="sr" for="who">Your name</label><input id="who" type="text" placeholder="Your name" autocomplete="name"></div>
       <div class="picks" id="picks"></div><div class="err" id="e"></div>
       <p class="small" style="margin:8px 0 0">Not on the list? <button class="linkbtn" id="j" type="button">Join with your name</button>. Wrong number? <button class="linkbtn" id="b" type="button">Go back</button>.</p>`;
@@ -988,8 +988,12 @@ async function renderOrg() {
       <td>${m.phone ? `<a href="https://wa.me/${esc(m.phone.replace(/\D/g, ""))}" target="_blank" rel="noopener">${esc(fmtPhone(m.phone))}</a>` : `<span class="muted">none</span>`}</td>
       <td>${m.seen ? new Date(m.seen).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "never"}</td>
       <td><input type="checkbox" data-act="${esc(m.id)}" ${m.active ? "checked" : ""} aria-label="Matched every Monday"></td>
-      <td style="white-space:nowrap">${m.photo ? `<button class="linkbtn" data-nophoto="${esc(m.id)}" type="button">Remove photo</button> ` : ""}${m.phone && !m.admin ? `<button class="linkbtn" data-reset="${esc(m.id)}" type="button">Unlink number</button> ` : ""}${m.admin ? "" : `<button class="linkbtn" style="color:var(--tomato)" data-rm="${esc(m.id)}" type="button">Remove</button>`}</td></tr>`).join("");
+      <td style="white-space:nowrap">${!m.phone ? `<button class="linkbtn" data-link="${esc(m.id)}" type="button">Link number</button> ` : ""}${m.photo ? `<button class="linkbtn" data-nophoto="${esc(m.id)}" type="button">Remove photo</button> ` : ""}${m.phone && !m.admin ? `<button class="linkbtn" data-reset="${esc(m.id)}" type="button">Unlink number</button> ` : ""}${m.admin ? "" : `<button class="linkbtn" style="color:var(--tomato)" data-rm="${esc(m.id)}" type="button">Remove</button>`}</td></tr>`).join("");
     $("#org-rows").querySelectorAll("[data-act]").forEach((c) => c.onchange = () => post("/admin/member", { id: c.dataset.act, active: c.checked }).then(() => toast("Saved.")));
+    $("#org-rows").querySelectorAll("[data-link]").forEach((b) => b.onclick = async () => {
+      const v = prompt("Their WhatsApp number, with country code (e.g. +82 1012345678):"); if (!v) return;
+      try { await post("/admin/member", { id: b.dataset.link, setPhone: v }); toast("Linked. They can sign in with it now."); renderOrg(); } catch (er) { toast(er.message); }
+    });
     $("#org-rows").querySelectorAll("[data-nophoto]").forEach((b) => b.onclick = async () => { if (confirm("Remove this person's photo? It won't be added back.")) { await post("/admin/member", { id: b.dataset.nophoto, removePhoto: true }); S = await call("/me"); render(); } });
     $("#org-rows").querySelectorAll("[data-reset]").forEach((b) => b.onclick = async () => { if (confirm("Unlink this number? They can claim their name again.")) { await post("/admin/member", { id: b.dataset.reset, resetPhone: true }); renderOrg(); } });
     $("#org-rows").querySelectorAll("[data-rm]").forEach((b) => b.onclick = async () => { if (confirm("Remove them? They won't be matched anymore.")) { await post("/admin/member", { id: b.dataset.rm, remove: true }); renderOrg(); } });

@@ -74,7 +74,8 @@ const digits = (s) => String(s || "").replace(/\D/g, "");
 // what people type into the sign-in box: 10 digits with no + or 00 means a US/Canadian number
 function typedPhone(s) {
   const raw = String(s || "").trim(), d = digits(raw);
-  return d.length === 10 && !/^(\+|00)/.test(raw) ? "1" + d : d;
+  if (d.length === 10 && /^[2-9]/.test(d) && !/^00/.test(raw)) return "1" + d;
+  return d;
 }
 // unclaimed profiles whose name looks like the one being typed (to avoid duplicate people)
 function nameTokens(s) { return slug(s).split("-").filter((t) => t.length > 1); }
@@ -205,6 +206,10 @@ export class CoffeeClub extends DurableObject {
       this.sql.exec("ALTER TABLE groups ADD COLUMN chat_by TEXT");
     }
     // one-time: numbers typed as 10 digits before typedPhone() existed were US/Canadian without the 1
+    if (!this.q("SELECT v FROM meta WHERE k = 'fix_us_numbers_2'").length) {
+      this.sql.exec("UPDATE members SET phone = '1' || phone WHERE length(phone) = 10 AND substr(phone, 1, 1) BETWEEN '2' AND '9'");
+      this.sql.exec("INSERT INTO meta (k, v) VALUES ('fix_us_numbers_2', '1')");
+    }
     if (!this.q("SELECT v FROM meta WHERE k = 'fix_us_numbers'").length) {
       this.sql.exec("UPDATE members SET phone = '1' || phone WHERE length(phone) = 10 AND substr(phone, 1, 1) BETWEEN '2' AND '9'");
       this.sql.exec("INSERT INTO meta (k, v) VALUES ('fix_us_numbers', '1')");
@@ -343,7 +348,7 @@ export class CoffeeClub extends DurableObject {
   throttled(ip) {
     const hourAgo = Date.now() - 3600e3;
     this.sql.exec("DELETE FROM attempts WHERE ts < ?", hourAgo);
-    return (this.one("SELECT COUNT(*) AS n FROM attempts WHERE ip = ?", ip)?.n || 0) >= 25;
+    return (this.one("SELECT COUNT(*) AS n FROM attempts WHERE ip = ?", ip)?.n || 0) >= 300;
   }
   miss(ip) { this.sql.exec("INSERT INTO attempts (ip, ts) VALUES (?, ?)", ip, Date.now()); }
 
@@ -457,7 +462,6 @@ export class CoffeeClub extends DurableObject {
       const m = this.member(id);
       if (!m || m.admin) return err("Couldn't find that name.");
       if (m.phone) return err("That name is already linked to another number. Message Ben and he'll sort it out.");
-      this.miss(ip); // claims count toward the hourly limit too
       this.sql.exec("UPDATE members SET phone = ? WHERE id = ?", d, m.id);
       return this.startSession(m.id, { named: true });
     }
@@ -477,7 +481,6 @@ export class CoffeeClub extends DurableObject {
           .slice(0, 6).map((m) => ({ id: m.id, name: m.name, wa: m.wa !== m.name ? m.wa : "" }));
         if (matches.length) return json({ ok: false, reason: "maybe", matches });
       }
-      this.miss(ip);
       let id = slug(nm), k = 2;
       while (this.one("SELECT 1 AS x FROM members WHERE id = ?", id)) id = slug(nm) + "-" + k++;
       this.sql.exec("INSERT INTO members (id, name, wa, phone, joined) VALUES (?, ?, ?, ?, ?)", id, nm, nm, d, Date.now());
@@ -675,16 +678,27 @@ export class CoffeeClub extends DurableObject {
         if (name) this.sql.exec("UPDATE members SET name = ? WHERE id = ?", cleanName(name), b.id);
         this.sql.exec("UPDATE sessions SET member = ? WHERE member = ?", b.id, a.id);
         this.sql.exec("UPDATE photos SET owner = ? WHERE owner = ?", b.id, a.id);
-        for (const g of this.q("SELECT week, gid, members, done_by FROM groups")) {
+        const all = this.q("SELECT week, gid, members FROM groups");
+        const intoWeeks = new Set(all.filter((g) => JSON.parse(g.members).includes(b.id)).map((g) => g.week));
+        for (const g of all) {
           const ids = JSON.parse(g.members);
           if (!ids.includes(a.id)) continue;
-          const next = ids.includes(b.id) ? ids.filter((x) => x !== a.id) : ids.map((x) => (x === a.id ? b.id : x));
+          const next = intoWeeks.has(g.week) ? ids.filter((x) => x !== a.id) : ids.map((x) => (x === a.id ? b.id : x));
           this.sql.exec("UPDATE groups SET members = ?, done_by = CASE WHEN done_by = ? THEN ? ELSE done_by END WHERE week = ? AND gid = ?", JSON.stringify(next), a.id, b.id, g.week, g.gid);
         }
-        // if both sat in different groups this round, keep `into` where it was and drop the extra seat
-        const n = weekOf(), here = this.q("SELECT gid, members FROM groups WHERE week = ?", n).filter((g) => JSON.parse(g.members).includes(b.id));
-        if (here.length > 1) for (const g of here.slice(1)) this.sql.exec("UPDATE groups SET members = ? WHERE week = ? AND gid = ?", JSON.stringify(JSON.parse(g.members).filter((x) => x !== b.id)), n, g.gid);
         this.sql.exec("DELETE FROM members WHERE id = ?", a.id);
+        return json({ ok: true });
+      }
+      if (path === "/admin/move" && method === "POST") {
+        const { id, gid } = await body();
+        const n = weekOf(), m = this.member(id), target = this.one("SELECT members FROM groups WHERE week = ? AND gid = ?", n, +gid);
+        if (!m || !target) return err("No such person or group.");
+        for (const g of this.q("SELECT gid, members FROM groups WHERE week = ?", n)) {
+          const ids = JSON.parse(g.members);
+          if (ids.includes(m.id) && g.gid !== +gid) this.sql.exec("UPDATE groups SET members = ? WHERE week = ? AND gid = ?", JSON.stringify(ids.filter((x) => x !== m.id)), n, g.gid);
+        }
+        const t = JSON.parse(target.members);
+        if (!t.includes(m.id)) this.sql.exec("UPDATE groups SET members = ? WHERE week = ? AND gid = ?", JSON.stringify([...t, m.id]), n, +gid);
         return json({ ok: true });
       }
       if (path === "/admin/duplicates" && method === "GET") {
@@ -731,6 +745,13 @@ export class CoffeeClub extends DurableObject {
         if (b.name !== undefined) this.sql.exec("UPDATE members SET name = ? WHERE id = ?", cleanName(b.name), m.id);
         if (b.active !== undefined) this.sql.exec("UPDATE members SET active = ? WHERE id = ?", b.active ? 1 : 0, m.id);
         if (b.removePhoto) this.dropPhotos(m.id);
+        if (b.setPhone !== undefined) {
+          const d = typedPhone(b.setPhone);
+          if (d.length < 7) return err("That number is too short.");
+          const other = this.q("SELECT id, phone FROM members WHERE phone IS NOT NULL AND removed = 0 AND id != ?", m.id).find((x) => phoneMatch(x.phone, d));
+          if (other) return err("That number is already linked to someone else.");
+          this.sql.exec("UPDATE members SET phone = ? WHERE id = ?", d, m.id);
+        }
         if (b.resetPhone) { this.sql.exec("UPDATE members SET phone = NULL WHERE id = ?", m.id); this.sql.exec("DELETE FROM sessions WHERE member = ?", m.id); }
         if (b.remove && !m.admin) { this.sql.exec("UPDATE members SET removed = 1, active = 0 WHERE id = ?", m.id); this.sql.exec("DELETE FROM sessions WHERE member = ?", m.id); }
         return json({ ok: true });
