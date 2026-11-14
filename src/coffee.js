@@ -298,6 +298,43 @@ export class CoffeeClub extends DurableObject {
     return true;
   }
 
+  // Keep groups at three when people leave. A group is only touched if nobody in it has signed in
+  // since the round started and it hasn't met, made a chat or added photos (so nobody has been
+  // in contact yet). Pairs take one person from an untouched group of four; a lone person joins
+  // the smallest untouched group. Returns the number of moves.
+  rebalance(n = weekOf()) {
+    const w = weekInfo();
+    if (w.over || w.brk || n !== w.n) return 0;
+    const startTs = (R[n - 1].s * DAY) + 5 * 3600e3;
+    const seen = new Map(this.q("SELECT id, seen FROM members").map((m) => [m.id, m.seen || 0]));
+    const withPhotos = new Set(this.q("SELECT DISTINCT gid FROM photos WHERE week = ?", n).map((r) => r.gid));
+    const load = () => this.q("SELECT * FROM groups WHERE week = ?", n).map((g) => ({ ...g, ids: JSON.parse(g.members) }));
+    const untouched = (g) => !g.done_at && !g.chat && !withPhotos.has(g.gid) && g.ids.every((id) => seen.get(id) < startTs);
+    const save = (g) => this.sql.exec("UPDATE groups SET members = ? WHERE week = ? AND gid = ?", JSON.stringify(g.ids), n, g.gid);
+    const met = this.metMap(n);
+    const cost = (id, ids) => ids.reduce((s2, x) => s2 + (met.get(id < x ? id + "|" + x : x + "|" + id) || 0), 0);
+    let moves = 0;
+    for (let guard = 0; guard < 20; guard++) {
+      const gs = load();
+      const small = gs.find((g) => g.ids.length <= 2 && g.ids.length > 0 && untouched(g));
+      if (!small) break;
+      if (small.ids.length === 2) {
+        const big = gs.filter((g) => g.ids.length >= 4 && untouched(g))[0];
+        if (!big) break;
+        // move whoever from the four knows the pair least
+        const pick = big.ids.slice().sort((a, b) => cost(a, small.ids) - cost(b, small.ids))[0];
+        big.ids = big.ids.filter((x) => x !== pick); small.ids.push(pick);
+        save(big); save(small); moves++;
+      } else {
+        const lone = small.ids[0];
+        const target = gs.filter((g) => g.gid !== small.gid && g.ids.length && untouched(g)).sort((a, b) => a.ids.length - b.ids.length || cost(lone, a.ids) - cost(lone, b.ids))[0];
+        if (!target) break;
+        target.ids.push(lone); small.ids = []; save(target); save(small); moves++;
+      }
+    }
+    return moves;
+  }
+
   // Someone who joins mid-week sits down at the table where they know nobody.
   slotIn(id) {
     const w = weekInfo();
@@ -564,6 +601,7 @@ export class CoffeeClub extends DurableObject {
       this.sql.exec("DELETE FROM photos WHERE owner = ? OR owner = ?", viewer.id, "headshot:" + viewer.id);
       this.sql.exec("UPDATE members SET name = 'Former member', wa = '', phone = NULL, photo = NULL, jackson_photo = NULL, bio = '', interests = '[]', active = 0, removed = 1 WHERE id = ?", viewer.id);
       this.sql.exec("DELETE FROM sessions WHERE member = ?", viewer.id);
+      this.rebalance();
       return json({ ok: true }, 200, { "Set-Cookie": `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0` });
     }
 
@@ -687,6 +725,7 @@ export class CoffeeClub extends DurableObject {
           this.sql.exec("UPDATE groups SET members = ?, done_by = CASE WHEN done_by = ? THEN ? ELSE done_by END WHERE week = ? AND gid = ?", JSON.stringify(next), a.id, b.id, g.week, g.gid);
         }
         this.sql.exec("DELETE FROM members WHERE id = ?", a.id);
+        this.rebalance();
         return json({ ok: true });
       }
       if (path === "/admin/move" && method === "POST") {
@@ -701,6 +740,7 @@ export class CoffeeClub extends DurableObject {
         if (!t.includes(m.id)) this.sql.exec("UPDATE groups SET members = ? WHERE week = ? AND gid = ?", JSON.stringify([...t, m.id]), n, +gid);
         return json({ ok: true });
       }
+      if (path === "/admin/rebalance" && method === "POST") return json({ ok: true, moves: this.rebalance() });
       if (path === "/admin/duplicates" && method === "GET") {
         const ms = this.q("SELECT id, name, wa, phone, seen FROM members WHERE removed = 0 AND name != ''");
         const pairs = [];
@@ -753,7 +793,17 @@ export class CoffeeClub extends DurableObject {
           this.sql.exec("UPDATE members SET phone = ? WHERE id = ?", d, m.id);
         }
         if (b.resetPhone) { this.sql.exec("UPDATE members SET phone = NULL WHERE id = ?", m.id); this.sql.exec("DELETE FROM sessions WHERE member = ?", m.id); }
-        if (b.remove && !m.admin) { this.sql.exec("UPDATE members SET removed = 1, active = 0 WHERE id = ?", m.id); this.sql.exec("DELETE FROM sessions WHERE member = ?", m.id); }
+        if (b.remove && !m.admin) {
+          this.sql.exec("UPDATE members SET removed = 1, active = 0 WHERE id = ?", m.id);
+          this.sql.exec("DELETE FROM sessions WHERE member = ?", m.id);
+          // take them out of this round's group too (unless it already met), then even groups out
+          const w = weekInfo();
+          for (const g of this.q("SELECT gid, members, done_at FROM groups WHERE week = ?", w.n)) {
+            const ids = JSON.parse(g.members);
+            if (ids.includes(m.id) && !g.done_at && !w.over && !w.brk) this.sql.exec("UPDATE groups SET members = ? WHERE week = ? AND gid = ?", JSON.stringify(ids.filter((x) => x !== m.id)), w.n, g.gid);
+          }
+          this.rebalance();
+        }
         return json({ ok: true });
       }
       // redo this week's tables (keeps nothing from the old draw)
