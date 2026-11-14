@@ -57,6 +57,7 @@ h3{font-weight:700;font-size:21px;line-height:1.15}
 .me-btn:hover{border-color:var(--blue)}
 .me-btn .av{width:30px;height:30px;font-size:12px}
 @media (max-width:640px){ .brand b{font-size:19px} .top .pill{display:none} }
+@media (max-width:430px){ .brand b{font-size:17px} .brand img{width:28px} .me-btn span{display:none} .me-btn{padding:3px} }
 
 /* buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;background:var(--blue);color:#fff;border-radius:999px;padding:12px 20px;font-weight:700;font-size:16px;text-decoration:none;white-space:nowrap;box-shadow:0 3px 0 var(--navy);transition:transform .12s, box-shadow .12s}
@@ -214,14 +215,23 @@ button.center:hover,a.center:hover{transform:translate(-50%,-50%) rotate(-8deg) 
 .who-filled{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
 .who-filled span{font-size:13.5px;font-weight:700;border-radius:999px;padding:4px 10px;background:var(--cream-2);color:var(--ink-3)}
 .who-filled span.in{background:#e9f7ee;color:var(--mint)}
-.grid-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tgrid{display:grid;gap:3px;min-width:520px;user-select:none;-webkit-user-select:none}
+.tgrid{display:grid;gap:3px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.tgrid.painting .cell{cursor:crosshair}
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 10px}
+.daynav b{font:800 15px/1.2 var(--display);color:var(--navy);text-align:center}
+.daynav .btn{min-width:44px;font-size:20px;padding:6px 14px}
+.quick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 12px}
+.savebar{position:sticky;bottom:12px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:6px 6px 6px 16px;box-shadow:0 8px 20px -10px rgba(0,0,0,.35)}
+.savebar #save-state{font-weight:700;font-size:14.5px;color:var(--mint)}
+.savebar #save-state.warn{color:var(--tomato)}
+@media (hover:hover) and (pointer:fine){ .how{display:none} }
 .tgrid .dh{font:700 13px/1.15 var(--display);text-align:center;color:var(--navy);padding-bottom:4px}
 .tgrid .dh small{display:block;font:500 11.5px var(--body);color:var(--ink-3)}
 .tgrid{row-gap:1px}
 .tgrid .hl{font-size:12px;color:var(--ink-3);text-align:right;padding-right:6px;line-height:12px;height:11px;transform:translateY(-4px);white-space:nowrap}
 .cell.top{margin-top:4px}
-.cell{height:11px;border-radius:3px;background:#f4efe6;border:2px solid transparent;cursor:pointer;touch-action:none;position:relative}
+.cell{height:11px;border-radius:3px;background:#f4efe6;border:2px solid transparent;cursor:pointer;touch-action:pan-y;position:relative}
+@media (max-width:900px){ .cell{height:15px} .tgrid .hl{height:15px} }
 .cell[data-c="1"]{background:#f1dcbc}.cell[data-c="2"]{background:#d9a466}.cell.all{background:var(--mint)}
 .cell.free{border-color:var(--blue)}
 .cell.picked{box-shadow:inset 0 0 0 2px var(--navy)}
@@ -803,7 +813,12 @@ function interestsTile(g) {
 const SLOTS = Array.from({ length: 68 }, (_, i) => String(7 + Math.floor(i / 4)).padStart(2, "0") + ["00", "15", "30", "45"][i % 4]);
 const toMin = (hm) => +hm.slice(0, 2) * 60 + +hm.slice(2, 4);
 const fromMin = (m) => String(Math.floor(m / 60)).padStart(2, "0") + String(m % 60).padStart(2, "0");
-let planPage = 0, dragMode = null, draft = null, saveTimer = null;
+let planPage = 0, planG = null, mineSet = new Set(), dirty = false, saving = false, saveTimer = null;
+const perPage = () => (innerWidth < 560 ? 3 : innerWidth < 900 ? 5 : 7); // days per page: fits a phone, no sideways scroll
+const QUICK = [["Morning", "0800", "1100"], ["Lunch", "1130", "1330"], ["Afternoon", "1400", "1700"], ["Evening", "1800", "2100"]];
+let resizeT = null;
+addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (planG && $("#tgrid")) renderPlanner(planG); }, 250); });
+document.addEventListener("visibilitychange", () => { if (document.hidden && dirty) saveAvail(); });
 const nyToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
 const timeLabel = (hm) => { const h = +hm.slice(0, 2) % 24, m = hm.slice(2, 4); return `${((h + 11) % 12) + 1}${m !== "00" ? ":" + m : ""}${h < 12 ? "am" : "pm"}`; };
 const slotLabel = (k) => { const [d, hm] = k.split("|"); return `${day(d, { weekday: "short", month: "short", day: "numeric" })}, ${timeLabel(hm)}`; };
@@ -826,83 +841,166 @@ function planLinks(g) {
 function renderPlanner(g) {
   const box = $("#planner"), me = g.members.find((p) => p.me), n = g.members.length;
   const days = roundDays(S.week);
-  if (!days.length) { box.innerHTML = ""; return; }
-  const mine = new Set(draft || g.avail[me.id] || []);
-  const count = (k) => g.members.reduce((c, p) => c + ((p.me ? mine : new Set(g.avail[p.id] || [])).has(k) ? 1 : 0), 0);
-  const pages = Math.ceil(days.length / 7); planPage = Math.min(planPage, pages - 1);
-  const shown = days.slice(planPage * 7, planPage * 7 + 7);
-  const filled = g.members.map((p) => ({ p, ok: (p.me ? mine.size : (g.avail[p.id] || []).length) > 0 }));
-  // best times: everyone free first, then the most people
-  const hourFrom = (d, hm) => Math.min(...[0, 15, 30, 45].map((o) => { const q = fromMin(toMin(hm) + o); return SLOTS.includes(q) ? count(`${d}|${q}`) : 0; }));
-  const all = days.flatMap((d) => SLOTS.slice(0, -3).map((hm) => ({ k: `${d}|${hm}`, c: hourFrom(d, hm) }))).filter((x) => x.c >= 2);
-  all.sort((a, b) => b.c - a.c || a.k.localeCompare(b.k));
-  // don't suggest three overlapping starts in the same hour
-  const best = [];
-  for (const x of all) { if (best.length === 3) break; if (!best.some((b) => b.k.slice(0, 10) === x.k.slice(0, 10) && Math.abs(toMin(b.k.slice(11)) - toMin(x.k.slice(11))) < 60)) best.push(x); }
+  if (!days.length) { box.innerHTML = ""; planG = null; return; }
+  // keep unsaved marks across re-renders; otherwise start from what's saved
+  if (!dirty || !planG || planG.gid !== g.gid || planG.week !== g.week) { mineSet = new Set(g.avail[me.id] || []); dirty = false; }
+  planG = g;
+  const pp = perPage(), pages = Math.ceil(days.length / pp);
+  planPage = Math.max(0, Math.min(planPage, pages - 1));
+  const shown = days.slice(planPage * pp, planPage * pp + pp);
+  const dl = (d) => day(d, { weekday: "short", month: "short", day: "numeric" });
+  const span = shown.length > 1 ? `${dl(shown[0])} – ${dl(shown[shown.length - 1])}` : dl(shown[0]);
   const planned = g.plan ? (() => { const L = planLinks(g); return `<div class="planned"><h3>☕ ${esc(slotLabel(g.plan.at))}</h3>
       <p>${g.plan.place ? esc(g.plan.place) + ". " : ""}Picked by ${esc(g.plan.by || "your group")}.</p>
       <div class="acts"><a class="btn gold sm" href="${esc(L.gcal)}" target="_blank" rel="noopener">Add to Google Calendar</a>
         <button class="btn ghost sm" type="button" id="ics">Apple / Outlook (.ics)</button>
         <a class="btn wa sm" href="https://wa.me/?text=${encodeURIComponent(L.share)}" target="_blank" rel="noopener">${waIco}Share in WhatsApp</a>
         <button class="btn ghost sm" type="button" id="unplan">Change</button></div></div>`; })() : "";
+  const inPlan = (d, hm) => g.plan && g.plan.at.slice(0, 10) === d && toMin(hm) >= toMin(g.plan.at.slice(11)) && toMin(hm) < toMin(g.plan.at.slice(11)) + 60;
   box.innerHTML = `${planned}<div class="plan-card">
-    <div class="plan-head"><div><h3>Find a time</h3><p>Tap or drag over the times you're free (15-minute blocks) before ${esc(day(S.week.end, { weekday: "long", month: "short", day: "numeric" }))}. Green means all ${n} of you can make it.</p></div>
-      ${pages > 1 ? `<div class="pager"><button class="btn sm ghost" type="button" id="pg-prev" ${planPage ? "" : "disabled"}>‹</button><span class="small">${planPage + 1} / ${pages}</span><button class="btn sm ghost" type="button" id="pg-next" ${planPage < pages - 1 ? "" : "disabled"}>›</button></div>` : ""}</div>
-    <div class="who-filled">${filled.map(({ p, ok }) => `<span class="${ok ? "in" : ""}">${ok ? "✓ " : ""}${esc(p.me ? "You" : first(p))}${ok ? "" : " hasn't filled it in"}</span>`).join("")}</div>
-    <div class="grid-wrap"><div class="tgrid" id="tgrid" style="grid-template-columns:44px repeat(${shown.length},1fr)">
+    <div class="plan-head"><div><h3>Find a time</h3>
+      <p>Mark when you're free before ${esc(day(S.week.end, { weekday: "long", month: "short", day: "numeric" }))}. Green means all ${n} of you can make it.</p>
+      <p class="small muted how">Tap a block to mark it, or press and hold, then drag to mark a stretch. Swipe as usual to scroll.</p></div></div>
+    <div class="who-filled" id="who-filled"></div>
+    <div class="daynav">
+      <button class="btn sm ghost" type="button" id="pg-prev" ${planPage ? "" : "disabled"} aria-label="Earlier days">‹</button>
+      <b>${esc(span)}</b>
+      <button class="btn sm ghost" type="button" id="pg-next" ${planPage < pages - 1 ? "" : "disabled"} aria-label="Later days">›</button>
+    </div>
+    <div class="quick"><span class="small muted">Fill these days:</span>${QUICK.map(([l, a, b]) => `<button type="button" class="pick" data-q="${a}-${b}">${l}</button>`).join("")}<button type="button" class="pick" data-q="clear">Clear</button></div>
+    <div class="tgrid" id="tgrid" style="grid-template-columns:42px repeat(${shown.length},1fr)">
       <div></div>${shown.map((d) => `<div class="dh">${esc(day(d, { weekday: "short" }))}<small>${esc(day(d))}</small></div>`).join("")}
-      ${SLOTS.map((hm) => `<div class="hl">${hm.endsWith("00") ? timeLabel(hm) : ""}</div>` + shown.map((d) => { const k = `${d}|${hm}`, c = count(k);
-        const inPlan = g.plan && g.plan.at.slice(0, 10) === d && toMin(hm) >= toMin(g.plan.at.slice(11)) && toMin(hm) < toMin(g.plan.at.slice(11)) + 60;
-        return `<div class="cell ${hm.endsWith("00") ? "top" : ""} ${mine.has(k) ? "free" : ""} ${c === n ? "all" : ""} ${inPlan ? "picked" : ""} ${g.plan?.at === k ? "start" : ""}" data-k="${k}" data-c="${c}" title="${esc(slotLabel(k))}: ${c} of ${n} free"></div>`; }).join("")).join("")}
-    </div></div>
+      ${SLOTS.map((hm) => `<div class="hl">${hm.endsWith("00") ? timeLabel(hm) : ""}</div>` + shown.map((d) => `<div class="cell ${hm.endsWith("00") ? "top" : ""} ${inPlan(d, hm) ? "picked" : ""} ${g.plan?.at === `${d}|${hm}` ? "start" : ""}" data-k="${d}|${hm}"></div>`).join("")).join("")}
+    </div>
     <div class="legend"><span><i style="background:#f4efe6;border:2px solid var(--blue)"></i>you're free</span><span><i style="background:#f1dcbc"></i>1 free</span><span><i style="background:#d9a466"></i>2 free</span><span><i style="background:var(--mint)"></i>everyone</span></div>
-    ${best.length ? `<div class="best"><b class="small" style="color:var(--ink-3)">Best times</b>${best.map((x) => `<div class="opt"><span><b>${esc(slotLabel(x.k))}–${esc(timeLabel(fromMin(toMin(x.k.slice(11)) + 60)))}</b> <span class="small muted">${x.c === n ? "everyone" : x.c + " of " + n}</span></span>
-        <span style="display:flex;gap:8px;flex-wrap:wrap"><select data-place="${x.k}">${CAFES.map((c) => `<option ${c.name === (g.plan?.place || g.cafe) ? "selected" : ""}>${esc(c.name)}</option>`).join("")}<option value="">Decide later</option></select>
-        <button class="btn sm" type="button" data-pick="${x.k}">${g.plan?.at === x.k ? "Update" : "Pick this"}</button></span></div>`).join("")}</div>`
-      : `<p class="small muted" style="margin:14px 0 0">Once two of you mark your free hours, the best times show up here.</p>`}
+    <div class="savebar"><span id="save-state"></span><button class="btn sm" type="button" id="save-avail">Save my times</button></div>
+    <div id="best-box"></div>
   </div>`;
-  wirePlanner(g, mine);
+  const prev = $("#pg-prev"), next = $("#pg-next");
+  prev.onclick = () => { planPage--; renderPlanner(planG); $("#tgrid").scrollIntoView({ block: "nearest" }); };
+  next.onclick = () => { planPage++; renderPlanner(planG); $("#tgrid").scrollIntoView({ block: "nearest" }); };
+  $("#save-avail").onclick = () => saveAvail();
+  document.querySelectorAll("[data-q]").forEach((b) => b.onclick = () => quickFill(b.dataset.q, shown));
+  const un = $("#unplan"); if (un) un.onclick = async () => { try { S = await post("/plan", { week: g.week, gid: g.gid, at: "" }); render(); } catch (er) { toast(er.message); } };
+  const ics = $("#ics"); if (ics) ics.onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([planLinks(g).ics], { type: "text/calendar" })); a.download = "coffee.ics"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+  wireGrid();
+  refreshPlanner();
 }
-function wirePlanner(g, mine) {
-  const grid = $("#tgrid"), redraw = () => renderPlanner(g);
-  // when2meet-style: everything in the rectangle from where you pressed to where you are now
-  let startCell = null, before = null;
-  const pos = (c) => ({ d: c.dataset.k.slice(0, 10), h: toMin(c.dataset.k.slice(11)) });
-  const paint = (cur) => {
-    const a = pos(startCell), b = pos(cur);
-    const [d1, d2] = [a.d, b.d].sort(), [h1, h2] = [Math.min(a.h, b.h), Math.max(a.h, b.h)];
-    mine.clear(); before.forEach((k) => mine.add(k));
-    grid.querySelectorAll(".cell").forEach((c) => {
-      const p2 = pos(c);
-      if (p2.d >= d1 && p2.d <= d2 && p2.h >= h1 && p2.h <= h2) { if (dragMode === "add") mine.add(c.dataset.k); else mine.delete(c.dataset.k); }
-      c.classList.toggle("free", mine.has(c.dataset.k));
-    });
-    draft = [...mine];
-  };
-  const save = () => { clearTimeout(saveTimer); saveTimer = setTimeout(async () => {
-    try { S = await post("/avail", { week: g.week, gid: g.gid, slots: draft }); draft = null; renderPlanner(S.group); } catch (er) { toast(er.message); } }, 450); };
-  grid.addEventListener("pointerdown", (e) => { const c = e.target.closest(".cell"); if (!c) return; e.preventDefault();
-    startCell = c; before = new Set(mine); dragMode = mine.has(c.dataset.k) ? "remove" : "add"; paint(c); });
-  grid.addEventListener("pointermove", (e) => { if (!dragMode) return; const el = document.elementFromPoint(e.clientX, e.clientY); const c = el && el.closest && el.closest(".cell"); if (c && grid.contains(c)) paint(c); });
-  const end = (e) => { if (!dragMode) return;
-    const el = e && e.clientX != null ? document.elementFromPoint(e.clientX, e.clientY) : null; const c = el && el.closest && el.closest(".cell");
-    if (c && grid.contains(c)) paint(c);
-    dragMode = null; redraw(); save(); };
-  window.addEventListener("pointerup", end, { once: true });
-  grid.addEventListener("pointercancel", end);
-  const pp = $("#pg-prev"), pn = $("#pg-next");
-  if (pp) pp.onclick = () => { planPage--; redraw(); };
-  if (pn) pn.onclick = () => { planPage++; redraw(); };
+
+// recolor cells, who's filled in, save state and best times, without rebuilding the grid
+function refreshPlanner() {
+  const g = planG; if (!g || !$("#tgrid")) return;
+  const n = g.members.length, others = g.members.filter((p) => !p.me).map((p) => new Set(g.avail[p.id] || []));
+  const count = (k) => (mineSet.has(k) ? 1 : 0) + others.reduce((c, s2) => c + (s2.has(k) ? 1 : 0), 0);
+  for (const c of document.querySelectorAll("#tgrid .cell")) {
+    const k = c.dataset.k, v = String(count(k));
+    if (c.dataset.c !== v) c.dataset.c = v;
+    c.classList.toggle("all", +v === n);
+    c.classList.toggle("free", mineSet.has(k));
+  }
+  $("#who-filled").innerHTML = g.members.map((p) => { const ok = p.me ? (g.avail[p.id] || []).length > 0 : (g.avail[p.id] || []).length > 0;
+    return `<span class="${ok ? "in" : ""}">${ok ? "✓ " : ""}${esc(p.me ? "You" : first(p))}${ok ? "" : " hasn't saved times yet"}</span>`; }).join("");
+  const st = $("#save-state"), btn = $("#save-avail");
+  st.textContent = saving ? "Saving…" : dirty ? "Not saved yet" : (g.avail[g.members.find((p) => p.me).id] || []).length ? "Saved ✓" : "Nothing marked yet";
+  st.className = dirty ? "warn" : "";
+  btn.disabled = !dirty || saving;
+  // best times: one-hour windows where the most people (ideally everyone) are free
+  const days = roundDays(S.week);
+  const hourFrom = (d, hm) => Math.min(...[0, 15, 30, 45].map((o) => { const q = fromMin(toMin(hm) + o); return SLOTS.includes(q) ? count(`${d}|${q}`) : 0; }));
+  const all = days.flatMap((d) => SLOTS.slice(0, -3).map((hm) => ({ k: `${d}|${hm}`, c: hourFrom(d, hm) }))).filter((x) => x.c >= 2);
+  all.sort((a, b) => b.c - a.c || a.k.localeCompare(b.k));
+  const best = [];
+  for (const x of all) { if (best.length === 3) break; if (!best.some((b) => b.k.slice(0, 10) === x.k.slice(0, 10) && Math.abs(toMin(b.k.slice(11)) - toMin(x.k.slice(11))) < 60)) best.push(x); }
+  $("#best-box").innerHTML = best.length ? `<div class="best"><b class="small" style="color:var(--ink-3)">Best times</b>${best.map((x) => `<div class="opt"><span><b>${esc(slotLabel(x.k))}–${esc(timeLabel(fromMin(toMin(x.k.slice(11)) + 60)))}</b> <span class="small muted">${x.c === n ? "everyone" : x.c + " of " + n}</span></span>
+      <span style="display:flex;gap:8px;flex-wrap:wrap"><select data-place="${x.k}">${CAFES.map((c) => `<option ${c.name === (g.plan?.place || g.cafe) ? "selected" : ""}>${esc(c.name)}</option>`).join("")}<option value="">Decide later</option></select>
+      <button class="btn sm" type="button" data-pick="${x.k}">${g.plan?.at === x.k ? "Update" : "Pick this"}</button></span></div>`).join("")}</div>`
+    : `<p class="small muted" style="margin:14px 0 0">Once two of you save your free times, the best ones show up here.</p>`;
   document.querySelectorAll("[data-pick]").forEach((b) => b.onclick = async () => {
     const at = b.dataset.pick, place = document.querySelector(`[data-place="${at}"]`).value;
     try {
+      if (dirty) await saveAvail();
       S = await post("/plan", { week: g.week, gid: g.gid, at, place }); render();
       const m = S.mail || {};
       toast(m.sent ? `Locked in. Emailed ${m.sent} ${m.sent === 1 ? "person" : "people"}.` : "Locked in. Share it in your group chat.");
     } catch (er) { toast(er.message); }
   });
-  const un = $("#unplan"); if (un) un.onclick = async () => { try { S = await post("/plan", { week: g.week, gid: g.gid, at: "" }); render(); } catch (er) { toast(er.message); } };
-  const ics = $("#ics"); if (ics) ics.onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([planLinks(g).ics], { type: "text/calendar" })); a.download = "coffee.ics"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+}
+
+function markChanged() {
+  dirty = true; refreshPlanner();
+  clearTimeout(saveTimer); saveTimer = setTimeout(saveAvail, 2500);
+}
+async function saveAvail() {
+  const g = planG; if (!g || !dirty || saving) return;
+  clearTimeout(saveTimer); saving = true; refreshPlanner();
+  const snap = [...mineSet].sort().join(",");
+  try {
+    S = await post("/avail", { week: g.week, gid: g.gid, slots: [...mineSet] });
+    planG = S.group || g;
+    dirty = [...mineSet].sort().join(",") !== snap; // marked more while it was saving
+    if (dirty) saveTimer = setTimeout(saveAvail, 1500);
+  } catch (er) { toast(er.message); }
+  saving = false; refreshPlanner();
+}
+function quickFill(q, shown) {
+  const keys = q === "clear" ? shown.flatMap((d) => SLOTS.map((hm) => `${d}|${hm}`))
+    : (() => { const [a, b] = q.split("-").map(toMin); return shown.flatMap((d) => SLOTS.filter((hm) => toMin(hm) >= a && toMin(hm) < b).map((hm) => `${d}|${hm}`)); })();
+  const add = q !== "clear" && !keys.every((k) => mineSet.has(k));
+  for (const k of keys) { if (add) mineSet.add(k); else mineSet.delete(k); }
+  markChanged();
+}
+
+// tap toggles one block; mouse drag, or press-and-hold then drag on touch, paints a rectangle
+function wireGrid() {
+  const grid = $("#tgrid");
+  const cells = [...grid.querySelectorAll(".cell")].map((el) => ({ el, k: el.dataset.k, d: el.dataset.k.slice(0, 10), m: toMin(el.dataset.k.slice(11)) }));
+  const byEl = new Map(cells.map((c) => [c.el, c]));
+  let mode = null, start = null, before = null, hold = null, down = null, moved = false, raf = 0, pt = null;
+  const set = (c, on) => { if (on) mineSet.add(c.k); else mineSet.delete(c.k); c.el.classList.toggle("free", on); };
+  const paintTo = (cur) => {
+    const d1 = start.d < cur.d ? start.d : cur.d, d2 = start.d < cur.d ? cur.d : start.d;
+    const m1 = Math.min(start.m, cur.m), m2 = Math.max(start.m, cur.m);
+    for (const c of cells) {
+      const want = c.d >= d1 && c.d <= d2 && c.m >= m1 && c.m <= m2 ? mode === "add" : before.has(c.k);
+      if (mineSet.has(c.k) !== want) set(c, want);
+    }
+  };
+  // positions are measured once when painting starts (the page doesn't scroll while painting)
+  let rects = null;
+  const cellAt = (x, y) => {
+    if (!rects) return null;
+    let best = null, bd = Infinity;
+    for (let i = 0; i < cells.length; i++) {
+      const r = rects[i];
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return cells[i];
+      const dx = x < r.left ? r.left - x : x > r.right ? x - r.right : 0, dy = y < r.top ? r.top - y : y > r.bottom ? y - r.bottom : 0;
+      if (dx + dy < bd) { bd = dx + dy; best = cells[i]; } // in the gap between blocks: nearest one
+    }
+    return bd < 24 ? best : null;
+  };
+  const begin = (c) => { rects = cells.map((x) => x.el.getBoundingClientRect()); start = c; before = new Set(mineSet); mode = mineSet.has(c.k) ? "remove" : "add"; paintTo(c); grid.classList.add("painting"); try { navigator.vibrate && navigator.vibrate(8); } catch {} };
+  const stop = () => { if (mode) { mode = null; grid.classList.remove("painting"); markChanged(); } };
+  grid.addEventListener("pointerdown", (e) => {
+    const c = byEl.get(e.target.closest && e.target.closest(".cell")); if (!c) return;
+    down = { x: e.clientX, y: e.clientY, c }; moved = false;
+    if (e.pointerType === "mouse" || e.pointerType === "pen") { e.preventDefault(); grid.setPointerCapture(e.pointerId); begin(c); }
+    else hold = setTimeout(() => { hold = null; if (!moved) begin(c); }, 230);
+  });
+  grid.addEventListener("pointermove", (e) => {
+    if (down && !mode && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8) { moved = true; clearTimeout(hold); hold = null; }
+    if (!mode) return;
+    pt = { x: e.clientX, y: e.clientY };
+    if (!raf) raf = requestAnimationFrame(() => { raf = 0; const c = cellAt(pt.x, pt.y); if (c) paintTo(c); });
+  });
+  // while painting with a finger, don't scroll the page
+  grid.addEventListener("touchmove", (e) => { if (mode) e.preventDefault(); }, { passive: false });
+  grid.addEventListener("pointerup", (e) => {
+    if (hold) { clearTimeout(hold); hold = null; if (!moved && down) { set(down.c, !mineSet.has(down.c.k)); markChanged(); } }
+    else { if (mode) { const c = cellAt(e.clientX, e.clientY); if (c) paintTo(c); } stop(); }
+    down = null;
+  });
+  grid.addEventListener("pointercancel", () => { clearTimeout(hold); hold = null; stop(); down = null; });
+  grid.addEventListener("contextmenu", (e) => e.preventDefault());
 }
 
 // press and hold the mug: it fills up, and when it overflows your group is marked as met
