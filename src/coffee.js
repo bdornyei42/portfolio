@@ -221,6 +221,23 @@ export class CoffeeClub extends DurableObject {
       this.sql.exec("ALTER TABLE groups ADD COLUMN plan_place TEXT");
       this.sql.exec("ALTER TABLE groups ADD COLUMN plan_by TEXT");
     }
+    if (!this.q("SELECT v FROM meta WHERE k = 'half_hours'").length) {
+      for (const a of this.q("SELECT week, gid, member, slots FROM avail")) {
+        const out = new Set();
+        for (const k of JSON.parse(a.slots)) { if (/\|\d{2}$/.test(k)) { out.add(k + "00"); out.add(k + "30"); } else out.add(k); }
+        this.sql.exec("UPDATE avail SET slots = ? WHERE week = ? AND gid = ? AND member = ?", JSON.stringify([...out]), a.week, a.gid, a.member);
+      }
+      this.sql.exec("UPDATE groups SET plan_at = plan_at || '00' WHERE plan_at IS NOT NULL AND length(plan_at) = 13");
+      this.sql.exec("INSERT INTO meta (k, v) VALUES ('half_hours', '1')");
+    }
+    if (!this.q("SELECT v FROM meta WHERE k = 'quarter_hours'").length) {
+      for (const a of this.q("SELECT week, gid, member, slots FROM avail")) {
+        const out = new Set();
+        for (const k of JSON.parse(a.slots)) { out.add(k); if (/\|\d{2}00$/.test(k)) out.add(k.slice(0, -2) + "15"); if (/\|\d{2}30$/.test(k)) out.add(k.slice(0, -2) + "45"); }
+        this.sql.exec("UPDATE avail SET slots = ? WHERE week = ? AND gid = ? AND member = ?", JSON.stringify([...out]), a.week, a.gid, a.member);
+      }
+      this.sql.exec("INSERT INTO meta (k, v) VALUES ('quarter_hours', '1')");
+    }
     if (!this.q("PRAGMA table_info(groups)").some((c) => c.name === "coord"))
       this.sql.exec("ALTER TABLE groups ADD COLUMN coord TEXT");
     if (!this.q("PRAGMA table_info(members)").some((c) => c.name === "email")) {
@@ -307,12 +324,13 @@ export class CoffeeClub extends DurableObject {
     const to = people.filter((m) => m.notify && m.email).map((m) => m.email);
     if (!to.length) return { sent: 0 };
     if (!this.env.EMAIL) return { sent: 0, error: "Email isn't set up on the site yet." };
-    const [d, hh] = g.plan_at.split("|"), h = +hh;
-    const when = new Date(d + "T12:00:00Z").toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric" }) + ` at ${((h + 11) % 12) + 1}${h < 12 ? "am" : "pm"}`;
-    const stamp = (hr) => d.replace(/-/g, "") + "T" + String(hr).padStart(2, "0") + "0000";
+    const [d, hm] = g.plan_at.split("|"), h = +hm.slice(0, 2), mi = +hm.slice(2, 4) || 0;
+    const when = new Date(d + "T12:00:00Z").toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric" }) + ` at ${((h + 11) % 12) + 1}${mi ? ":" + String(mi).padStart(2, "0") : ""}${h < 12 ? "am" : "pm"}`;
+    // an hour from the picked start
+    const stamp = (mins) => d.replace(/-/g, "") + "T" + String(Math.floor(mins / 60)).padStart(2, "0") + String(mins % 60).padStart(2, "0") + "00";
     const place = g.plan_place || "a café you pick together";
     const gcal = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent("Coffee: " + people.map((m) => m.name.split(" ")[0]).join(", ")) +
-      "&dates=" + stamp(h) + "/" + stamp(h + 1) + "&ctz=America/New_York&location=" + encodeURIComponent(g.plan_place ? g.plan_place + ", New Haven, CT" : "New Haven, CT") +
+      "&dates=" + stamp(h * 60 + mi) + "/" + stamp(h * 60 + mi + 60) + "&ctz=America/New_York&location=" + encodeURIComponent(g.plan_place ? g.plan_place + ", New Haven, CT" : "New Haven, CT") +
       "&details=" + encodeURIComponent("Jackson Coffee Buddies, round " + week + ". https://dornyei.com/jackson-coffee-buddies");
     const h2 = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
     const names = people.map((m) => m.name).join(", ");
@@ -770,7 +788,7 @@ export class CoffeeClub extends DurableObject {
       if (!g || !JSON.parse(g.members).includes(viewer.id)) return err("Not your group.", 403);
       const r = weekRange(+week);
       const clean = [...new Set((Array.isArray(slots) ? slots : []).map(String))]
-        .filter((k) => /^\d{4}-\d{2}-\d{2}\|\d{2}$/.test(k) && k.slice(0, 10) >= r.start && k.slice(0, 10) <= r.end).slice(0, 400);
+        .filter((k) => /^\d{4}-\d{2}-\d{2}\|\d{2}(00|15|30|45)$/.test(k) && k.slice(0, 10) >= r.start && k.slice(0, 10) <= r.end).slice(0, 1800);
       this.sql.exec("INSERT INTO avail (week, gid, member, slots) VALUES (?, ?, ?, ?) ON CONFLICT(week, gid, member) DO UPDATE SET slots = excluded.slots", +week, +gid, viewer.id, JSON.stringify(clean));
       return json(this.me(this.fresh(viewer)));
     }
@@ -780,7 +798,7 @@ export class CoffeeClub extends DurableObject {
       const g = this.one("SELECT * FROM groups WHERE week = ? AND gid = ?", +week, +gid);
       if (!g || (!JSON.parse(g.members).includes(viewer.id) && !viewer.admin)) return err("Not your group.", 403);
       if (!at) { this.sql.exec("UPDATE groups SET plan_at = NULL, plan_place = NULL, plan_by = NULL WHERE week = ? AND gid = ?", +week, +gid); return json(this.me(this.fresh(viewer))); }
-      if (!/^\d{4}-\d{2}-\d{2}\|\d{2}$/.test(String(at))) return err("Pick a time from the grid.");
+      if (!/^\d{4}-\d{2}-\d{2}\|\d{2}(00|15|30|45)$/.test(String(at))) return err("Pick a time from the grid.");
       const pl = String(place || "").replace(/[<>]/g, "").slice(0, 80);
       this.sql.exec("UPDATE groups SET plan_at = ?, plan_place = ?, plan_by = ?, cafe = CASE WHEN ? != '' THEN ? ELSE cafe END WHERE week = ? AND gid = ?", String(at), pl, viewer.id, pl, pl, +week, +gid);
       const mail = await this.mailPlan(+week, +gid);

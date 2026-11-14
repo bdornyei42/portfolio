@@ -218,11 +218,14 @@ button.center:hover,a.center:hover{transform:translate(-50%,-50%) rotate(-8deg) 
 .tgrid{display:grid;gap:3px;min-width:520px;user-select:none;-webkit-user-select:none}
 .tgrid .dh{font:700 13px/1.15 var(--display);text-align:center;color:var(--navy);padding-bottom:4px}
 .tgrid .dh small{display:block;font:500 11.5px var(--body);color:var(--ink-3)}
-.tgrid .hl{font-size:12px;color:var(--ink-3);text-align:right;padding-right:6px;line-height:26px}
-.cell{height:26px;border-radius:5px;background:#f4efe6;border:2px solid transparent;cursor:pointer;touch-action:none;position:relative}
+.tgrid{row-gap:1px}
+.tgrid .hl{font-size:12px;color:var(--ink-3);text-align:right;padding-right:6px;line-height:12px;height:11px;transform:translateY(-4px);white-space:nowrap}
+.cell.top{margin-top:4px}
+.cell{height:11px;border-radius:3px;background:#f4efe6;border:2px solid transparent;cursor:pointer;touch-action:none;position:relative}
 .cell[data-c="1"]{background:#f1dcbc}.cell[data-c="2"]{background:#d9a466}.cell.all{background:var(--mint)}
 .cell.free{border-color:var(--blue)}
-.cell.picked::after{content:"☕";position:absolute;inset:0;display:grid;place-items:center;font-size:13px}
+.cell.picked{box-shadow:inset 0 0 0 2px var(--navy)}
+.cell.start::after{content:"";position:absolute;left:3px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--navy)}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink-3);margin-top:10px;align-items:center}
 .legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
 .pager{display:flex;gap:6px;align-items:center}
@@ -793,23 +796,26 @@ function interestsTile(g) {
 }
 
 // ----- find a time: when2meet-style grid for the round (New York time) -----
-const HOURS = Array.from({ length: 13 }, (_, i) => 8 + i); // start times 8am..8pm
+// 15-minute slots, 8:00am to 8:45pm (keys "YYYY-MM-DD|HHMM", New York time)
+const SLOTS = Array.from({ length: 52 }, (_, i) => String(8 + Math.floor(i / 4)).padStart(2, "0") + ["00", "15", "30", "45"][i % 4]);
+const toMin = (hm) => +hm.slice(0, 2) * 60 + +hm.slice(2, 4);
+const fromMin = (m) => String(Math.floor(m / 60)).padStart(2, "0") + String(m % 60).padStart(2, "0");
 let planPage = 0, dragMode = null, draft = null, saveTimer = null;
 const nyToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
-const hourLabel = (h) => `${((h + 11) % 12) + 1}${h < 12 ? "am" : "pm"}`;
-const slotLabel = (k) => { const [d, h] = k.split("|"); return `${day(d, { weekday: "short", month: "short", day: "numeric" })}, ${hourLabel(+h)}`; };
+const timeLabel = (hm) => { const h = +hm.slice(0, 2), m = hm.slice(2, 4); return `${((h + 11) % 12) + 1}${m !== "00" ? ":" + m : ""}${h < 12 ? "am" : "pm"}`; };
+const slotLabel = (k) => { const [d, hm] = k.split("|"); return `${day(d, { weekday: "short", month: "short", day: "numeric" })}, ${timeLabel(hm)}`; };
 function roundDays(w) {
   const out = [], start = w.start > nyToday() ? w.start : nyToday();
   for (let t = Date.parse(start + "T12:00:00Z"); t <= Date.parse(w.end + "T12:00:00Z"); t += 864e5) out.push(new Date(t).toISOString().slice(0, 10));
   return out;
 }
 function planLinks(g) {
-  const [d, hh] = g.plan.at.split("|"), h = +hh, st = (x) => d.replace(/-/g, "") + "T" + String(x).padStart(2, "0") + "0000";
+  const [d, hm] = g.plan.at.split("|"), m0 = toMin(hm), st = (m) => d.replace(/-/g, "") + "T" + fromMin(m) + "00";
   const title = "Coffee: " + g.members.map(first).join(", ");
   const where = g.plan.place ? g.plan.place + ", New Haven, CT" : "New Haven, CT";
-  const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${st(h)}/${st(h + 1)}&ctz=America/New_York&location=${encodeURIComponent(where)}&details=${encodeURIComponent("Jackson Coffee Buddies. https://dornyei.com/jackson-coffee-buddies")}`;
+  const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${st(m0)}/${st(m0 + 60)}&ctz=America/New_York&location=${encodeURIComponent(where)}&details=${encodeURIComponent("Jackson Coffee Buddies. https://dornyei.com/jackson-coffee-buddies")}`;
   const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Jackson Coffee Buddies//EN", "BEGIN:VEVENT", `UID:coffee-${g.week}-${g.gid}@dornyei.com`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`,
-    `DTSTART;TZID=America/New_York:${st(h)}`, `DTEND;TZID=America/New_York:${st(h + 1)}`, `SUMMARY:${title}`, `LOCATION:${where}`, "DESCRIPTION:Jackson Coffee Buddies", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    `DTSTART;TZID=America/New_York:${st(m0)}`, `DTEND;TZID=America/New_York:${st(m0 + 60)}`, `SUMMARY:${title}`, `LOCATION:${where}`, "DESCRIPTION:Jackson Coffee Buddies", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
   const share = `Coffee is on: ${slotLabel(g.plan.at)}${g.plan.place ? " at " + g.plan.place : ""}. See you there!`;
   return { gcal, ics, share };
 }
@@ -823,9 +829,12 @@ function renderPlanner(g) {
   const shown = days.slice(planPage * 7, planPage * 7 + 7);
   const filled = g.members.map((p) => ({ p, ok: (p.me ? mine.size : (g.avail[p.id] || []).length) > 0 }));
   // best times: everyone free first, then the most people
-  const all = days.flatMap((d) => HOURS.map((h) => `${d}|${String(h).padStart(2, "0")}`)).map((k) => ({ k, c: count(k) })).filter((x) => x.c >= 2);
+  const hourFrom = (d, hm) => Math.min(...[0, 15, 30, 45].map((o) => { const q = fromMin(toMin(hm) + o); return SLOTS.includes(q) ? count(`${d}|${q}`) : 0; }));
+  const all = days.flatMap((d) => SLOTS.slice(0, -3).map((hm) => ({ k: `${d}|${hm}`, c: hourFrom(d, hm) }))).filter((x) => x.c >= 2);
   all.sort((a, b) => b.c - a.c || a.k.localeCompare(b.k));
-  const best = all.slice(0, 3);
+  // don't suggest three overlapping starts in the same hour
+  const best = [];
+  for (const x of all) { if (best.length === 3) break; if (!best.some((b) => b.k.slice(0, 10) === x.k.slice(0, 10) && Math.abs(toMin(b.k.slice(11)) - toMin(x.k.slice(11))) < 60)) best.push(x); }
   const planned = g.plan ? (() => { const L = planLinks(g); return `<div class="planned"><h3>☕ ${esc(slotLabel(g.plan.at))}</h3>
       <p>${g.plan.place ? esc(g.plan.place) + ". " : ""}Picked by ${esc(g.plan.by || "your group")}.</p>
       <div class="acts"><a class="btn gold sm" href="${esc(L.gcal)}" target="_blank" rel="noopener">Add to Google Calendar</a>
@@ -833,16 +842,17 @@ function renderPlanner(g) {
         <a class="btn wa sm" href="https://wa.me/?text=${encodeURIComponent(L.share)}" target="_blank" rel="noopener">${waIco}Share in WhatsApp</a>
         <button class="btn ghost sm" type="button" id="unplan">Change</button></div></div>`; })() : "";
   box.innerHTML = `${planned}<div class="plan-card">
-    <div class="plan-head"><div><h3>Find a time</h3><p>Tap or drag over the hours you're free before ${esc(day(S.week.end, { weekday: "long", month: "short", day: "numeric" }))}. Green means all ${n} of you can make it.</p></div>
+    <div class="plan-head"><div><h3>Find a time</h3><p>Tap or drag over the times you're free (15-minute blocks) before ${esc(day(S.week.end, { weekday: "long", month: "short", day: "numeric" }))}. Green means all ${n} of you can make it.</p></div>
       ${pages > 1 ? `<div class="pager"><button class="btn sm ghost" type="button" id="pg-prev" ${planPage ? "" : "disabled"}>‹</button><span class="small">${planPage + 1} / ${pages}</span><button class="btn sm ghost" type="button" id="pg-next" ${planPage < pages - 1 ? "" : "disabled"}>›</button></div>` : ""}</div>
     <div class="who-filled">${filled.map(({ p, ok }) => `<span class="${ok ? "in" : ""}">${ok ? "✓ " : ""}${esc(p.me ? "You" : first(p))}${ok ? "" : " hasn't filled it in"}</span>`).join("")}</div>
     <div class="grid-wrap"><div class="tgrid" id="tgrid" style="grid-template-columns:44px repeat(${shown.length},1fr)">
       <div></div>${shown.map((d) => `<div class="dh">${esc(day(d, { weekday: "short" }))}<small>${esc(day(d))}</small></div>`).join("")}
-      ${HOURS.map((h) => `<div class="hl">${hourLabel(h)}</div>` + shown.map((d) => { const k = `${d}|${String(h).padStart(2, "0")}`, c = count(k);
-        return `<div class="cell ${mine.has(k) ? "free" : ""} ${c === n ? "all" : ""} ${g.plan?.at === k ? "picked" : ""}" data-k="${k}" data-c="${c}" title="${esc(slotLabel(k))}: ${c} of ${n} free"></div>`; }).join("")).join("")}
+      ${SLOTS.map((hm) => `<div class="hl">${hm.endsWith("00") ? timeLabel(hm) : ""}</div>` + shown.map((d) => { const k = `${d}|${hm}`, c = count(k);
+        const inPlan = g.plan && g.plan.at.slice(0, 10) === d && toMin(hm) >= toMin(g.plan.at.slice(11)) && toMin(hm) < toMin(g.plan.at.slice(11)) + 60;
+        return `<div class="cell ${hm.endsWith("00") ? "top" : ""} ${mine.has(k) ? "free" : ""} ${c === n ? "all" : ""} ${inPlan ? "picked" : ""} ${g.plan?.at === k ? "start" : ""}" data-k="${k}" data-c="${c}" title="${esc(slotLabel(k))}: ${c} of ${n} free"></div>`; }).join("")).join("")}
     </div></div>
     <div class="legend"><span><i style="background:#f4efe6;border:2px solid var(--blue)"></i>you're free</span><span><i style="background:#f1dcbc"></i>1 free</span><span><i style="background:#d9a466"></i>2 free</span><span><i style="background:var(--mint)"></i>everyone</span></div>
-    ${best.length ? `<div class="best"><b class="small" style="color:var(--ink-3)">Best times</b>${best.map((x) => `<div class="opt"><span><b>${esc(slotLabel(x.k))}</b> <span class="small muted">${x.c === n ? "everyone" : x.c + " of " + n}</span></span>
+    ${best.length ? `<div class="best"><b class="small" style="color:var(--ink-3)">Best times</b>${best.map((x) => `<div class="opt"><span><b>${esc(slotLabel(x.k))}–${esc(timeLabel(fromMin(toMin(x.k.slice(11)) + 60)))}</b> <span class="small muted">${x.c === n ? "everyone" : x.c + " of " + n}</span></span>
         <span style="display:flex;gap:8px;flex-wrap:wrap"><select data-place="${x.k}">${CAFES.map((c) => `<option ${c.name === (g.plan?.place || g.cafe) ? "selected" : ""}>${esc(c.name)}</option>`).join("")}<option value="">Decide later</option></select>
         <button class="btn sm" type="button" data-pick="${x.k}">${g.plan?.at === x.k ? "Update" : "Pick this"}</button></span></div>`).join("")}</div>`
       : `<p class="small muted" style="margin:14px 0 0">Once two of you mark your free hours, the best times show up here.</p>`}
@@ -853,7 +863,7 @@ function wirePlanner(g, mine) {
   const grid = $("#tgrid"), redraw = () => renderPlanner(g);
   // when2meet-style: everything in the rectangle from where you pressed to where you are now
   let startCell = null, before = null;
-  const pos = (c) => ({ d: c.dataset.k.slice(0, 10), h: +c.dataset.k.slice(11) });
+  const pos = (c) => ({ d: c.dataset.k.slice(0, 10), h: toMin(c.dataset.k.slice(11)) });
   const paint = (cur) => {
     const a = pos(startCell), b = pos(cur);
     const [d1, d2] = [a.d, b.d].sort(), [h1, h2] = [Math.min(a.h, b.h), Math.max(a.h, b.h)];
