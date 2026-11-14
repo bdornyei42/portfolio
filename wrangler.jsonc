@@ -57,6 +57,10 @@
   },
   "migrations": [{ "tag": "coffee-v1", "new_sqlite_classes": ["CoffeeClub"] }],
 
+  // Cloudflare Email Sending: Coffee Buddies emails the organizer each round's groups
+  // (from coffee@dornyei.com). dornyei.com must be onboarded to Email Sending in the dashboard.
+  "send_email": [{ "name": "EMAIL" }],
+
   "assets": {
     "directory": "./site",
     "binding": "ASSETS",

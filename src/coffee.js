@@ -197,6 +197,10 @@ export class CoffeeClub extends DurableObject {
       this.sql.exec("ALTER TABLE groups ADD COLUMN chat TEXT");
       this.sql.exec("ALTER TABLE groups ADD COLUMN chat_by TEXT");
     }
+    if (!this.q("PRAGMA table_info(members)").some((c) => c.name === "no_photo"))
+      this.sql.exec("ALTER TABLE members ADD COLUMN no_photo INTEGER NOT NULL DEFAULT 0");
+    if (!this.q("PRAGMA table_info(members)").some((c) => c.name === "interests"))
+      this.sql.exec("ALTER TABLE members ADD COLUMN interests TEXT NOT NULL DEFAULT '[]'");
     if (!this.q("PRAGMA table_info(sessions)").some((c) => c.name === "admin"))
       this.sql.exec("ALTER TABLE sessions ADD COLUMN admin INTEGER NOT NULL DEFAULT 0");
   }
@@ -206,6 +210,51 @@ export class CoffeeClub extends DurableObject {
   one(query, ...args) { return this.q(query, ...args)[0] || null; }
   member(id) { return this.one("SELECT * FROM members WHERE id = ? AND removed = 0", id); }
   // re-read a member after an edit, keeping this session's organizer flag
+  getMeta(k) { return this.one("SELECT v FROM meta WHERE k = ?", k)?.v ?? null; }
+  setMeta(k, v) { this.sql.exec("INSERT INTO meta (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v", k, v); }
+
+  // Email the organizer the new groups (names, numbers, WhatsApp links) so they can tell people.
+  // Needs the send_email binding (EMAIL) and dornyei.com onboarded to Cloudflare Email Sending;
+  // the address lives in this object's meta table (set from the organizer panel), not in the repo.
+  async notifyRound(n, why = "new") {
+    const to = this.getMeta("notify_email");
+    if (!to) return { sent: false, error: "No email address set." };
+    if (!this.env.EMAIL) return { sent: false, error: "Email isn't set up on the site yet (no EMAIL binding)." };
+    if (why === "new" && this.getMeta("notified:" + n)) return { sent: false, error: "Already sent for this round." };
+    const people = new Map(this.q("SELECT * FROM members").map((m) => [m.id, m]));
+    const groups = this.q("SELECT * FROM groups WHERE week = ? ORDER BY gid", n).map((g) => JSON.parse(g.members).map((id) => people.get(id)).filter(Boolean));
+    if (!groups.length) return { sent: false, error: "No groups this round." };
+    const r = weekRange(n), url = "https://dornyei.com/jackson-coffee-buddies";
+    const fmt = (d) => { const x = String(d); return x.length === 11 && x[0] === "1" ? `+1 (${x.slice(1, 4)}) ${x.slice(4, 7)}-${x.slice(7)}` : "+" + x; };
+    const h = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    const withNums = groups.flat().filter((m) => m.phone).length, total = groups.flat().length;
+    const paste = `Round ${n} of Jackson Coffee Buddies is up (${r.start} to ${r.end}). See your group and say hi: ${url}`;
+    const title = why === "test" ? `Coffee Buddies round ${n}: this round's groups` : why === "reshuffled" ? `Coffee Buddies round ${n}: groups were redone` : `Coffee Buddies round ${n}: ${groups.length} new groups`;
+    const text = [title, `${r.start} to ${r.end}. ${withNums} of ${total} people have a number linked.`, "", "Paste in the Jackson group:", paste, "",
+      ...groups.map((g, i) => `${i + 1}. ` + g.map((m) => `${m.name}${m.phone ? " " + fmt(m.phone) : " (no number yet)"}`).join(", "))].join("\n");
+    const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1f1a17;max-width:640px">
+      <h2 style="color:#3152a4;margin:0 0 4px">${h(title)}</h2>
+      <p style="margin:0 0 14px;color:#5a5048">${h(r.start)} to ${h(r.end)}. ${withNums} of ${total} people have a number linked.</p>
+      <p style="margin:0 0 4px"><b>Paste in the Jackson group:</b></p>
+      <p style="background:#f3ead8;padding:10px 12px;border-radius:8px;margin:0 0 18px">${h(paste)}</p>
+      <table style="border-collapse:collapse;width:100%">${groups.map((g, i) => `<tr><td style="padding:8px 8px 8px 0;border-top:1px solid #e6dccb;vertical-align:top;color:#8d8278">${i + 1}</td><td style="padding:8px 0;border-top:1px solid #e6dccb">${g.map((m) => m.phone
+        ? `<a href="https://wa.me/${m.phone}" style="color:#1f8f4e;font-weight:bold;text-decoration:none">${h(m.name)}</a> <span style="color:#8d8278">${h(fmt(m.phone))}</span>`
+        : `<b>${h(m.name)}</b> <span style="color:#8d8278">(no number yet)</span>`).join("<br>")}</td></tr>`).join("")}</table>
+      <p style="margin-top:18px;color:#8d8278;font-size:13px">Sent by ${h(url)}. Change or turn off these emails in the organizer section of the page.</p></div>`;
+    try {
+      await this.env.EMAIL.send({ to, from: { email: "coffee@dornyei.com", name: "Jackson Coffee Buddies" }, subject: title, html, text });
+      if (why === "new") this.setMeta("notified:" + n, String(Date.now()));
+      return { sent: true };
+    } catch (e) {
+      return { sent: false, error: String(e?.message || e) };
+    }
+  }
+
+  // take down every photo of a member (their upload and any headshot found online), for good
+  dropPhotos(id) {
+    this.sql.exec("DELETE FROM photos WHERE week IS NULL AND (owner = ? OR owner = ?)", id, "headshot:" + id);
+    this.sql.exec("UPDATE members SET photo = NULL, jackson_photo = NULL, no_photo = 1 WHERE id = ?", id);
+  }
   fresh(viewer) { return { ...this.member(viewer.id), admin: viewer.admin }; }
 
   metMap(exceptWeek = -1) {
@@ -254,7 +303,7 @@ export class CoffeeClub extends DurableObject {
   }
 
   async alarm() {
-    this.ensureWeek();
+    if (this.ensureWeek()) await this.notifyRound(weekOf());
     const nx = nextMondayTs();
     if (nx) await this.ctx.storage.setAlarm(nx);
   }
@@ -297,6 +346,7 @@ export class CoffeeClub extends DurableObject {
       photo: m.photo ? `/api/coffee/img/${m.photo}` : m.jackson_photo || null,
       bio: m.bio || "", me: viewer ? m.id === viewer.id : undefined,
       phone: see ? "+" + m.phone : null, signedUp: !!m.phone,
+      interests: (() => { try { return JSON.parse(m.interests || "[]"); } catch { return []; } })(),
     };
   }
   groupView(g, viewer, people) {
@@ -343,6 +393,7 @@ export class CoffeeClub extends DurableObject {
   // ----- request router -----
   async fetch(request) {
     await this.ensureAlarm();
+    if (this.ensureWeek()) this.ctx.waitUntil(this.notifyRound(weekOf()));
     const url = new URL(request.url);
     const path = url.pathname.replace(/^\/api\/coffee/, "") || "/";
     const method = request.method;
@@ -439,7 +490,7 @@ export class CoffeeClub extends DurableObject {
           added++;
         } else {
           // names are only corrected for people who haven't signed in (and so haven't picked their own)
-          this.sql.exec("UPDATE members SET phone = COALESCE(phone, ?), jackson_photo = CASE WHEN jackson_photo LIKE '/api/%' THEN jackson_photo ELSE COALESCE(?, jackson_photo) END, admin = ?, wa = ?, name = CASE WHEN seen IS NULL AND ? != '' THEN ? ELSE name END WHERE id = ?",
+          this.sql.exec("UPDATE members SET phone = COALESCE(phone, ?), jackson_photo = CASE WHEN no_photo = 1 OR jackson_photo LIKE '/api/%' THEN jackson_photo ELSE COALESCE(?, jackson_photo) END, admin = ?, wa = ?, name = CASE WHEN seen IS NULL AND ? != '' THEN ? ELSE name END WHERE id = ?",
             r.phone ? digits(r.phone) : null, r.jackson_photo || null, r.admin ? 1 : 0, cleanName(r.wa || ex.wa), cleanName(r.name), cleanName(r.name), r.id);
           updated++;
         }
@@ -452,8 +503,9 @@ export class CoffeeClub extends DurableObject {
     if (path === "/admin/memberphoto" && method === "POST") {
       const auth = request.headers.get("Authorization") || "";
       if (!this.env.COFFEE_ADMIN_TOKEN || auth !== "Bearer " + this.env.COFFEE_ADMIN_TOKEN) return err("forbidden", 403);
-      const m = this.one("SELECT id, jackson_photo FROM members WHERE id = ? AND removed = 0", url.searchParams.get("id"));
+      const m = this.one("SELECT id, jackson_photo, no_photo FROM members WHERE id = ? AND removed = 0", url.searchParams.get("id"));
       if (!m) return err("no such member", 404);
+      if (m.no_photo) return json({ ok: true, skipped: "photo was taken down" });
       const mime = (request.headers.get("Content-Type") || "").split(";")[0];
       if (!/^image\/(jpeg|png|webp)$/.test(mime)) return err("image only");
       const data = await request.arrayBuffer();
@@ -488,7 +540,7 @@ export class CoffeeClub extends DurableObject {
         this.sql.exec("UPDATE groups SET members = ? WHERE week = ? AND gid = ?", JSON.stringify(rest), g.week, g.gid);
       }
       this.sql.exec("DELETE FROM photos WHERE owner = ? OR owner = ?", viewer.id, "headshot:" + viewer.id);
-      this.sql.exec("UPDATE members SET name = 'Former member', wa = '', phone = NULL, photo = NULL, jackson_photo = NULL, bio = '', active = 0, removed = 1 WHERE id = ?", viewer.id);
+      this.sql.exec("UPDATE members SET name = 'Former member', wa = '', phone = NULL, photo = NULL, jackson_photo = NULL, bio = '', interests = '[]', active = 0, removed = 1 WHERE id = ?", viewer.id);
       this.sql.exec("DELETE FROM sessions WHERE member = ?", viewer.id);
       return json({ ok: true }, 200, { "Set-Cookie": `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0` });
     }
@@ -504,6 +556,14 @@ export class CoffeeClub extends DurableObject {
       }
       if (b.bio !== undefined) this.sql.exec("UPDATE members SET bio = ? WHERE id = ?", String(b.bio).replace(/[<>]/g, "").slice(0, 140), viewer.id);
       if (b.active !== undefined) this.sql.exec("UPDATE members SET active = ? WHERE id = ?", b.active ? 1 : 0, viewer.id);
+      if (Array.isArray(b.interests)) {
+        const seen = new Set(), list = [];
+        for (const raw of b.interests) {
+          const t = String(raw).replace(/[<>\u0000-\u001f]/g, "").replace(/\s+/g, " ").trim().slice(0, 30);
+          if (t && !seen.has(t.toLowerCase()) && list.length < 10) { seen.add(t.toLowerCase()); list.push(t); }
+        }
+        this.sql.exec("UPDATE members SET interests = ? WHERE id = ?", JSON.stringify(list), viewer.id);
+      }
       return json(this.me(this.fresh(viewer)));
     }
 
@@ -524,7 +584,7 @@ export class CoffeeClub extends DurableObject {
       if (kind === "avatar") {
         const old = viewer.photo;
         this.sql.exec("INSERT INTO photos (id, mime, data, owner, created) VALUES (?, ?, ?, ?, ?)", id, mime, data, viewer.id, Date.now());
-        this.sql.exec("UPDATE members SET photo = ? WHERE id = ?", id, viewer.id);
+        this.sql.exec("UPDATE members SET photo = ?, no_photo = 0 WHERE id = ?", id, viewer.id);
         if (old) this.sql.exec("DELETE FROM photos WHERE id = ? AND week IS NULL", old);
       } else {
         const week = +url.searchParams.get("week"), gid = +url.searchParams.get("gid");
@@ -538,8 +598,7 @@ export class CoffeeClub extends DurableObject {
     if (path === "/photo/delete" && method === "POST") {
       const { id } = await body();
       if (id === "avatar") {
-        if (viewer.photo) this.sql.exec("DELETE FROM photos WHERE id = ?", viewer.photo);
-        this.sql.exec("UPDATE members SET photo = NULL WHERE id = ?", viewer.id);
+        this.dropPhotos(viewer.id);
       } else {
         const p = this.one("SELECT owner FROM photos WHERE id = ?", id);
         if (!p || (p.owner !== viewer.id && !viewer.admin)) return err("Not your photo.", 403);
@@ -584,6 +643,15 @@ export class CoffeeClub extends DurableObject {
           })),
         });
       }
+      if (path === "/admin/notify" && method === "GET") return json({ email: this.getMeta("notify_email") || "", ready: !!this.env.EMAIL });
+      if (path === "/admin/notify" && method === "POST") {
+        const { email } = await body();
+        const e = String(email || "").trim();
+        if (e && !/^[^\s@<>]+@[^\s@<>]+\.[a-z]{2,}$/i.test(e)) return err("That doesn't look like an email address.");
+        this.setMeta("notify_email", e);
+        return json({ ok: true, email: e });
+      }
+      if (path === "/admin/notify/test" && method === "POST") return json(await this.notifyRound(weekOf(), "test"));
       if (path === "/admin/member" && method === "POST") {
         const b = await body();
         if (b.add) {
@@ -599,6 +667,7 @@ export class CoffeeClub extends DurableObject {
         if (!m) return err("No such member.", 404);
         if (b.name !== undefined) this.sql.exec("UPDATE members SET name = ? WHERE id = ?", cleanName(b.name), m.id);
         if (b.active !== undefined) this.sql.exec("UPDATE members SET active = ? WHERE id = ?", b.active ? 1 : 0, m.id);
+        if (b.removePhoto) this.dropPhotos(m.id);
         if (b.resetPhone) { this.sql.exec("UPDATE members SET phone = NULL WHERE id = ?", m.id); this.sql.exec("DELETE FROM sessions WHERE member = ?", m.id); }
         if (b.remove && !m.admin) { this.sql.exec("UPDATE members SET removed = 1, active = 0 WHERE id = ?", m.id); this.sql.exec("DELETE FROM sessions WHERE member = ?", m.id); }
         return json({ ok: true });
@@ -609,6 +678,7 @@ export class CoffeeClub extends DurableObject {
         this.sql.exec("DELETE FROM photos WHERE week = ?", n);
         this.sql.exec("DELETE FROM groups WHERE week = ?", n);
         this.ensureWeek(n, Date.now() % 100000);
+        this.ctx.waitUntil(this.notifyRound(n, "reshuffled"));
         return json(this.me(this.fresh(viewer)));
       }
     }
