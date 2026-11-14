@@ -221,6 +221,8 @@ export class CoffeeClub extends DurableObject {
       this.sql.exec("ALTER TABLE groups ADD COLUMN plan_place TEXT");
       this.sql.exec("ALTER TABLE groups ADD COLUMN plan_by TEXT");
     }
+    if (!this.q("PRAGMA table_info(groups)").some((c) => c.name === "coord"))
+      this.sql.exec("ALTER TABLE groups ADD COLUMN coord TEXT");
     if (!this.q("PRAGMA table_info(members)").some((c) => c.name === "email")) {
       this.sql.exec("ALTER TABLE members ADD COLUMN email TEXT");
       this.sql.exec("ALTER TABLE members ADD COLUMN notify INTEGER NOT NULL DEFAULT 0");
@@ -238,6 +240,21 @@ export class CoffeeClub extends DurableObject {
   one(query, ...args) { return this.q(query, ...args)[0] || null; }
   member(id) { return this.one("SELECT * FROM members WHERE id = ? AND removed = 0", id); }
   // re-read a member after an edit, keeping this session's organizer flag
+  pickCoord(ids) {
+    const ms = ids.map((id) => this.member(id)).filter(Boolean);
+    if (!ms.length) return null;
+    const seen = ms.filter((m) => m.seen).sort((a, b) => b.seen - a.seen);
+    if (seen.length) return seen[0].id;
+    const withNum = ms.filter((m) => m.phone);
+    return (withNum[0] || ms[0]).id;
+  }
+  // every group of this round gets a coordinator (or a new one if theirs left the group)
+  ensureCoords(n = weekOf()) {
+    for (const g of this.q("SELECT gid, members, coord FROM groups WHERE week = ?", n)) {
+      const ids = JSON.parse(g.members);
+      if (!g.coord || !ids.includes(g.coord)) this.sql.exec("UPDATE groups SET coord = ? WHERE week = ? AND gid = ?", this.pickCoord(ids), n, g.gid);
+    }
+  }
   getMeta(k) { return this.one("SELECT v FROM meta WHERE k = ?", k)?.v ?? null; }
   setMeta(k, v) { this.sql.exec("INSERT INTO meta (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v", k, v); }
 
@@ -250,6 +267,8 @@ export class CoffeeClub extends DurableObject {
     if (!this.env.EMAIL) return { sent: false, error: "Email isn't set up on the site yet (no EMAIL binding)." };
     if (why === "new" && this.getMeta("notified:" + n)) return { sent: false, error: "Already sent for this round." };
     const people = new Map(this.q("SELECT * FROM members").map((m) => [m.id, m]));
+    this.ensureCoords(n);
+    const coords = new Set(this.q("SELECT coord FROM groups WHERE week = ?", n).map((g) => g.coord));
     const groups = this.q("SELECT * FROM groups WHERE week = ? ORDER BY gid", n).map((g) => JSON.parse(g.members).map((id) => people.get(id)).filter(Boolean));
     if (!groups.length) return { sent: false, error: "No groups this round." };
     const r = weekRange(n), url = "https://dornyei.com/jackson-coffee-buddies";
@@ -259,15 +278,17 @@ export class CoffeeClub extends DurableObject {
     const paste = `Round ${n} of Jackson Coffee Buddies is up (${r.start} to ${r.end}). See your group and say hi: ${url}`;
     const title = why === "test" ? `Coffee Buddies round ${n}: this round's groups` : why === "reshuffled" ? `Coffee Buddies round ${n}: groups were redone` : `Coffee Buddies round ${n}: ${groups.length} new groups`;
     const text = [title, `${r.start} to ${r.end}. ${withNums} of ${total} people have a number linked.`, "", "Paste in the Jackson group:", paste, "",
-      ...groups.map((g, i) => `${i + 1}. ` + g.map((m) => `${m.name}${m.phone ? " " + fmt(m.phone) : " (no number yet)"}`).join(", "))].join("\n");
+      "(★ = coordinator, makes the group chat and picks a time)", "",
+      ...groups.map((g, i) => `${i + 1}. ` + g.map((m) => `${coords.has(m.id) ? "★ " : ""}${m.name}${m.phone ? " " + fmt(m.phone) : " (no number yet)"}`).join(", "))].join("\n");
     const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1f1a17;max-width:640px">
       <h2 style="color:#3152a4;margin:0 0 4px">${h(title)}</h2>
       <p style="margin:0 0 14px;color:#5a5048">${h(r.start)} to ${h(r.end)}. ${withNums} of ${total} people have a number linked.</p>
+      <p style="margin:0 0 10px;color:#5a5048">★ marks each group's coordinator, who makes the group chat and picks a time.</p>
       <p style="margin:0 0 4px"><b>Paste in the Jackson group:</b></p>
       <p style="background:#f3ead8;padding:10px 12px;border-radius:8px;margin:0 0 18px">${h(paste)}</p>
-      <table style="border-collapse:collapse;width:100%">${groups.map((g, i) => `<tr><td style="padding:8px 8px 8px 0;border-top:1px solid #e6dccb;vertical-align:top;color:#8d8278">${i + 1}</td><td style="padding:8px 0;border-top:1px solid #e6dccb">${g.map((m) => m.phone
+      <table style="border-collapse:collapse;width:100%">${groups.map((g, i) => `<tr><td style="padding:8px 8px 8px 0;border-top:1px solid #e6dccb;vertical-align:top;color:#8d8278">${i + 1}</td><td style="padding:8px 0;border-top:1px solid #e6dccb">${g.map((m) => (coords.has(m.id) ? "★ " : "") + (m.phone
         ? `<a href="https://wa.me/${m.phone}" style="color:#1f8f4e;font-weight:bold;text-decoration:none">${h(m.name)}</a> <span style="color:#8d8278">${h(fmt(m.phone))}</span>`
-        : `<b>${h(m.name)}</b> <span style="color:#8d8278">(no number yet)</span>`).join("<br>")}</td></tr>`).join("")}</table>
+        : `<b>${h(m.name)}</b> <span style="color:#8d8278">(no number yet)</span>`)).join("<br>")}</td></tr>`).join("")}</table>
       <p style="margin-top:18px;color:#8d8278;font-size:13px">Sent by ${h(url)}. Change or turn off these emails in the organizer section of the page.</p></div>`;
     try {
       await this.env.EMAIL.send({ to, from: { email: "coffee@dornyei.com", name: "Jackson Coffee Buddies" }, subject: title, html, text });
@@ -338,7 +359,7 @@ export class CoffeeClub extends DurableObject {
     const ids = this.q("SELECT id FROM members WHERE removed = 0 AND active = 1 AND name != '' ORDER BY id").map((r) => r.id);
     if (ids.length < 2) return false;
     const groups = makeGroups(ids, this.metMap(n), 20261116 + n * 7919 + salt);
-    groups.forEach((g, i) => this.sql.exec("INSERT INTO groups (week, gid, members) VALUES (?, ?, ?)", n, i + 1, JSON.stringify(g)));
+    groups.forEach((g, i) => this.sql.exec("INSERT INTO groups (week, gid, members, coord) VALUES (?, ?, ?, ?)", n, i + 1, JSON.stringify(g), this.pickCoord(g)));
     return true;
   }
 
@@ -458,6 +479,7 @@ export class CoffeeClub extends DurableObject {
       cafe: g.cafe || "", photos, mine: ids.includes(viewer.id),
       chat: g.chat || "", chatBy: g.chat_by ? (people.get(g.chat_by)?.name || "") : null,
       avail: Object.fromEntries(this.q("SELECT member, slots FROM avail WHERE week = ? AND gid = ?", g.week, g.gid).map((a) => [a.member, JSON.parse(a.slots)])),
+      coord: g.coord || null,
       plan: g.plan_at ? { at: g.plan_at, place: g.plan_place || "", by: people.get(g.plan_by)?.name || "" } : null,
     };
   }
@@ -465,6 +487,7 @@ export class CoffeeClub extends DurableObject {
   me(viewer) {
     const n = weekOf();
     this.ensureWeek(n);
+    this.ensureCoords(n);
     const people = new Map(this.q("SELECT * FROM members").map((m) => [m.id, m]));
     const all = this.q("SELECT * FROM groups ORDER BY week DESC, gid");
     this.mates = new Set();
@@ -732,6 +755,14 @@ export class CoffeeClub extends DurableObject {
     }
 
     // the table's WhatsApp group: someone makes it in WhatsApp and pastes the invite link here
+    if (path === "/coord" && method === "POST") {
+      const { week, gid } = await body();
+      const g = this.one("SELECT members FROM groups WHERE week = ? AND gid = ?", +week, +gid);
+      if (!g || !JSON.parse(g.members).includes(viewer.id)) return err("Not your group.", 403);
+      this.sql.exec("UPDATE groups SET coord = ? WHERE week = ? AND gid = ?", viewer.id, +week, +gid);
+      return json(this.me(this.fresh(viewer)));
+    }
+
     // your free hours for this group: slot keys "YYYY-MM-DD|HH" (New York time)
     if (path === "/avail" && method === "POST") {
       const { week, gid, slots } = await body();

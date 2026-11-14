@@ -235,6 +235,10 @@ button.center:hover,a.center:hover{transform:translate(-50%,-50%) rotate(-8deg) 
 .planned p{margin:6px 0 14px;color:#dfe8f8}
 .planned .acts{display:flex;gap:8px;flex-wrap:wrap}
 .planned .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.5);box-shadow:none}
+.coord-chip{display:inline-block;vertical-align:2px;margin-left:6px;background:var(--gold);color:var(--navy);font:800 12px/1 var(--display);padding:4px 8px;border-radius:999px}
+.role{margin-top:12px;background:#fff8d6;border:1.5px solid #f1e3a0;border-radius:14px;padding:10px 14px;font-size:15px;color:var(--ink-2)}
+.role b{color:var(--navy)}
+.role.me{background:var(--gold);border-color:#d9bd12;color:var(--navy)}
 .tags{display:flex;flex-wrap:wrap;gap:6px}
 .tag{display:inline-block;background:#fff;border:1.5px solid #c9d7f1;color:var(--navy);border-radius:999px;padding:3px 10px;font-weight:700;font-size:13.5px}
 .tag.hot{background:var(--blue);border-color:var(--blue);color:#fff}
@@ -521,7 +525,7 @@ function tableHtml(members, { empty = false, center = "" } = {}) {
     return `<${el} class="cup ${p.me ? "me" : ""} ${s.y < 45 ? "up" : ""}" style="left:${s.x}%;top:${s.y}%" data-i="${i}" ${empty ? "" : `type="button" data-person="${esc(p.id)}" title="${esc(p.name)}"`}>
       <span class="saucer"></span><span class="handle" style="transform:rotate(${s.deg + 35}deg) translate(28%,-50%)"></span>
       <span class="rim"></span><span class="coffee">${inner}</span>
-      ${empty ? `<svg class="steam" viewBox="0 0 40 50"><path d="M12 48c-6-8 6-12 0-22s6-14 2-24"/><path d="M22 48c-6-8 6-12 0-22s6-14 2-24"/><path d="M32 48c-6-8 6-12 0-22s6-14 2-24"/></svg>` : `<span class="label" style="--t:${(i % 2 ? 3 : -3)}deg">${esc(p.me ? "You" : p.name)}</span>`}
+      ${empty ? `<svg class="steam" viewBox="0 0 40 50"><path d="M12 48c-6-8 6-12 0-22s6-14 2-24"/><path d="M22 48c-6-8 6-12 0-22s6-14 2-24"/><path d="M32 48c-6-8 6-12 0-22s6-14 2-24"/></svg>` : `<span class="label" style="--t:${(i % 2 ? 3 : -3)}deg">${p.id && p.id === curCoord ? "★ " : ""}${esc(p.me ? "You" : p.name)}</span>`}
     </${el}>`;
   }).join("");
   return `<div class="table">${cups}${center}</div>`;
@@ -660,12 +664,13 @@ function render() {
   $("#org").hidden = !d.me.admin; if (d.me.admin) renderOrg();
 }
 
+let curCoord = null; // this round's coordinator id for the group being drawn
 function personCard(p) {
   const num = p.phone
     ? `<span class="num">${esc(fmtPhone(p.phone))}</span><a class="btn wa sm" href="${esc(waLink(p, hello(p)))}" target="_blank" rel="noopener">${waIco}Say hi</a>`
     : `<span class="none">${p.signedUp ? "Number hidden." : "Hasn't signed in yet, so no number here. They're in the Jackson WhatsApp group."}</span>`;
   return `<div class="person">${avatar(p, "", `data-person="${esc(p.id)}"`)}
-    <div><div class="nm"><button type="button" data-person="${esc(p.id)}">${esc(p.name)}</button></div>
+    <div><div class="nm"><button type="button" data-person="${esc(p.id)}">${esc(p.name)}</button>${p.id === curCoord ? ` <span class="coord-chip">★ Coordinator</span>` : ""}</div>
     ${p.wa ? `<div class="sub">“${esc(p.wa)}” on WhatsApp</div>` : ""}${p.bio ? `<div class="bio">${esc(p.bio)}</div>` : ""}
     ${(p.interests || []).length ? `<div class="tags mini-tags">${tags(p.interests)}</div>` : ""}
     <div class="acts">${num}</div></div></div>`;
@@ -695,11 +700,17 @@ function renderMine() {
     return;
   }
   const others = g.members.filter((p) => !p.me);
+  curCoord = g.coord;
+  const coordP = g.members.find((p) => p.id === g.coord), iCoord = coordP?.me;
+  const role = iCoord
+    ? `<div class="role me"><b>★ You're the coordinator this round.</b> Make the group chat and pick a time below.</div>`
+    : coordP ? `<div class="role"><b>★ ${esc(first(coordP))} is coordinating.</b> They'll make the group chat and pick a time. <button class="linkbtn" type="button" id="take-coord">I'll coordinate instead</button></div>` : "";
   const until = d.week.last ? `classes end on ${day(d.week.end, { weekday: "long", month: "short", day: "numeric" })}` : `${monday(d.week.next)}, when the cups get shuffled again`;
   copy.innerHTML = `<span class="kicker">${d.week.last ? "Last round, " + range(d.week) : roundLabel(d.week)}</span>
     <h1>You, <em>${esc(list(others.map(first)))}</em></h1>
     <p class="when">${g.done ? (d.week.last ? "You've met. That was the last round of the year." : "You've met this round. New groups on " + monday(d.week.next) + ".") : "Have a coffee before " + until + "."}</p>
     <div class="people">${others.map(personCard).join("")}</div>
+    ${role}
     <p class="small muted" style="margin:12px 0 0">Can't do it this term? <button class="linkbtn" type="button" id="to-optout">Pause or opt out</button></p>`;
   // the middle of the table: a green coaster with spinning text around the WhatsApp logo
   const ring = (label) => `<svg class="spin" viewBox="0 0 100 100" aria-hidden="true"><defs><path id="ringpath" d="M50,50 m-39,0 a39,39 0 1,1 78,0 a39,39 0 1,1 -78,0"/></defs>
@@ -720,7 +731,7 @@ function renderMine() {
     ? `<h3>Group chat</h3><p>${g.chatBy ? esc(g.chatBy) + " made one." : "Your group has a chat."}</p>
        <a class="btn wa" href="${esc(g.chat)}" target="_blank" rel="noopener">${waIco}Open the group chat</a>
        <p class="small" style="margin:12px 0 0"><button class="linkbtn" type="button" id="chat-change">Change the link</button></p>`
-    : `<h3>Make a group chat</h3><p>WhatsApp won't let a website make groups, so one of you does it in the app:</p>
+    : `<h3>${iCoord ? "Make the group chat" : "Group chat"}</h3><p>${iCoord ? "You're the coordinator, so this one's yours. WhatsApp won't let a website make groups, so do it in the app:" : `${esc(coordP ? first(coordP) : "Your coordinator")} will make it. If nothing has happened in a day or two, make it yourself:`}</p>
        <ol>
          <li>${withNum.length ? `<button class="btn sm ghost" type="button" id="vcf">Save ${esc(list(withNum.map(first)))} to contacts</button>` : "No numbers here yet."}${without.length ? `<br><span class="muted small">${esc(list(without.map(first)))} ${without.length > 1 ? "haven't" : "hasn't"} signed in, so find them in the Jackson group.</span>` : ""}</li>
          <li>New group in WhatsApp, add them, name it “${esc(gname)}”. <button class="linkbtn" type="button" id="copy-name">Copy name</button></li>
@@ -755,6 +766,7 @@ function renderMine() {
   const ai = $("#add-interests"); if (ai) ai.onclick = () => { focusInterests = true; openProfile(); };
   wireChat(g, others);
   $("#to-optout").onclick = () => { focusOptout = true; openProfile(); };
+  const tc = $("#take-coord"); if (tc) tc.onclick = async () => { try { S = await post("/coord", { week: g.week, gid: g.gid }); render(); toast("You're coordinating now. Start the group chat!"); } catch (er) { toast(er.message); } };
 }
 
 // what your group has in common, from the interests each of you picked
