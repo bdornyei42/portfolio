@@ -868,6 +868,24 @@ export class CoffeeClub extends DurableObject {
         if (!t.includes(m.id)) this.sql.exec("UPDATE groups SET members = ? WHERE week = ? AND gid = ?", JSON.stringify([...t, m.id]), n, +gid);
         return json({ ok: true });
       }
+      // round progress for the organizer: who signed in, who marked times, who agreed on a time
+      if (path === "/admin/stats" && method === "GET") {
+        const n = weekOf(), w = weekInfo();
+        const ms = this.q("SELECT id, name, seen FROM members WHERE removed = 0 AND name != ''");
+        const byId = new Map(ms.map((m) => [m.id, m]));
+        const roundStart = R[n - 1].s * DAY + 5 * 3600e3;
+        const avail = this.q("SELECT gid, member, slots FROM avail WHERE week = ?", n).filter((a) => JSON.parse(a.slots).length);
+        const groups = this.q("SELECT * FROM groups WHERE week = ? ORDER BY gid", n).map((g) => {
+          const ids = JSON.parse(g.members);
+          return { gid: g.gid, members: ids.map((id) => byId.get(id)?.name || id), coord: byId.get(g.coord)?.name || null,
+            signedIn: ids.filter((id) => byId.get(id)?.seen).length, markedTimes: avail.filter((a) => a.gid === g.gid).length,
+            plan: g.plan_at ? { at: g.plan_at, place: g.plan_place || "" } : null, chat: !!g.chat, met: !!g.done_at, cafe: g.cafe || "" };
+        });
+        return json({ round: { n, ...weekRange(n), total: w.total }, people: ms.length,
+          signedIn: ms.filter((m) => m.seen).length, signedInThisRound: ms.filter((m) => m.seen >= roundStart).length,
+          groups: groups.length, withTimes: groups.filter((g) => g.markedTimes).length, agreed: groups.filter((g) => g.plan).length,
+          chats: groups.filter((g) => g.chat).length, met: groups.filter((g) => g.met).length, list: groups });
+      }
       if (path === "/admin/rebalance" && method === "POST") return json({ ok: true, moves: this.rebalance() });
       if (path === "/admin/duplicates" && method === "GET") {
         const ms = this.q("SELECT id, name, wa, phone, seen FROM members WHERE removed = 0 AND name != ''");
